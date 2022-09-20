@@ -88,7 +88,7 @@ function App() {
   var diagnosticsUdpRef = useRef(null);
   var diagnosticsHostRef = useRef(null);
   var diagnosticsReflexRef = useRef(null);
-  var exWebClient = new ExotelWebClient()
+  var exWebClient = new ExotelWebClient();
   var configRefs = {
     'Username':useRef(null),
     'DisplayName':useRef(null),

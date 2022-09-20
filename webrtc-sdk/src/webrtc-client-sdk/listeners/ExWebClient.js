@@ -20,8 +20,8 @@ import { registerCallback } from '../listeners/Callback';
 import { sessionCallback } from '../listeners/Callback';
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
-var webrtcSIPPhoneInterface = require('../../webrtc-core-sdk/webrtcSIPPhoneInterface');
 import webrtcSIPPhoneService from '../../webrtc-core-sdk/webrtcSIPPhoneService';
+import webrtcSIPPhone from "../../webrtc-core-sdk/webrtcSIPPhone";
 
 import { webrtcLogger } from "../api/omAPI/WebrtcLogger";
 
@@ -210,13 +210,13 @@ export function ExotelWebClient() {
 
     var sipAccountInfo = null;
 	console.log(webrtcSIPPhoneService)
-    if (logger) {
-        webrtcSIPPhoneService.setWebrtcLogger(logger);
-        console.log("Webrtc Logger")
-    } else {
-        webrtcSIPPhoneService.setWebrtcLogger(console);
-        console.log("Console Logger")
-    }
+    // if (logger) {
+    //     webrtcSIPPhoneService.setWebrtcLogger(logger);
+    //     console.log("Webrtc Logger")
+    // } else {
+    //     webrtcSIPPhoneService.setWebrtcLogger(console);
+    //     console.log("Console Logger")
+    // }
 
     this.initWebrtc = function(sipAccountInfo_, 
         RegisterEventCallBack, CallListenerCallback, SessionCallback) {

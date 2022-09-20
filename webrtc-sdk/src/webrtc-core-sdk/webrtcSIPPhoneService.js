@@ -97,7 +97,7 @@ const webrtcSIPPhoneService = {
 
 		webrtcSIPPhone.registerPhone(engine,webrtcPhoneDelegate);
 		
-		logger.info("Going to register webrtc instance");		
+		// logger.info("Going to register webrtc instance");		
 		registerWebrtcInstance(result,uiCallbackHandler);
 		startCheckingWebrtcStatus(result, webRTCStatusCallbackHandler,uiCallbackHandler);
 		
