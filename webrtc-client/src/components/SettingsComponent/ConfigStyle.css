@@ -1,0 +1,65 @@
+.config-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.config-card {
+    width: 350px;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+}
+.card-container {
+    display:flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+.div-container {
+    display:flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+.input {
+    margin: 20px;
+    height: 40px;
+}
+.p-config{
+    margin: 25px;
+    height: 40px;
+    font-weight: bold;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+.config-header-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.config-header-h1 {
+    color: #2194FF;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin: 3%;
+}
+.submit-btn {
+    margin: 10px;
+    background-color: #2194FF;
+    border:none;
+    width: 120px;
+    height:40px;
+    color:white;
+    font-weight: bold;
+    font-size: 17px;
+    border-radius: 5px;
+}
+.btn-div {
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}

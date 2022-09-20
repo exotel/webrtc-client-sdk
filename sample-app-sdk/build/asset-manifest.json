@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/static/css/main.c2cbe675.css",
+    "main.js": "/static/js/main.e9c3c0e0.js",
+    "static/js/787.8e53b886.chunk.js": "/static/js/787.8e53b886.chunk.js",
+    "static/media/ringtone.wav": "/static/media/ringtone.c79bd9a78f9efa815c0f.wav",
+    "static/media/ringbacktone.wav": "/static/media/ringbacktone.9b002be293af5cfbf781.wav",
+    "static/media/beep.wav": "/static/media/beep.2fbb7f0f87f09e54287f.wav",
+    "index.html": "/index.html",
+    "main.c2cbe675.css.map": "/static/css/main.c2cbe675.css.map",
+    "main.e9c3c0e0.js.map": "/static/js/main.e9c3c0e0.js.map",
+    "787.8e53b886.chunk.js.map": "/static/js/787.8e53b886.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c2cbe675.css",
+    "static/js/main.e9c3c0e0.js"
+  ]
+}
