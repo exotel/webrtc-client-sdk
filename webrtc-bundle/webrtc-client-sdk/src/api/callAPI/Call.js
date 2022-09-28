@@ -1,12 +1,9 @@
 import { CallDetails } from "./CallDetails";
-//import webrtcSIPPhoneInterface from '../../../webrtc-sdk-core/webrtcSIPPhoneInterface'
 import { webrtcLogger } from "../omAPI/WebrtcLogger"
 
 var logger = webrtcLogger()
 var webrtcSDK = require('../../webrtc-sdk-core/webrtcsdk');
-var webrtcSIPPhoneInterface_ =  webrtcSDK.webrtcSIPPhoneInterface;
-// var webrtcSIPPhoneInterface_ =  require('../../../webrtc-sdk-core/webrtcSIPPhoneInterface');
-//var webrtcSIPPhoneInterface_ =  new webrtcSIPPhoneInterface()
+var webrtcSIPPhone = webrtcSDK.webrtcSIPPhone;
 
 export function Call()  {
     this.Answer = function() {
@@ -14,7 +11,7 @@ export function Call()  {
          * When agent accepts phone, add appropriate msg to be sent to webclient
          */
         logger.log('Call answered')
-        webrtcSIPPhoneInterface_.pickCall();
+        webrtcSIPPhone.pickCall();
     }
 
     this.Hangup = function() {
@@ -22,7 +19,7 @@ export function Call()  {
          * When call is terminated
          */
         logger.log('call ended')
-        webrtcSIPPhoneInterface_.rejectCall();
+        webrtcSIPPhone.rejectCall();
     }
 
     this.MuteToggle = function() {
@@ -31,7 +28,7 @@ export function Call()  {
          */
         logger.log('mute toggle clicked')
         let dummyFlag = null;
-        webrtcSIPPhoneInterface_.webRTCMuteUnmute(null);
+        webrtcSIPPhone.webRTCMuteUnmute(null);
     }
 
     this.Mute = function() {
@@ -40,7 +37,7 @@ export function Call()  {
          */
         logger.log('mute clicked')
         let dummyFlag = true;
-        webrtcSIPPhoneInterface_.webRTCMuteUnmute(dummyFlag);
+        webrtcSIPPhone.webRTCMuteUnmute(dummyFlag);
     }
 
     this.UnMute = function() {
@@ -49,7 +46,7 @@ export function Call()  {
          */
         logger.log('unmute clicked')
         let dummyFlag = false;
-        webrtcSIPPhoneInterface_.webRTCMuteUnmute(dummyFlag);
+        webrtcSIPPhone.webRTCMuteUnmute(dummyFlag);
     }
 
     this.HoldToggle = function() {
@@ -57,7 +54,8 @@ export function Call()  {
          * When user clicks on hold
          */
         logger.log('Hold toggle clicked')
-        webrtcSIPPhoneInterface_.callHold();
+        // webrtcSIPPhoneInterface_.callHold();
+        webrtcSIPPhone.holdCall();
     }
 
     this.Hold = function() {
@@ -66,7 +64,8 @@ export function Call()  {
          */
         logger.log('hold clicked')
         let dummyFlag = true;
-        webrtcSIPPhoneInterface_.holdAction(dummyFlag);
+        // webrtcSIPPhoneInterface_.holdAction(dummyFlag);
+        webrtcSIPPhone.holdCall();
     }
 
     this.UnHold = function() {
@@ -75,7 +74,8 @@ export function Call()  {
          */
          logger.log('unhold clicked')
          let dummyFlag = true;
-         webrtcSIPPhoneInterface_.holdAction(dummyFlag);
+        //  webrtcSIPPhoneInterface_.holdAction(dummyFlag);
+        webrtcSIPPhone.holdCall();
     }
 
     this.callDetails = function() {

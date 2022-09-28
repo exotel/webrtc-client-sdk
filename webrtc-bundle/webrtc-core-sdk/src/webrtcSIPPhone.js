@@ -15,7 +15,7 @@ function sendWebRTCEventsToFSM (eventType, sipMethod) {
 
 let sipAccountInfoData = {};
 
-const webrtcSIPPhone = {
+export const webrtcSIPPhone = {
 
 
 	 isConnected: () => {

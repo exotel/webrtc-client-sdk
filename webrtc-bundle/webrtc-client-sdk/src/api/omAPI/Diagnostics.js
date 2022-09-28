@@ -1,5 +1,4 @@
 import { diagnosticsCallback } from "../../listeners/Callback";
-//import { webrtcSIPPhoneInterface } from '../../../webrtc-sdk-core/webrtcSIPPhoneInterface';
 import { webrtcLogger } from "./WebrtcLogger"
 
 var logger = webrtcLogger()
@@ -26,7 +25,7 @@ eventMapper.sipml5.terminated_REGISTER = "USER_REG_TEST_FAIL";
 var candidateProcessData = {};
 //var webrtcSIPPhoneInterface_ =  new webrtcSIPPhoneInterface()
 var webrtcSDK = require('../../webrtc-sdk-core/webrtcsdk');
-var webrtcSIPPhoneInterface_ =  webrtcSDK.webrtcSIPPhoneInterface;
+var webrtcSIPPhone = webrtcSDK.webrtcSIPPhone;
 // var webrtcSIPPhoneInterface_ =  require('../../../webrtc-sdk-core/webrtcSIPPhoneInterface')
 
 export var ameyoWebRTCTroubleshooter = {
@@ -145,7 +144,7 @@ export var ameyoWebRTCTroubleshooter = {
   },
 
   stopSpeakerTesttone: function () {
-    speakerTestTone = webrtcSIPPhoneInterface_.getSpeakerTestTone();
+    speakerTestTone = webrtcSIPPhone.getSpeakerTestTone();
     speakerTestTone.pause();
   },
 
@@ -170,7 +169,7 @@ export var ameyoWebRTCTroubleshooter = {
     intervalID = setInterval(function(){
 
           try {
-          speakerTestTone = webrtcSIPPhoneInterface_.getSpeakerTestTone();
+          speakerTestTone = webrtcSIPPhone.getSpeakerTestTone();
           /* Close last pending tracks.. */
           logger.log("close last track")
           speakerTestTone.pause();
@@ -230,7 +229,7 @@ export var ameyoWebRTCTroubleshooter = {
 
   stopSpeakerTest: function () {
     var parent = this;       
-    speakerTestTone = webrtcSIPPhoneInterface_.getSpeakerTestTone();
+    speakerTestTone = webrtcSIPPhone.getSpeakerTestTone();
     //Enable this for tone loop - Start
     try {
       clearInterval(intervalID) 
@@ -444,7 +443,7 @@ export var ameyoWebRTCTroubleshooter = {
 
   setWSTroubleshootData: function(txtWsStatus) {
 	  //Already done during init, no need to do again. 
-    let txtWSSUrl = webrtcSIPPhoneInterface_.getWSSURL()
+    let txtWSSUrl = webrtcSIPPhone.getWSSUrl();
     diagnosticsCallback.triggerKeyValueSetCallback("wss", txtWsStatus, txtWSSUrl)
   },
 

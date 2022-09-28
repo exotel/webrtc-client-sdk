@@ -20,13 +20,10 @@ import { registerCallback } from '../listeners/Callback';
 import { sessionCallback } from '../listeners/Callback';
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
-//import { webrtcSIPPhoneService } from '../../webrtc-sdk-core/webrtcSIPPhoneService';
 
 import { webrtcLogger } from "../api/omAPI/WebrtcLogger";
-//var webrtcSIPPhoneService_ = new webrtcSIPPhoneService()
-// var webrtcSIPPhoneService_ = require('../../webrtc-sdk-core/webrtcSIPPhoneService');
 var webrtcSDK = require('../webrtc-sdk-core/webrtcsdk');
-var webrtcSIPPhoneService_ = webrtcSDK.webrtcSIPPhoneService;
+var webrtcSIPPhone = webrtcSDK.webrtcSIPPhone;
 
 var intervalId;
 var intervalIDMap = new Map();
@@ -213,19 +210,6 @@ const  ExotelWebClient = function() {
 
     var sipAccountInfo = null;
 
-    this.startLogger = function(myLogger) {
-        webrtcSIPPhoneService_.setWebrtcLogger(myLogger);
-    }
-
-
-    if (logger) {
-        console.log("Webrtc Logger", webrtcSIPPhoneService_)
-        this.startLogger(logger);
-    } else {
-        console.log("Console Logger", webrtcSIPPhoneService_)
-        this.startLogger(console);
-    }
-
     this.initWebrtc = function(sipAccountInfo_, 
         RegisterEventCallBack, CallListenerCallback, SessionCallback) {
 
@@ -388,7 +372,8 @@ const  ExotelWebClient = function() {
      * @param {*} sipAccountInfo 
      */
     this.unregister = function(sipAccountInfo){
-        webrtcSIPPhone.unregister(sipAccountInfo)
+        // webrtcSIPPhone.unregister(sipAccountInfo)
+        webrtcSIPPhone.sipUnRegisterWebRTC()
     } 
 
 
@@ -473,8 +458,8 @@ const  ExotelWebClient = function() {
         //this.webRTCPhones[this.userName] = webRTC;
 
         /* New-Way  */
-        webrtcSIPPhoneService_.init("sipjs", this,
-        this.webRTCStatusCallbackHandler, delegationHandler, synchronousHandler);
+        webrtcSIPPhone.registerPhone("sipjs",delegationHandler);
+        webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler);
 
          /**
           * Store the intervalID against a map
