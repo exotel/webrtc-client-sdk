@@ -1,0 +1,25 @@
+{
+  "name": "@exotel/webrtc-client-sdk",
+  "version": "1.0.0",
+  "description": "client sdk for webrtc based on webrtc core sdk",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://bitbucket.org/Exotel/webrtc.git"
+  },
+  "keywords": [
+    "webrtc"
+  ],
+  "author": "exotel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://bitbucket.org/Exotel/webrtc/issues"
+  },
+  "homepage": "https://bitbucket.org/Exotel/webrtc#readme",
+  "dependencies": {
+    "@exotel/webrtc-core-sdk": "file:../webrtc-core-sdk"
+  }
+}
