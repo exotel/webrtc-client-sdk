@@ -1,7 +1,7 @@
 import { diagnosticsCallback } from "../../listeners/Callback";
 import { webrtcLogger } from "./WebrtcLogger"
 
-var webrtcSIPPhone = require('@exotel/webrtc-core-sdk/src/webrtcSIPPhone').webrtcSIPPhone;
+var webrtcSIPPhone = require('@exotel-npm-dev/webrtc-core-sdk/src/webrtcSIPPhone').webrtcSIPPhone;
 var logger = webrtcLogger()
 var speakerNode;
 var micNode;

@@ -31,20 +31,20 @@ export var callbacks = {
  * Initializes register callback and also sets to which phone registration was renewed
  */
     export var registerCallback = {
-        registerCallback :null,
+        registerCallbackHandler :null,
         registerState: null,
         phone:'',
         initializeRegisterCallback: function(RegisterEventCallBack){
-            this.registerCallback = RegisterEventCallBack;
+            registerCallback.registerCallbackHandler = RegisterEventCallBack;
         },
         initializeRegister: function(state, phone){
-            this.registerState = state;
-            this.phone = phone;
+            registerCallback.registerState = state;
+            registerCallback.phone = phone;
         },
         triggerRegisterCallback: function(){
-            const callbackFunc = this.registerCallback;
-            const state = this.registerState
-            return callbackFunc(state, this.phone);
+            const callbackFunc = registerCallback.registerCallbackHandler;
+            const state = registerCallback.registerState
+            return callbackFunc(state, registerCallback.phone);
         }
     };
 /**

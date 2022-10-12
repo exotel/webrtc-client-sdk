@@ -1,7 +1,7 @@
 import { CallDetails } from "./CallDetails";
 import { webrtcLogger } from "../omAPI/WebrtcLogger"
 
-var webrtcSIPPhone = require('@exotel/webrtc-core-sdk/src/webrtcSIPPhone').webrtcSIPPhone;
+var webrtcSIPPhone = require('@exotel-npm-dev/webrtc-core-sdk/src/webrtcSIPPhone').webrtcSIPPhone;
 var logger = webrtcLogger()
 
 export function Call()  {
