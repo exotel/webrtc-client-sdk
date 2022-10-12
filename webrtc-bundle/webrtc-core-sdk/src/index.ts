@@ -1,5 +1,5 @@
 const version = "1.0.0"
-const name = "webrtc-core-sdk.js";
+const name = "webrtcsdk.js";
 export { name, version };
 
 

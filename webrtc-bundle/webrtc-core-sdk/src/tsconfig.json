@@ -2,8 +2,8 @@
     "extends": "../tsconfig-base.json",
     "compilerOptions": {
       "allowJs": true,
-      "declaration": true,
-      "declarationMap": true,
+      "declaration": false,
+      "declarationMap": false,
       "outDir": "../lib"
     },
     "include": [
