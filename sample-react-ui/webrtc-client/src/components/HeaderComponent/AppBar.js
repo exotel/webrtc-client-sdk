@@ -32,7 +32,6 @@ import DiagnosticsAskPopup from '../DiagnosticsComponent/DiagnosticsAskPopup';
 import data from '../../phone.json';
 import { uuid } from 'uuidv4';
 import { FetchTabInfo } from '../../constants/common';
-import { ExotelWebClient } from '@exotel/webrtc-sdk-diagnostics/src/webrtc-client-sdk/listeners/ExWebClient';
 import logoSrc from '../../static/exotelLogo.jpg'
 import { createRef, useState } from 'react'
 import { useScreenshot, createFileName  } from 'use-react-screenshot'
@@ -87,7 +86,7 @@ export default function PrimaryPhoneAppBar(myPhoneDetails) {
   /**
    * Initialize all the singleton functions here
    */
-  var exWebClient = new ExotelWebClient()
+  var exWebClient = require('@exotel-npm-dev/webrtc-client-sdk/src/listeners/ExWebClient').ExotelWebClient;
   var call;
   var sipAccountInfo;
 
