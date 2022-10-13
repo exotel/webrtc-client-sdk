@@ -1,0 +1,22 @@
+{
+  "name": "@exotel-npm-dev/webrtc-core-sdk",
+  "version": "1.0.0",
+  "description": "core sdk for webrtc based in sip-0.20.0.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://bitbucket.org/Exotel/webrtc-sdk.git"
+  },
+  "keywords": [
+    "webrtc"
+  ],
+  "author": "exotel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://bitbucket.org/Exotel/webrtc/issues"
+  },
+  "homepage": "https://bitbucket.org/Exotel/webrtc#readme"
+}

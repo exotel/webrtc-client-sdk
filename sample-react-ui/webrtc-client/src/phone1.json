@@ -1,0 +1,26 @@
+[
+
+    {
+        "agentName": "agent2",
+        "agentPwd": "agent2",
+        "AccountSID": { 
+                "value": "exotelt1",
+                "ua": [
+    
+                        {
+                            "Username":"harsham79e843e5",
+                            "DisplayName":"Harsha",
+                            "HostServer":"voip.exotel.in",
+                            "Domain":"ccplexopoc1m.voip.exotel.com",
+                            "Port":443,
+                            "Password":"webrtc123",
+                            "CallTimeout":1000,
+			                "Security": "wss",
+                            "AccountSID":"exotelt1",
+                            "AccountNo":"harsham79e843e5",
+                            "AutoRegistration": true
+                        }                       
+                    ]
+            }
+        }
+]
