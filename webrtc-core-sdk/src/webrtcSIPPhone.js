@@ -18,7 +18,7 @@ let sipAccountInfoData = {};
 export const webrtcSIPPhone = {
 
 
-	 isConnected: () => {
+	isConnected: () => {
 		var status = phone.getStatus();
 		if (status != "offline") {
 			return true;

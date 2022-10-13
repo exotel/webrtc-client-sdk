@@ -13,7 +13,7 @@ module.exports = {
   entry: {
     webrtcsdk:'./src/index.ts'
   },
-  devtool: 'inline-source-map',
+  devtool: 'source-map',
   mode: 'development',
   output: {
     filename:'[name].js',
@@ -24,8 +24,19 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.wav$/, use: 'file-loader' },
-      { test: /\.ts$/, use: 'ts-loader' },
+      { test: /\.wav$/,exclude: /node_modules/, use: 'file-loader' },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        loader: "ts-loader",
+        options: {
+          compilerOptions: {
+            "declaration": false,
+            "declarationMap": false,
+            "outDir": path.resolve(__dirname, 'dist')
+          }
+        }
+      },
       {
         test: /\.(js)$/,
         exclude: /node_modules/,

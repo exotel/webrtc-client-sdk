@@ -1,9 +1,8 @@
 import { CallDetails } from "./CallDetails";
 import { webrtcLogger } from "../omAPI/WebrtcLogger"
 
+var webrtcSIPPhone = require('@exotel-npm-dev/webrtc-core-sdk/src/webrtcSIPPhone').webrtcSIPPhone;
 var logger = webrtcLogger()
-var webrtcSDK = require('../../webrtc-sdk-core/webrtcsdk');
-var webrtcSIPPhone = webrtcSDK.webrtcSIPPhone;
 
 export function Call()  {
     this.Answer = function() {
@@ -54,7 +53,6 @@ export function Call()  {
          * When user clicks on hold
          */
         logger.log('Hold toggle clicked')
-        // webrtcSIPPhoneInterface_.callHold();
         webrtcSIPPhone.holdCall();
     }
 
@@ -64,7 +62,6 @@ export function Call()  {
          */
         logger.log('hold clicked')
         let dummyFlag = true;
-        // webrtcSIPPhoneInterface_.holdAction(dummyFlag);
         webrtcSIPPhone.holdCall();
     }
 
@@ -74,8 +71,7 @@ export function Call()  {
          */
          logger.log('unhold clicked')
          let dummyFlag = true;
-        //  webrtcSIPPhoneInterface_.holdAction(dummyFlag);
-        webrtcSIPPhone.holdCall();
+         webrtcSIPPhone.holdCall();
     }
 
     this.callDetails = function() {

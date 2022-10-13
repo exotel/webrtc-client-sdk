@@ -1,6 +1,7 @@
 import { diagnosticsCallback } from "../../listeners/Callback";
 import { webrtcLogger } from "./WebrtcLogger"
 
+var webrtcSIPPhone = require('@exotel-npm-dev/webrtc-core-sdk/src/webrtcSIPPhone').webrtcSIPPhone;
 var logger = webrtcLogger()
 var speakerNode;
 var micNode;
@@ -23,10 +24,6 @@ eventMapper.sipml5.connected_REGISTER = "USER_REG_TEST_PASS";
 eventMapper.sipml5.terminated_REGISTER = "USER_REG_TEST_FAIL";
 
 var candidateProcessData = {};
-//var webrtcSIPPhoneInterface_ =  new webrtcSIPPhoneInterface()
-var webrtcSDK = require('../../webrtc-sdk-core/webrtcsdk');
-var webrtcSIPPhone = webrtcSDK.webrtcSIPPhone;
-// var webrtcSIPPhoneInterface_ =  require('../../../webrtc-sdk-core/webrtcSIPPhoneInterface')
 
 export var ameyoWebRTCTroubleshooter = {
   js_yyyy_mm_dd_hh_mm_ss: function () {

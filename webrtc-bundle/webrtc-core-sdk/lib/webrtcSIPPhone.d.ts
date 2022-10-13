@@ -1,5 +1,4 @@
-export default webrtcSIPPhone;
-declare namespace webrtcSIPPhone {
+export namespace webrtcSIPPhone {
     function isConnected(): boolean;
     function sendDTMFWebRTC(dtmfValue: any): void;
     function registerWebRTCClient(sipAccountInfo: any, handler: any): void;
@@ -32,4 +31,5 @@ declare namespace webrtcSIPPhone {
     function getWSSUrl(): any;
     function getWSSUrl(): any;
 }
+export default webrtcSIPPhone;
 //# sourceMappingURL=webrtcSIPPhone.d.ts.map

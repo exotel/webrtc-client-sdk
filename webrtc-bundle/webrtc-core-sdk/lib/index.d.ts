@@ -1,6 +1,5 @@
 declare const version = "1.0.0";
-declare const name = "webrtc-core-sdk.js";
+declare const name = "webrtcsdk.js";
 export { name, version };
-export * from './webrtcSIPPhoneService';
-export * from './webrtcSIPPhoneInterface';
+export * from './webrtcSIPPhone';
 //# sourceMappingURL=index.d.ts.map
