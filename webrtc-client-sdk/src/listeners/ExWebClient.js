@@ -21,7 +21,7 @@ import { sessionCallback } from '../listeners/Callback';
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
 import { webrtcLogger } from "../api/omAPI/WebrtcLogger";
-import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk/src/webrtcSIPPhone';
+import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
 
 var intervalId;
 var intervalIDMap = new Map();

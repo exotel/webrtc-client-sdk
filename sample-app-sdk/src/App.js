@@ -17,7 +17,7 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Input from '@mui/material/Input';
 import { styled } from '@mui/material/styles';
-import { ExotelWebClient as exWebClient} from '@exotel-npm-dev/webrtc-client-sdk/src/listeners/ExWebClient';
+import { ExotelWebClient as exWebClient} from '@exotel-npm-dev/webrtc-client-sdk';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
