@@ -1086,7 +1086,6 @@ const SIPJSPhone = {
 					if (txtSecurity == 'ws') {
 						txtWebsocketURL = "ws://" + txtHostName + ":" + txtWSPort + "/ws";
 						txtUDPURL = "udp://" + txtHostName + ":" + txtSipPort;
-						logger.log("SIP udp : " + txtSipUdpPort);
 						if (window.location.protocol == "http:") {
 							txtWebsocketURL = "ws://" + txtHostName + ":" + txtWSPort + "/ws";
 							txtUDPURL = "udp://" + txtHostName + ":" + txtSipPort;
@@ -1096,7 +1095,7 @@ const SIPJSPhone = {
 							   Q: Can cient and proxy be on different servers?
 								  We need not have this if condition in that case.
 							 */
-							txtWebsocketURL = "wss://" + txtHostName + ":" + txtWSPort + "/wss";
+							txtWebsocketURL = "wss://" + txtHostName + ":" + txtWSPort + "/ws";
 							txtUDPURL = "udp://" + txtHostName + ":" + txtSipSecurePort;
 						}
 

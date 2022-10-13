@@ -346,11 +346,11 @@ export const ExotelWebClient = {
     callEventCallback :(event, phone, param) => {
 	    logger.log("Dialer: callEventCallback: Received ---> " + event + 'param sent....' + param + 'for phone....' + phone)
         if (event === "i_new_call") {
-            callListener.onIncomingCall(param,phone)
+            ExotelWebClient.callListener.onIncomingCall(param,phone)
         } else if (event === "connected") {
-            callListener.onCallEstablished(param,phone);
+            ExotelWebClient.callListener.onCallEstablished(param,phone);
         } else if (event === "terminated") {
-            callListener.onCallEnded(param,phone);          
+            ExotelWebClient.callListener.onCallEnded(param,phone);          
         }
     },
     
@@ -431,15 +431,15 @@ export const ExotelWebClient = {
         
 
 
-        ExotelWebClient.sipAccntInfo['userName'] = userName;
+        ExotelWebClient.sipAccntInfo['userName'] = ExotelWebClient.userName;
         ExotelWebClient.sipAccntInfo['authUser'] = subscriberName;
         ExotelWebClient.sipAccntInfo['domain'] = hostName;
         ExotelWebClient.sipAccntInfo['sipdomain'] = ExotelWebClient.sipdomain;
-        ExotelWebClient.sipAccntInfo['accountName'] = userName;
+        ExotelWebClient.sipAccntInfo['accountName'] = ExotelWebClient.userName;
         ExotelWebClient.sipAccntInfo['secret'] = ExotelWebClient.password;
         ExotelWebClient.sipAccntInfo['sipuri'] = ExotelWebClient.sipuri;
         ExotelWebClient.sipAccntInfo['security'] = ExotelWebClient.security;
-        ExotelWebClient.sipAccntInfo['port'] = ExotelWebClient.webrtcPort;
+        ExotelWebClient.sipAccntInfo['port'] = webrtcPort;
         ExotelWebClient.sipAccntInfo['contactHost'] = ExotelWebClient.contactHost;
         localStorage.setItem('contactHost', ExotelWebClient.contactHost);
         /* This is permanent -End */
@@ -450,7 +450,7 @@ export const ExotelWebClient = {
         var synchronousHandler = new ExSynchronousHandler(ExotelWebClient);
         var delegationHandler = new ExDelegationHandler(ExotelWebClient);
 
-        var userName = userName;
+        var userName = ExotelWebClient.userName;
         /* OLD-Way to be revisited for multile phone support */
         //webRTCPhones[userName] = webRTC;
 
