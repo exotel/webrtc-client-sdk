@@ -73,7 +73,7 @@ function App() {
     'displayname': data[0].DisplayName,
     'secret': data[0].Password,
     'port': data[0].Port,
-    'security': data[0].Security,
+    'endpoint': data[0].EndPoint,
   };
   
   var registrationRef = useRef(null);
@@ -180,7 +180,7 @@ function App() {
       sipAccountInfo['displayname'] = phone.DisplayName;
       sipAccountInfo['secret'] = phone.Password;
       sipAccountInfo['port'] = phone.Port;
-      sipAccountInfo['security'] = phone.Security;
+      sipAccountInfo['endpoint'] = phone.EndPoint;
       exWebClient.initWebrtc(sipAccountInfo, RegisterEventCallBack, CallListenerCallback, SessionCallback)
     }  
   }

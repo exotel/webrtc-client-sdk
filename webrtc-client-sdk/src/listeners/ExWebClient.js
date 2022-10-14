@@ -386,7 +386,7 @@ export const ExotelWebClient = {
             sipAccountInfo) => {
 
         let wssPort = sipAccountInfo.port;
-        let wsPort = 4442;
+        let wsPort = 8089;
         ExotelWebClient.sipAccntInfo = {
         'userName':'',
         'authUser':'',
@@ -397,6 +397,7 @@ export const ExotelWebClient = {
         'secret':'',	
         'sipUri':'',
         'security':'',
+        'endpoint':'',
         'port':'',
         'contactHost':''
         }
@@ -414,7 +415,7 @@ export const ExotelWebClient = {
         ExotelWebClient.accountSid = 'exotelt1';
         ExotelWebClient.subscriberToken = sipAccountInfo.secret;
         ExotelWebClient.secret = ExotelWebClient.password = sipAccountInfo.secret;
-        ExotelWebClient.security = sipAccountInfo.security;
+        ExotelWebClient.endpoint = sipAccountInfo.endpoint;
         ExotelWebClient.port = sipAccountInfo.port;
         ExotelWebClient.contactHost = sipAccountInfo.contactHost;
         ExotelWebClient.sipWsPort = 5061;
@@ -423,11 +424,12 @@ export const ExotelWebClient = {
         /* Temporary till we figure out the arguments - End */
 
         /* This is permanent -Start */
-        let webrtcPort = wssPort;
+        let webrtcPort = wsPort;
 
-        if (ExotelWebClient.security === 'ws') {
-            webrtcPort = wsPort;
-        }   
+        if (ExotelWebClient.endpoint === 'wss') {
+            ExotelWebClient.security = 'wss';
+            webrtcPort = wssPort;
+        } 
         
 
 
@@ -439,6 +441,7 @@ export const ExotelWebClient = {
         ExotelWebClient.sipAccntInfo['secret'] = ExotelWebClient.password;
         ExotelWebClient.sipAccntInfo['sipuri'] = ExotelWebClient.sipuri;
         ExotelWebClient.sipAccntInfo['security'] = ExotelWebClient.security;
+        ExotelWebClient.sipAccntInfo['endpoint'] = ExotelWebClient.endpoint;
         ExotelWebClient.sipAccntInfo['port'] = webrtcPort;
         ExotelWebClient.sipAccntInfo['contactHost'] = ExotelWebClient.contactHost;
         localStorage.setItem('contactHost', ExotelWebClient.contactHost);
