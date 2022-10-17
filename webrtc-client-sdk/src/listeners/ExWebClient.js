@@ -386,7 +386,7 @@ export const ExotelWebClient = {
             sipAccountInfo) => {
 
         let wssPort = sipAccountInfo.port;
-        let wsPort = 8089;
+        let wsPort = 4442;
         ExotelWebClient.sipAccntInfo = {
         'userName':'',
         'authUser':'',
@@ -415,6 +415,7 @@ export const ExotelWebClient = {
         ExotelWebClient.accountSid = 'exotelt1';
         ExotelWebClient.subscriberToken = sipAccountInfo.secret;
         ExotelWebClient.secret = ExotelWebClient.password = sipAccountInfo.secret;
+        ExotelWebClient.security = sipAccountInfo.security;
         ExotelWebClient.endpoint = sipAccountInfo.endpoint;
         ExotelWebClient.port = sipAccountInfo.port;
         ExotelWebClient.contactHost = sipAccountInfo.contactHost;
@@ -424,12 +425,11 @@ export const ExotelWebClient = {
         /* Temporary till we figure out the arguments - End */
 
         /* This is permanent -Start */
-        let webrtcPort = wsPort;
+        let webrtcPort = wssPort;
 
-        if (ExotelWebClient.endpoint === 'wss') {
-            ExotelWebClient.security = 'wss';
-            webrtcPort = wssPort;
-        } 
+        if (ExotelWebClient.security === 'ws') {
+            webrtcPort = wsPort;
+        }  
         
 
 
