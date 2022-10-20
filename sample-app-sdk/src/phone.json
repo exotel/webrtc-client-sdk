@@ -8,6 +8,7 @@
         "Password":"webrtc123",
         "CallTimeout":1000,
         "Security": "wss",
+        "EndPoint": "wss",
         "AccountSID":"exotelt1",
         "AccountNo":"harsham79e843e5",
         "AutoRegistration": true

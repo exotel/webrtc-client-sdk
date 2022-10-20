@@ -17,7 +17,7 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Input from '@mui/material/Input';
 import { styled } from '@mui/material/styles';
-// import { ExotelWebClient } from '@exotel/webrtc-client-sdk/src/listeners/ExWebClient';
+import { ExotelWebClient} from '@exotel-npm-dev/webrtc-client-sdk';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -74,6 +74,7 @@ function App() {
     'secret': data[0].Password,
     'port': data[0].Port,
     'security': data[0].Security,
+    'endpoint': data[0].EndPoint,
   };
   
   var registrationRef = useRef(null);
@@ -88,8 +89,7 @@ function App() {
   var diagnosticsUdpRef = useRef(null);
   var diagnosticsHostRef = useRef(null);
   var diagnosticsReflexRef = useRef(null);
-  // var exWebClient = new ExotelWebClient();
-  var exWebClient = require('@exotel-npm-dev/webrtc-client-sdk/src/listeners/ExWebClient').ExotelWebClient;
+  var exWebClient = new ExotelWebClient();
   var configRefs = {
     'Username':useRef(null),
     'DisplayName':useRef(null),
@@ -183,6 +183,7 @@ function App() {
       sipAccountInfo['secret'] = phone.Password;
       sipAccountInfo['port'] = phone.Port;
       sipAccountInfo['security'] = phone.Security;
+      sipAccountInfo['endpoint'] = phone.EndPoint;
       exWebClient.initWebrtc(sipAccountInfo, RegisterEventCallBack, CallListenerCallback, SessionCallback)
     }  
   }
