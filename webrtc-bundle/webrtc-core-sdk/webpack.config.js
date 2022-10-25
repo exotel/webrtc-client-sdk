@@ -11,13 +11,13 @@ WebRTC CORE SIP version ' + pkg.version + '\n\
 
 module.exports = {
   entry: {
-    webrtcsdk:'./src/index.ts'
+    webrtcsdk:'./index.js'
   },
   devtool: 'source-map',
   mode: 'development',
   output: {
     filename:'[name].js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'bundle'),
     libraryTarget: 'umd',
     library: 'webrtcSDK',
     globalObject: 'this'
@@ -26,18 +26,6 @@ module.exports = {
     rules: [
       { test: /\.wav$/,exclude: /node_modules/, use: 'file-loader' },
       {
-        test: /\.ts$/,
-        exclude: /node_modules/,
-        loader: "ts-loader",
-        options: {
-          compilerOptions: {
-            "declaration": false,
-            "declarationMap": false,
-            "outDir": path.resolve(__dirname, 'dist')
-          }
-        }
-      },
-      {
         test: /\.(js)$/,
         exclude: /node_modules/,
         use: 'babel-loader',
@@ -45,7 +33,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.ts', '.d.ts', '.js']
+    extensions: ['.js']
   },
   optimization: {
     minimizer: [

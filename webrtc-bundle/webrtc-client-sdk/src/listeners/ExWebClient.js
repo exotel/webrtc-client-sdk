@@ -22,7 +22,7 @@ import { webrtcTroubleshooterEventBus } from "./Callback";
 
 
 import { webrtcLogger } from "../api/omAPI/WebrtcLogger";
-var webrtcSDK = require('../webrtc-sdk-core/webrtcsdk');
+var webrtcSDK = require('@exotel/webrtc-sdk-core/bundle/webrtcsdk');
 var webrtcSIPPhone = webrtcSDK.webrtcSIPPhone;
 
 var intervalId;
@@ -197,36 +197,36 @@ export function ExSynchronousHandler() {
     }
 }
 
-const  ExotelWebClient = function() {
+export class ExotelWebClient  {
 
 
 
-    var ctrlr = null;
-    var call = null;
-    var eventListener = null;
-    var callListener = null;
+    ctrlr = null;
+    call = null;
+    eventListener = null;
+    callListener = null;
     /* OLD-Way to be revisited for multile phone support */
     //this.webRTCPhones = {};
 
-    var sipAccountInfo = null;
+    sipAccountInfo = null;
 
-    this.initWebrtc = function(sipAccountInfo_, 
-        RegisterEventCallBack, CallListenerCallback, SessionCallback) {
+    initWebrtc = (sipAccountInfo_, 
+        RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
 
         if (!this.eventListener) {
-            this.eventListener = eventListener = new ExotelVoiceClientListener();
+            this.eventListener = new ExotelVoiceClientListener();
         }
 
         if (!this.callListener) {
-            this.callListener = callListener = new CallListener();
+            this.callListener = new CallListener();
         }
 
         if (!this.ctrlr) {
-            this.ctrlr =  ctrlr = new CallController();
+            this.ctrlr = new CallController();
         }
 
         if (!this.call) {
-            this.call = call = new Call();
+            this.call = new Call();
         }
 
         logger.log("Exotel Client Initialised with " + JSON.stringify(sipAccountInfo_))
@@ -240,77 +240,76 @@ const  ExotelWebClient = function() {
         registerCallback.initializeRegisterCallback(RegisterEventCallBack);
         logger.log("Initializing session callback")
         sessionCallback.initializeSessionCallback(SessionCallback);
-        this.setEventListener(eventListener);
+        this.setEventListener(this.eventListener);
         return true;                
-    }
+    };
 
-    this.DoRegister = function () {
+    DoRegister = () => {
         DoRegisterRL(this.sipAccountInfo, this)
-    }
+    };
 
-    this.UnRegister = function () {
+    UnRegister = () => {
         UnRegisterRL(this.sipAccountInfo, this)
-    }
+    };
 
-    this.initDiagnostics = function (saveDiagnosticsCallback, keyValueSetCallback) {
+    initDiagnostics = (saveDiagnosticsCallback, keyValueSetCallback) => {
         initDiagnosticsDL(saveDiagnosticsCallback, keyValueSetCallback)
-    }
+    };
     
-    this.closeDiagnostics = function () {
+    closeDiagnostics = () => {
         closeDiagnosticsDL()
-    }
+    };
 
-
-    this.startSpeakerDiagnosticsTest = function () {
+    startSpeakerDiagnosticsTest = () => {
         startSpeakerDiagnosticsTestDL()
-    }
+    };
 
-    this.stopSpeakerDiagnosticsTest = function (speakerTestResponse='none') {
+    stopSpeakerDiagnosticsTest = (speakerTestResponse='none') => {
         stopSpeakerDiagnosticsTestDL(speakerTestResponse)
-    }
+    };
 
-    this.startMicDiagnosticsTest = function () {
+    startMicDiagnosticsTest = () => {
         startMicDiagnosticsTestDL()
-    }
+    };
 
-    this.stopMicDiagnosticsTest = function (micTestResponse='none') {
+    stopMicDiagnosticsTest = (micTestResponse='none') => {
         stopMicDiagnosticsTestDL(micTestResponse)
-    }
+    };
 
-    this.startNetworkDiagnostics = function () {
+    startNetworkDiagnostics = () => {
         startNetworkDiagnosticsDL()
         this.DoRegister()
-    }
+    };
 
-    this.stopNetworkDiagnostics = function () {
+    stopNetworkDiagnostics = () => {
         stopNetworkDiagnosticsDL()
-    }
+    };
 
-    this.SessionListener = function () {
+    SessionListener = () => {
         SessionListenerSL()
-    }
+    };
 
     /**
      * function that returns the instance of the call controller object object
      */
 
-    this.getCallController = function() {
+    getCallController =() => {
         return this.ctrlr;
-    }
+    };
 
-    this.getCall = function() {
+    getCall =() => {
         if (!this.call) {
             this.call = call = new Call();
         }        
         return this.call;
-    }
+    };
 
     /**
      * Dummy function to set the event listener object
      */
-    this.setEventListener = function(eventListener) {
+    setEventListener =(eventListener) => {
         this.eventListener = eventListener;
-    }
+    };
 
 
     /**
@@ -320,42 +319,42 @@ const  ExotelWebClient = function() {
      * @param {*} param 
      */
 
-     this.registerEventCallback = function(event, phone, param) {
+     registerEventCallback =(event, phone, param) => {
         
 	    logger.log("Dialer: registerEventCallback: Received ---> " + event + 'phone....', phone + 'param....', param)
         if (event === "connected") {
             /**
              * When registration is successful then send the phone number of the same to UI
              */
-            eventListener.onInitializationSuccess(phone);
+             this.eventListener.onInitializationSuccess(phone);
         } else if( event === "failed_to_start" || event === "transport_error"){
             /**
              * If registration fails
              */
-            eventListener.onInitializationFailure(phone);
+             this.eventListener.onInitializationFailure(phone);
         } else if( event === "sent_request"){
             /**
              * If registration request waiting...
              */
-            eventListener.onInitializationWaiting(phone);
+             this.eventListener.onInitializationWaiting(phone);
         } 
-    }
+    };
     /**
      * Event listener for calls, any change in sipjsphone will trigger the callback here
      * @param {*} event 
      * @param {*} phone 
      * @param {*} param 
      */
-    this.callEventCallback = function(event, phone, param) {
+    callEventCallback =(event, phone, param) => {
 	    logger.log("Dialer: callEventCallback: Received ---> " + event + 'param sent....' + param + 'for phone....' + phone)
         if (event === "i_new_call") {
-            callListener.onIncomingCall(param,phone)
+            this.callListener.onIncomingCall(param,phone)
         } else if (event === "connected") {
-            callListener.onCallEstablished(param,phone);
+            this.callListener.onCallEstablished(param,phone);
         } else if (event === "terminated") {
-            callListener.onCallEnded(param,phone);          
+            this.callListener.onCallEnded(param,phone);          
         }
-    }
+    };
     
     /**
      * Event listener for diagnostic tests, any change in diagnostic tests will trigger this callback
@@ -363,30 +362,30 @@ const  ExotelWebClient = function() {
      * @param {*} phone 
      * @param {*} param 
      */
-     this.diagnosticEventCallback = function(event, phone, param) {
+     diagnosticEventCallback =(event, phone, param) => {
         webrtcTroubleshooterEventBus.sendDiagnosticEvent(event, phone, param)
-    }
+    };
         
     /**
      * Function to unregister a phone
      * @param {*} sipAccountInfo 
      */
-    this.unregister = function(sipAccountInfo){
+    unregister =(sipAccountInfo) => {
         // webrtcSIPPhone.unregister(sipAccountInfo)
-        webrtcSIPPhone.sipUnRegisterWebRTC()
-    } 
+        webrtcSIPPhone.sipUnRegisterWebRTC();
+    };
 
 
-    this.webRTCStatusCallbackHandler = function(msg1, arg1) {
+    webRTCStatusCallbackHandler =(msg1, arg1) => {
         logger.log("webRTCStatusCallbackHandler: " + msg1 + " " + arg1)
-    }
+    };
 
     /**
      * initialize function called when user wants to register client
      */
-    this.initialize = function(uiContext, hostName,subscriberName,
+    initialize =(uiContext, hostName,subscriberName,
             displayName,accountSid,subscriberToken,
-            sipAccountInfo){
+            sipAccountInfo) => {
 
         let wssPort = sipAccountInfo.port;
         let wsPort = 4442;
@@ -400,6 +399,7 @@ const  ExotelWebClient = function() {
         'secret':'',	
         'sipUri':'',
         'security':'',
+        'endpoint':'',
         'port':'',
         'contactHost':''
         }
@@ -409,15 +409,16 @@ const  ExotelWebClient = function() {
         fetchPublicIP(sipAccountInfo);
 
         /* Temporary till we figure out the arguments - Start */
-        this.domain = this.hostName = sipAccountInfo.domain;
+        this.domain = hostName = sipAccountInfo.domain;
         this.sipdomain = sipAccountInfo.sipdomain;
         this.accountName = this.userName = sipAccountInfo.userName;
-        this.authUser = this.subscriberName = sipAccountInfo.authUser;
+        this.authUser = subscriberName = sipAccountInfo.authUser;
         this.displayName = sipAccountInfo.displayName;
         this.accountSid = 'exotelt1';
         this.subscriberToken = sipAccountInfo.secret;
         this.secret = this.password = sipAccountInfo.secret;
-        this.security = sipAccountInfo.security;
+        this.security = sipAccountInfo.security ? sipAccountInfo.security : "wss";
+        this.endpoint = sipAccountInfo.endpoint ? sipAccountInfo.endpoint : "wss";
         this.port = sipAccountInfo.port;
         this.contactHost = sipAccountInfo.contactHost;
         this.sipWsPort = 5061;
@@ -430,18 +431,19 @@ const  ExotelWebClient = function() {
 
         if (this.security === 'ws') {
             webrtcPort = wsPort;
-        }   
+        }  
         
 
 
         this.sipAccntInfo['userName'] = this.userName;
-        this.sipAccntInfo['authUser'] = this.subscriberName;
-        this.sipAccntInfo['domain'] = this.hostName;
+        this.sipAccntInfo['authUser'] = subscriberName;
+        this.sipAccntInfo['domain'] = hostName;
         this.sipAccntInfo['sipdomain'] = this.sipdomain;
         this.sipAccntInfo['accountName'] = this.userName;
         this.sipAccntInfo['secret'] = this.password;
         this.sipAccntInfo['sipuri'] = this.sipuri;
         this.sipAccntInfo['security'] = this.security;
+        this.sipAccntInfo['endpoint'] = this.endpoint;
         this.sipAccntInfo['port'] = webrtcPort;
         this.sipAccntInfo['contactHost'] = this.contactHost;
         localStorage.setItem('contactHost', this.contactHost);
@@ -455,18 +457,17 @@ const  ExotelWebClient = function() {
 
         var userName = this.userName;
         /* OLD-Way to be revisited for multile phone support */
-        //this.webRTCPhones[this.userName] = webRTC;
+        //webRTCPhones[userName] = webRTC;
 
         /* New-Way  */
         webrtcSIPPhone.registerPhone("sipjs",delegationHandler);
         webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler);
-
+        
          /**
           * Store the intervalID against a map
           */
          intervalIDMap.set(userName, intervalId);
     };
-      
 }
 
 export default ExotelWebClient;

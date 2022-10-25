@@ -20,10 +20,9 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Input from '@mui/material/Input';
 import { styled } from '@mui/material/styles';
-import ExotelWebClient from '@exotel/webrtc-sdk-diagnostics/src/listeners/ExWebClient'
-const  exWebClient = new ExotelWebClient();
 
-// var exWebClient = require('@exotel/webrtc-sdk-diagnostics/src/webrtc-client-sdk/listeners/ExWebClient');
+var exotelsdk = require('@exotel/webrtc-client-sdk/bundle/exotelsdk');
+const  exWebClient = new exotelsdk.ExotelWebClient();
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',

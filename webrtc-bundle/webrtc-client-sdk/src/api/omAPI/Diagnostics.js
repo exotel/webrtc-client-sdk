@@ -24,7 +24,7 @@ eventMapper.sipml5.terminated_REGISTER = "USER_REG_TEST_FAIL";
 
 var candidateProcessData = {};
 //var webrtcSIPPhoneInterface_ =  new webrtcSIPPhoneInterface()
-var webrtcSDK = require('../../webrtc-sdk-core/webrtcsdk');
+var webrtcSDK = require('@exotel/webrtc-sdk-core/bundle/webrtcsdk');
 var webrtcSIPPhone = webrtcSDK.webrtcSIPPhone;
 // var webrtcSIPPhoneInterface_ =  require('../../../webrtc-sdk-core/webrtcSIPPhoneInterface')
 
