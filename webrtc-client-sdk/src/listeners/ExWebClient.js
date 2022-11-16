@@ -21,7 +21,7 @@ import { sessionCallback } from '../listeners/Callback';
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
 import { webrtcLogger } from "../api/omAPI/WebrtcLogger";
-var webrtcSIPPhone = require('@exotel-npm-dev/webrtc-core-sdk/src/webrtcSIPPhone').webrtcSIPPhone;
+import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
 
 var intervalId;
 var intervalIDMap = new Map();
@@ -195,119 +195,119 @@ export function ExSynchronousHandler() {
     }
 }
 
-export const ExotelWebClient = {
+export class ExotelWebClient  {
 
 
 
-    ctrlr : null,
-    call : null,
-    eventListener : null,
-    callListener : null,
+    ctrlr = null;
+    call = null;
+    eventListener = null;
+    callListener = null;
     /* OLD-Way to be revisited for multile phone support */
     //this.webRTCPhones = {};
 
-    sipAccountInfo : null,
+    sipAccountInfo = null;
 
-    initWebrtc : (sipAccountInfo_, 
+    initWebrtc = (sipAccountInfo_, 
         RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
 
-        if (!ExotelWebClient.eventListener) {
-            ExotelWebClient.eventListener = new ExotelVoiceClientListener();
+        if (!this.eventListener) {
+            this.eventListener = new ExotelVoiceClientListener();
         }
 
-        if (!ExotelWebClient.callListener) {
-            ExotelWebClient.callListener = new CallListener();
+        if (!this.callListener) {
+            this.callListener = new CallListener();
         }
 
-        if (!ExotelWebClient.ctrlr) {
-            ExotelWebClient.ctrlr = new CallController();
+        if (!this.ctrlr) {
+            this.ctrlr = new CallController();
         }
 
-        if (!ExotelWebClient.call) {
-            ExotelWebClient.call = new Call();
+        if (!this.call) {
+            this.call = new Call();
         }
 
         logger.log("Exotel Client Initialised with " + JSON.stringify(sipAccountInfo_))
-        ExotelWebClient.sipAccountInfo = sipAccountInfo_;
-        if ( !ExotelWebClient.sipAccountInfo["userName"] || !ExotelWebClient.sipAccountInfo["sipdomain"] || !ExotelWebClient.sipAccountInfo["port"]) {
+        this.sipAccountInfo = sipAccountInfo_;
+        if ( !this.sipAccountInfo["userName"] || !this.sipAccountInfo["sipdomain"] || !this.sipAccountInfo["port"]) {
             return false;                
         }
-        ExotelWebClient.sipAccountInfo["sipUri"] = "wss://" + ExotelWebClient.sipAccountInfo["userName"] + "@" + ExotelWebClient.sipAccountInfo["sipdomain"] + ":" + ExotelWebClient.sipAccountInfo["port"];
+        this.sipAccountInfo["sipUri"] = "wss://" + this.sipAccountInfo["userName"] + "@" + this.sipAccountInfo["sipdomain"] + ":" + this.sipAccountInfo["port"];
 
         callbacks.initializeCallback(CallListenerCallback);
         registerCallback.initializeRegisterCallback(RegisterEventCallBack);
         logger.log("Initializing session callback")
         sessionCallback.initializeSessionCallback(SessionCallback);
-        ExotelWebClient.setEventListener(ExotelWebClient.eventListener);
+        this.setEventListener(this.eventListener);
         return true;                
-    },
+    };
 
-    DoRegister : () => {
-        DoRegisterRL(ExotelWebClient.sipAccountInfo, ExotelWebClient)
-    },
+    DoRegister = () => {
+        DoRegisterRL(this.sipAccountInfo, this)
+    };
 
-    UnRegister : () => {
-        UnRegisterRL(ExotelWebClient.sipAccountInfo, ExotelWebClient)
-    },
+    UnRegister = () => {
+        UnRegisterRL(this.sipAccountInfo, this)
+    };
 
-    initDiagnostics : (saveDiagnosticsCallback, keyValueSetCallback) => {
+    initDiagnostics = (saveDiagnosticsCallback, keyValueSetCallback) => {
         initDiagnosticsDL(saveDiagnosticsCallback, keyValueSetCallback)
-    },
+    };
     
-    closeDiagnostics : () => {
+    closeDiagnostics = () => {
         closeDiagnosticsDL()
-    },
+    };
 
-    startSpeakerDiagnosticsTest : () => {
+    startSpeakerDiagnosticsTest = () => {
         startSpeakerDiagnosticsTestDL()
-    },
+    };
 
-    stopSpeakerDiagnosticsTest : (speakerTestResponse='none') => {
+    stopSpeakerDiagnosticsTest = (speakerTestResponse='none') => {
         stopSpeakerDiagnosticsTestDL(speakerTestResponse)
-    },
+    };
 
-    startMicDiagnosticsTest : () => {
+    startMicDiagnosticsTest = () => {
         startMicDiagnosticsTestDL()
-    },
+    };
 
-    stopMicDiagnosticsTest : (micTestResponse='none') => {
+    stopMicDiagnosticsTest = (micTestResponse='none') => {
         stopMicDiagnosticsTestDL(micTestResponse)
-    },
+    };
 
-    startNetworkDiagnostics : () => {
+    startNetworkDiagnostics = () => {
         startNetworkDiagnosticsDL()
-        ExotelWebClient.DoRegister()
-    },
+        this.DoRegister()
+    };
 
-    stopNetworkDiagnostics : () => {
+    stopNetworkDiagnostics = () => {
         stopNetworkDiagnosticsDL()
-    },
+    };
 
-    SessionListener : () => {
+    SessionListener = () => {
         SessionListenerSL()
-    },
+    };
 
     /**
      * function that returns the instance of the call controller object object
      */
 
-    getCallController :() => {
-        return ExotelWebClient.ctrlr;
-    },
+    getCallController =() => {
+        return this.ctrlr;
+    };
 
-    getCall :() => {
-        if (!ExotelWebClient.call) {
-            ExotelWebClient.call = call = new Call();
+    getCall =() => {
+        if (!this.call) {
+            this.call = call = new Call();
         }        
-        return ExotelWebClient.call;
-    },
+        return this.call;
+    };
 
     /**
      * Dummy function to set the event listener object
      */
-    setEventListener :(eventListener) => {
-        ExotelWebClient.eventListener = eventListener;
-    },
+    setEventListener =(eventListener) => {
+        this.eventListener = eventListener;
+    };
 
 
     /**
@@ -317,42 +317,42 @@ export const ExotelWebClient = {
      * @param {*} param 
      */
 
-     registerEventCallback :(event, phone, param) => {
+     registerEventCallback =(event, phone, param) => {
         
 	    logger.log("Dialer: registerEventCallback: Received ---> " + event + 'phone....', phone + 'param....', param)
         if (event === "connected") {
             /**
              * When registration is successful then send the phone number of the same to UI
              */
-             ExotelWebClient.eventListener.onInitializationSuccess(phone);
+             this.eventListener.onInitializationSuccess(phone);
         } else if( event === "failed_to_start" || event === "transport_error"){
             /**
              * If registration fails
              */
-             ExotelWebClient.eventListener.onInitializationFailure(phone);
+             this.eventListener.onInitializationFailure(phone);
         } else if( event === "sent_request"){
             /**
              * If registration request waiting...
              */
-             ExotelWebClient.eventListener.onInitializationWaiting(phone);
+             this.eventListener.onInitializationWaiting(phone);
         } 
-    },
+    };
     /**
      * Event listener for calls, any change in sipjsphone will trigger the callback here
      * @param {*} event 
      * @param {*} phone 
      * @param {*} param 
      */
-    callEventCallback :(event, phone, param) => {
+    callEventCallback =(event, phone, param) => {
 	    logger.log("Dialer: callEventCallback: Received ---> " + event + 'param sent....' + param + 'for phone....' + phone)
         if (event === "i_new_call") {
-            callListener.onIncomingCall(param,phone)
+            this.callListener.onIncomingCall(param,phone)
         } else if (event === "connected") {
-            callListener.onCallEstablished(param,phone);
+            this.callListener.onCallEstablished(param,phone);
         } else if (event === "terminated") {
-            callListener.onCallEnded(param,phone);          
+            this.callListener.onCallEnded(param,phone);          
         }
-    },
+    };
     
     /**
      * Event listener for diagnostic tests, any change in diagnostic tests will trigger this callback
@@ -360,34 +360,34 @@ export const ExotelWebClient = {
      * @param {*} phone 
      * @param {*} param 
      */
-     diagnosticEventCallback :(event, phone, param) => {
+     diagnosticEventCallback =(event, phone, param) => {
         webrtcTroubleshooterEventBus.sendDiagnosticEvent(event, phone, param)
-    },
+    };
         
     /**
      * Function to unregister a phone
      * @param {*} sipAccountInfo 
      */
-    unregister :(sipAccountInfo) => {
+    unregister =(sipAccountInfo) => {
         // webrtcSIPPhone.unregister(sipAccountInfo)
         webrtcSIPPhone.sipUnRegisterWebRTC();
-    }, 
+    };
 
 
-    webRTCStatusCallbackHandler :(msg1, arg1) => {
+    webRTCStatusCallbackHandler =(msg1, arg1) => {
         logger.log("webRTCStatusCallbackHandler: " + msg1 + " " + arg1)
-    },
+    };
 
     /**
      * initialize function called when user wants to register client
      */
-    initialize :(uiContext, hostName,subscriberName,
+    initialize =(uiContext, hostName,subscriberName,
             displayName,accountSid,subscriberToken,
             sipAccountInfo) => {
 
         let wssPort = sipAccountInfo.port;
         let wsPort = 4442;
-        ExotelWebClient.sipAccntInfo = {
+        this.sipAccntInfo = {
         'userName':'',
         'authUser':'',
         'domain':'',
@@ -397,6 +397,7 @@ export const ExotelWebClient = {
         'secret':'',	
         'sipUri':'',
         'security':'',
+        'endpoint':'',
         'port':'',
         'contactHost':''
         }
@@ -406,63 +407,65 @@ export const ExotelWebClient = {
         fetchPublicIP(sipAccountInfo);
 
         /* Temporary till we figure out the arguments - Start */
-        ExotelWebClient.domain = hostName = sipAccountInfo.domain;
-        ExotelWebClient.sipdomain = sipAccountInfo.sipdomain;
-        ExotelWebClient.accountName = ExotelWebClient.userName = sipAccountInfo.userName;
-        ExotelWebClient.authUser = subscriberName = sipAccountInfo.authUser;
-        ExotelWebClient.displayName = sipAccountInfo.displayName;
-        ExotelWebClient.accountSid = 'exotelt1';
-        ExotelWebClient.subscriberToken = sipAccountInfo.secret;
-        ExotelWebClient.secret = ExotelWebClient.password = sipAccountInfo.secret;
-        ExotelWebClient.security = sipAccountInfo.security;
-        ExotelWebClient.port = sipAccountInfo.port;
-        ExotelWebClient.contactHost = sipAccountInfo.contactHost;
-        ExotelWebClient.sipWsPort = 5061;
-        ExotelWebClient.sipPort = 5061;
-        ExotelWebClient.sipSecurePort = 5062;
+        this.domain = hostName = sipAccountInfo.domain;
+        this.sipdomain = sipAccountInfo.sipdomain;
+        this.accountName = this.userName = sipAccountInfo.userName;
+        this.authUser = subscriberName = sipAccountInfo.authUser;
+        this.displayName = sipAccountInfo.displayName;
+        this.accountSid = 'exotelt1';
+        this.subscriberToken = sipAccountInfo.secret;
+        this.secret = this.password = sipAccountInfo.secret;
+        this.security = sipAccountInfo.security ? sipAccountInfo.security : "wss";
+        this.endpoint = sipAccountInfo.endpoint ? sipAccountInfo.endpoint : "wss";
+        this.port = sipAccountInfo.port;
+        this.contactHost = sipAccountInfo.contactHost;
+        this.sipWsPort = 5061;
+        this.sipPort = 5061;
+        this.sipSecurePort = 5062;
         /* Temporary till we figure out the arguments - End */
 
         /* This is permanent -Start */
         let webrtcPort = wssPort;
 
-        if (ExotelWebClient.security === 'ws') {
+        if (this.security === 'ws') {
             webrtcPort = wsPort;
-        }   
+        }  
         
 
 
-        ExotelWebClient.sipAccntInfo['userName'] = userName;
-        ExotelWebClient.sipAccntInfo['authUser'] = subscriberName;
-        ExotelWebClient.sipAccntInfo['domain'] = hostName;
-        ExotelWebClient.sipAccntInfo['sipdomain'] = ExotelWebClient.sipdomain;
-        ExotelWebClient.sipAccntInfo['accountName'] = userName;
-        ExotelWebClient.sipAccntInfo['secret'] = ExotelWebClient.password;
-        ExotelWebClient.sipAccntInfo['sipuri'] = ExotelWebClient.sipuri;
-        ExotelWebClient.sipAccntInfo['security'] = ExotelWebClient.security;
-        ExotelWebClient.sipAccntInfo['port'] = ExotelWebClient.webrtcPort;
-        ExotelWebClient.sipAccntInfo['contactHost'] = ExotelWebClient.contactHost;
-        localStorage.setItem('contactHost', ExotelWebClient.contactHost);
+        this.sipAccntInfo['userName'] = this.userName;
+        this.sipAccntInfo['authUser'] = subscriberName;
+        this.sipAccntInfo['domain'] = hostName;
+        this.sipAccntInfo['sipdomain'] = this.sipdomain;
+        this.sipAccntInfo['accountName'] = this.userName;
+        this.sipAccntInfo['secret'] = this.password;
+        this.sipAccntInfo['sipuri'] = this.sipuri;
+        this.sipAccntInfo['security'] = this.security;
+        this.sipAccntInfo['endpoint'] = this.endpoint;
+        this.sipAccntInfo['port'] = webrtcPort;
+        this.sipAccntInfo['contactHost'] = this.contactHost;
+        localStorage.setItem('contactHost', this.contactHost);
         /* This is permanent -End */
         
         /**
          * Call the webclient function inside this and pass register and call callbacks as arg
          */
-        var synchronousHandler = new ExSynchronousHandler(ExotelWebClient);
-        var delegationHandler = new ExDelegationHandler(ExotelWebClient);
+        var synchronousHandler = new ExSynchronousHandler(this);
+        var delegationHandler = new ExDelegationHandler(this);
 
-        var userName = userName;
+        var userName = this.userName;
         /* OLD-Way to be revisited for multile phone support */
         //webRTCPhones[userName] = webRTC;
 
         /* New-Way  */
         webrtcSIPPhone.registerPhone("sipjs",delegationHandler);
-        webrtcSIPPhone.registerWebRTCClient(ExotelWebClient.sipAccntInfo, synchronousHandler);
+        webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler);
         
          /**
           * Store the intervalID against a map
           */
          intervalIDMap.set(userName, intervalId);
-    }
+    };
 }
 
 export default ExotelWebClient;

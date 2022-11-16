@@ -25,7 +25,7 @@ videoLocal = document.createElement("video");//getElementById("video_local");
 videoRemote = document.createElement("video");//getElementById("video_remote");
 
 let txtDisplayName, txtPrivateIdentity, txtHostNameWithPort, txtHostName, txtWebSocketPort, txtAccountName;
-let txtSecurity, txtSipDomain, txtWSPort, txtSipPort, txtSipSecurePort, txtContactHost;
+let txtSecurity, txtSipDomain, txtWSPort, txtSipPort, txtSipSecurePort, txtContactHost, endpoint;
 let txtPassword, txtRealm, txtTurnServer, txtCredential, txtTurnUri, txtWebsocketURL, txtUDPURL;
 
 
@@ -1014,35 +1014,19 @@ const SIPJSPhone = {
 			txtTurnServer = "drishti@" + txtRealm + ":3478";
 			txtCredential = "jrp931";
 			txtTurnUri = "'turn:" + txtRealm + ":3478?transport=udp', credential: '" + txtCredential + "', username: 'drishti'";
-			if (!txtWebSocketPort) {
-				txtWebSocketPort = 8089;
-			}
-			/*txtWebsocketURL = "wss://" + txtHostName + ":" + txtWebSocketPort + "/ws";
-			txtUDPURL = "udp://" + txtHostName + ":5061";
-			if (window.location.protocol == "http:") {
-				txtWebsocketURL = "ws://" + txtHostName + ":8088/ws";
-				txtUDPURL = "udp://" + txtHostName + ":5060";
-			}*/
 
-			/* NL needs extra params and we pass it in sipAccountInfo.
-			   For these extra params, Ameyo does not have any entries and hence we fill
-			   default values for Ameyo.
-			*/
 
 			var default_values = {
-				'security':'ws',
+				'security': window.location.protocol == "http:"?'ws':'wss',
 				'sipdomain':txtHostName,
 				'contactHost':txtHostName,
-				'wsPort' : 8088,
-				'udpPort' : 5060,
-				'tcpPort' : 5061
+				'wsPort' : window.location.protocol == "http:"? 8088 : 8089,
+				'sipPort' : window.location.protocol == "http:"? 5060 : 5061,
+				'endpoint':'ws'
 			}
 
-			if (sipAccountInfo['security']) {
-				txtSecurity = sipAccountInfo['security'];
-			} else {
-				txtSecurity = default_values['security'];
-			}
+			txtSecurity = sipAccountInfo['security'] ? sipAccountInfo['security']:default_values['security'];
+			txtWSPort = txtWebSocketPort ? txtWebSocketPort : default_values['wsPort'];
 
 			if (sipAccountInfo['sipdomain']) {
 				txtSipDomain = sipAccountInfo["sipdomain"];
@@ -1051,70 +1035,18 @@ const SIPJSPhone = {
 				txtSipDomain = default_values["sipdomain"];
 			}
 
-
 			if (sipAccountInfo['contactHost']) {
-				txtContactHost = sipAccountInfo["contactHost"]; //NL contact host seperate from viaHost
+				txtContactHost = sipAccountInfo["contactHost"]; 
 			} else {
-				txtContactHost = default_values["contactHost"]; //NL contact host seperate from viaHost
+				txtContactHost = default_values["contactHost"]; 
 			}
 
-			/*if (sipAccountInfo['wsPort']) {
-				txtWSPort = sipAccountInfo['wsPort'];
-			} else {
-				txtWSPort = default_values["wsPort"];
-			}*/
-			txtWSPort = txtWebSocketPort;
+			txtSipPort = sipAccountInfo['sipPort'] ? sipAccountInfo["sipPort"] : default_values["sipPort"];
+			endpoint = sipAccountInfo['endpoint'] ? sipAccountInfo['endpoint'] : default_values['endpoint'];
 
-			if (sipAccountInfo['sipPort']) {
-				txtSipPort = sipAccountInfo["sipPort"];
-			} else {
-				txtSipPort = default_values["sipPort"];
-			}
+			txtWebsocketURL = txtSecurity+"://" + txtHostName + ":" + txtWSPort + "/"+endpoint;
+			txtUDPURL = "udp://" + txtHostName + ":" + txtSipPort;
 
-			if (sipAccountInfo['sipSecurePort']) {
-				txtSipSecurePort = sipAccountInfo["sipSecurePort"];
-			} else {
-				txtSipSecurePort = default_values["sipSecurePort"];
-			}
-
-			/* We need to recalculate the Websocket URL
-			   based on the values above
-			*/
-
-			var loadCredentials_port_fn = function(sipAccountInfo) {
-					console.log("loadCredentials_extra:", sipAccountInfo);
-					if (txtSecurity == 'ws') {
-						txtWebsocketURL = "ws://" + txtHostName + ":" + txtWSPort + "/ws";
-						txtUDPURL = "udp://" + txtHostName + ":" + txtSipPort;
-						logger.log("SIP udp : " + txtSipUdpPort);
-						if (window.location.protocol == "http:") {
-							txtWebsocketURL = "ws://" + txtHostName + ":" + txtWSPort + "/ws";
-							txtUDPURL = "udp://" + txtHostName + ":" + txtSipPort;
-							logger.log("ws http : " + txtSipPort);
-						} else {
-							/* Cannot send with "ws" plain when client is https. Means for https, we need to force wss.
-							   Q: Can cient and proxy be on different servers?
-								  We need not have this if condition in that case.
-							 */
-							txtWebsocketURL = "wss://" + txtHostName + ":" + txtWSPort + "/wss";
-							txtUDPURL = "udp://" + txtHostName + ":" + txtSipSecurePort;
-						}
-
-					} else {
-
-						txtWebsocketURL = "wss://" + txtHostName + ":" + txtWSPort + "/wss";
-						txtUDPURL = "udp://" + txtHostName + ":" + txtSipSecurePort;
-						logger.log("wss udp :" + txtSipSecurePort);
-						if (window.location.protocol == "http:") {
-							txtWebsocketURL = "wss://" + txtHostName + ":" + txtWSPort + "/wss";
-							txtUDPURL = "udp://" + txtHostName + ":" + txtSipSecurePort;
-						}
-						logger.log("wss http : " + txtWSPort);
-						logger.log("wss txtWebsocketURL : " + txtWebsocketURL);
-					}
-			}
-
-			loadCredentials_port_fn(sipAccountInfo)
 
 			var oInitializeCompleteTimer = setTimeout(function () {
 				if (initializeComplete == true) {
