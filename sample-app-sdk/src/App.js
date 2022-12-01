@@ -256,29 +256,29 @@ function App() {
     var sip = "sip:" + phone.Username;
     var toNumber = makeCallRef.current.value;
     try {
-        var myHeaders = new Headers();
-        myHeaders.append("Access-Control-Allow-Origin", "*");
-        myHeaders.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        myHeaders.append(
-          'Authorization',
-          'Basic YTg1OWU0YTkyMmNlYWNlMGQxMGFhYTIzZTVhNzA5NTIwZTNiOTNkMjk5NWNmMzYzOmQ5MjU0YzBmYjQ2OGIzNjc3YTFjNjJkMjQyMGU4MzIyZjBlNzM5YjU5ZGQ5MzBjMg==');
+      var myHeaders = new Headers();
+      myHeaders.append("Access-Control-Allow-Origin", "*");
+      myHeaders.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      myHeaders.append(
+        'Authorization',
+        'Basic YTg1OWU0YTkyMmNlYWNlMGQxMGFhYTIzZTVhNzA5NTIwZTNiOTNkMjk5NWNmMzYzOmQ5MjU0YzBmYjQ2OGIzNjc3YTFjNjJkMjQyMGU4MzIyZjBlNzM5YjU5ZGQ5MzBjMg==');
 
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          redirect: 'follow',
-        };
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        redirect: 'follow',
+      };
 
-        fetch(
-          `/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${callerId}&From=${sip}&To=%2B91${toNumber}`,
-          requestOptions
-        )
-          .then((response) => response.text())
-          .then((result) => console.log(result))
-          .catch((error) => console.log('error', error));
-      } catch (e) {
-        console.log('inside exception', e);
-      }
+      fetch(
+        `/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${callerId}&From=${sip}&To=%2B91${toNumber}`,
+        requestOptions
+      )
+        .then((response) => console.log("Response App" + response.text()))
+        .then((result) => console.log("Result App" + result))
+        .catch((error) => console.log('Error app', error));
+    } catch (e) {
+      console.log('inside exception', e);
+    }
   }
 
   function callDemo() {
