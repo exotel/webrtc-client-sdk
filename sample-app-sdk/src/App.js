@@ -89,6 +89,7 @@ function App() {
   var diagnosticsUdpRef = useRef(null);
   var diagnosticsHostRef = useRef(null);
   var diagnosticsReflexRef = useRef(null);
+  var makeCallRef = useRef(null);
   var exWebClient = new ExotelWebClient();
   var configRefs = {
     'Username':useRef(null),
@@ -245,6 +246,41 @@ function App() {
     registerHandler();
   }
 
+  function makeCall() {
+    if(!regState.valueOf()) {
+      console.log("Cannot Make Call as reg is not done");
+      return
+    }
+    console.log("Making Call to to: ", makeCallRef.current.value);
+    var callerId = "01135124165";
+    var sip = "sip:" + phone.Username;
+    var toNumber = makeCallRef.current.value;
+    try {
+        var myHeaders = new Headers();
+        myHeaders.append("Access-Control-Allow-Origin", "*");
+        myHeaders.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        myHeaders.append(
+          'Authorization',
+          'Basic YTg1OWU0YTkyMmNlYWNlMGQxMGFhYTIzZTVhNzA5NTIwZTNiOTNkMjk5NWNmMzYzOmQ5MjU0YzBmYjQ2OGIzNjc3YTFjNjJkMjQyMGU4MzIyZjBlNzM5YjU5ZGQ5MzBjMg==');
+
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          redirect: 'follow',
+        };
+
+        fetch(
+          `/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${callerId}&From=${sip}&To=%2B91${toNumber}`,
+          requestOptions
+        )
+          .then((response) => response.text())
+          .then((result) => console.log(result))
+          .catch((error) => console.log('error', error));
+      } catch (e) {
+        console.log('inside exception', e);
+      }
+  }
+
   function callDemo() {
       return (
 
@@ -252,6 +288,11 @@ function App() {
   <Grid item xs={6}>
     <Item>
     <Stack spacing={2}>
+    <Item>
+    <Input fullWidth={true} inputRef={makeCallRef} defaultValue=""></Input>
+      <br></br><br></br> 
+      <Button variant="outlined" onClick={makeCall}>MakeCall</Button>
+    </Item>
     <Item>
     <textarea style={{ width: 400, height: 300, resize:'none' }} ref={registrationRef} value={registrationData} onChange={registrationStatusChanged}></textarea>
       <br></br>          
