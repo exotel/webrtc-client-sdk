@@ -6,6 +6,7 @@
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@exotel-npm-dev/webrtc-client-sdk": "^1.0.0",
+    "@exotel-npm-dev/webrtc-core-sdk": "^1.0.3",
     "@mui/icons-material": "^5.8.3",
     "@mui/material": "^5.8.3",
     "@testing-library/jest-dom": "^5.16.4",
@@ -45,5 +46,6 @@
   },
   "devDependencies": {
     "core-js-pure": "^3.25.4"
-  }
+  },
+  "proxy": "https://api.in.exotel.com"
 }

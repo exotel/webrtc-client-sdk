@@ -1,16 +1,16 @@
 [
     {
-        "Username":"ashishrb544b97d",
-        "DisplayName":"Ashish",
+        "Username":"ajayp50360fe3",
+        "DisplayName":"Ajay",
         "HostServer":"voip.exotel.in",
         "Domain":"ccplexopoc1m.voip.exotel.com",
         "Port":443,
-        "Password":"test1234",
+        "Password":"ajay_paratmandali123",
         "CallTimeout":1000,
         "Security": "wss",
         "EndPoint": "wss",
-        "AccountSID":"exotelt1",
-        "AccountNo":"ashishrb544b97d",
+        "AccountSID":"ccplexopoc1m",
+        "AccountNo":"ajayp50360fe3",
         "AutoRegistration": true
     }            
 ]
