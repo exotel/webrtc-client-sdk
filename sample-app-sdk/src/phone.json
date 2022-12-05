@@ -11,6 +11,9 @@
         "EndPoint": "wss",
         "AccountSID":"ccplexopoc1m",
         "AccountNo":"ajayp50360fe3",
-        "AutoRegistration": true
-    }            
+        "AutoRegistration": true,
+        "VirtualNumber": "01135124165",
+        "ApiKey": "a859e4a922ceace0d10aaa23e5a709520e3b93d2995cf363",
+        "ApiToken": "d9254c0fb468b3677a1c62d2420e8322f0e739b59dd930c2"
+    }
 ]
