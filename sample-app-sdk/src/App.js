@@ -18,6 +18,7 @@ import Button from '@mui/material/Button';
 import Input from '@mui/material/Input';
 import { styled } from '@mui/material/styles';
 import { ExotelWebClient} from '@exotel-npm-dev/webrtc-client-sdk';
+import { Buffer } from "buffer";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -75,6 +76,9 @@ function App() {
     'port': data[0].Port,
     'security': data[0].Security,
     'endpoint': data[0].EndPoint,
+    'apikey': data[0].ApiKey,
+    'apitoken': data[0].ApiToken,
+    'vitualnumber': data[0].VirtualNumber
   };
   
   var registrationRef = useRef(null);
@@ -185,6 +189,9 @@ function App() {
       sipAccountInfo['port'] = phone.Port;
       sipAccountInfo['security'] = phone.Security;
       sipAccountInfo['endpoint'] = phone.EndPoint;
+      sipAccountInfo['apikey'] = phone.ApiKey;
+      sipAccountInfo['apitoken'] = phone.ApiToken;
+      sipAccountInfo['virtualnumber'] = phone.VirtualNumber;
       exWebClient.initWebrtc(sipAccountInfo, RegisterEventCallBack, CallListenerCallback, SessionCallback)
     }  
   }
@@ -212,6 +219,9 @@ function App() {
     newRows.push(createData('AccountSID', phone.AccountSID))
     newRows.push(createData('AccountNo', phone.AccountNo))
     newRows.push(createData('AutoRegistration', phone.AutoRegistration))
+    newRows.push(createData('ApiKey', phone.ApiKey))
+    newRows.push(createData('ApiToken', phone.ApiToken))
+    newRows.push(createData('VirtualNumber', phone.VirtualNumber))
     setRows(newRows);     
   }
 
@@ -242,6 +252,9 @@ function App() {
     phone.AccountNo = configRefs['AccountNo'].current.value;
     phone.AutoRegistration = configRefs['AutoRegistration'].current.value;
     phone.CallTimeout = configRefs['CallTimeout'].current.value;
+    phone.ApiKey = configRefs['ApiKey'].current.value;
+    phone.ApiToken = configRefs['ApiToken'].current.value;
+    phone.VirtualNumber = configRefs['VirtualNumber'].current.value;
 
     registerHandler();
   }
@@ -252,16 +265,18 @@ function App() {
       return
     }
     console.log("Making Call to to: ", makeCallRef.current.value);
-    var callerId = "01135124165";
+    var callerId = phone.VirtualNumber;
     var sip = "sip:" + phone.Username;
     var toNumber = makeCallRef.current.value;
+    const token = "Basic " + Buffer.from(phone.ApiKey + ":" + phone.ApiToken).toString('base64');
+
     try {
       var myHeaders = new Headers();
       myHeaders.append("Access-Control-Allow-Origin", "*");
       myHeaders.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       myHeaders.append(
         'Authorization',
-        'Basic YTg1OWU0YTkyMmNlYWNlMGQxMGFhYTIzZTVhNzA5NTIwZTNiOTNkMjk5NWNmMzYzOmQ5MjU0YzBmYjQ2OGIzNjc3YTFjNjJkMjQyMGU4MzIyZjBlNzM5YjU5ZGQ5MzBjMg==');
+        token);
 
       var requestOptions = {
         method: 'POST',
