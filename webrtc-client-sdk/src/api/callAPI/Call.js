@@ -80,4 +80,32 @@ export function Call()  {
          */
         return CallDetails.getCallDetails();
     }
+
+    this.makeCall = function(to, from, virtual, token) {
+        try {
+            var myHeaders = new Headers();
+            myHeaders.append("Access-Control-Allow-Origin", "*");
+            myHeaders.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+            myHeaders.append(
+                'Authorization',
+                token);
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                redirect: 'follow',
+            };
+
+            fetch(
+                `/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${virtual}&From=${from}&To=%2B91${to}`,
+                requestOptions
+            )
+            .then((response) => console.log("Response App" + response.json()))
+            .then((result) => console.log("Result App" + result))
+            .catch((error) => console.log('Error app', error))
+            .done();
+        } catch (e) {
+            console.log('inside exception', e);
+        }
+    }
 }

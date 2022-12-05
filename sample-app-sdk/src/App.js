@@ -18,7 +18,6 @@ import Button from '@mui/material/Button';
 import Input from '@mui/material/Input';
 import { styled } from '@mui/material/styles';
 import { ExotelWebClient} from '@exotel-npm-dev/webrtc-client-sdk';
-import { Buffer } from "buffer";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -264,35 +263,8 @@ function App() {
       return
     }
     console.log("Making Call to to: ", makeCallRef.current.value);
-    var callerId = phone.VirtualNumber;
-    var sip = "sip:" + phone.Username;
     var toNumber = makeCallRef.current.value;
-    const token = "Basic " + Buffer.from(phone.ApiKey + ":" + phone.ApiToken).toString('base64');
-
-    try {
-      var myHeaders = new Headers();
-      myHeaders.append("Access-Control-Allow-Origin", "*");
-      myHeaders.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      myHeaders.append(
-        'Authorization',
-        token);
-
-      var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        redirect: 'follow',
-      };
-
-      fetch(
-        `/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${callerId}&From=${sip}&To=%2B91${toNumber}`,
-        requestOptions
-      )
-        .then((response) => console.log("Response App" + response.text()))
-        .then((result) => console.log("Result App" + result))
-        .catch((error) => console.log('Error app', error));
-    } catch (e) {
-      console.log('inside exception', e);
-    }
+    exWebClient.makeCall(toNumber, phone)
   }
 
   function callDemo() {
