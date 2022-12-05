@@ -140,8 +140,7 @@ function App() {
       setCallComing(false)
       setCallState(false)
     }
-
- }
+  }
 
   function RegisterEventCallBack (state, phone){
     /**
