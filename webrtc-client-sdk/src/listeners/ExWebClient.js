@@ -22,6 +22,7 @@ import { webrtcTroubleshooterEventBus } from "./Callback";
 
 import { webrtcLogger } from "../api/omAPI/WebrtcLogger";
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
+import { Buffer } from 'buffer'
 
 var intervalId;
 var intervalIDMap = new Map();
@@ -290,6 +291,17 @@ export class ExotelWebClient  {
     /**
      * function that returns the instance of the call controller object object
      */
+    makeCall = (toNumber, phone) => {
+        var callerId = phone.VirtualNumber;
+        var sip = "sip:" + phone.Username;
+        var token = "Basic " + Buffer.from(phone.ApiKey + ":" + phone.ApiToken).toString('base64');
+        logger.log("Dialer: makeCall: Received: ", toNumber, sip, token) 
+        this.getCall().makeCall(toNumber, sip, callerId, token)
+    }
+
+    /**
+     * function that returns the instance of the call controller object object
+     */
 
     getCallController =() => {
         return this.ctrlr;
@@ -297,7 +309,7 @@ export class ExotelWebClient  {
 
     getCall =() => {
         if (!this.call) {
-            this.call = call = new Call();
+            this.call = new Call();
         }        
         return this.call;
     };
