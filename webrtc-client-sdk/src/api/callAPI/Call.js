@@ -83,6 +83,7 @@ export function Call()  {
 
     this.makeCall = function(to, from, virtual, token) {
         try {
+            var toNum = "+91" + to
             var myHeaders = new Headers();
             myHeaders.append("Access-Control-Allow-Origin", "*");
             myHeaders.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -97,13 +98,12 @@ export function Call()  {
             };
 
             fetch(
-                `/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${virtual}&From=${from}&To=%2B91${to}`,
+                `/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${virtual}&From=${from}&To=${toNum}`,
                 requestOptions
             )
             .then((response) => console.log("Response App" + response.json()))
             .then((result) => console.log("Result App" + result))
-            .catch((error) => console.log('Error app', error))
-            .done();
+            .catch((error) => console.log('Error app', error));
         } catch (e) {
             console.log('inside exception', e);
         }
