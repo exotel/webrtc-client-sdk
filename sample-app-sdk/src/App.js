@@ -32,6 +32,7 @@ var unregisterWait = "false";
 
 function App() {
   const [phone, setPhoneData ] = React.useState('');
+  const [outboundStatus, setOutboundStatus ] = React.useState('MakeCall');
   const [tabValue, setTabValue] = React.useState(0);
   const [ registrationData, setRegistrationData ] = React.useState("Not Registered");
   const [ diagnosticsValue, setDiagnostics ] = React.useState("Diagnostics Info");
@@ -168,12 +169,6 @@ function App() {
     }
   }
 
-  function OutboundCallBack(eventType, callObj) {
-    console.log("************* App ***************")
-    console.log(eventType, callObj)
-    console.log("************ App ****************")
-  }
-
   function SessionCallback(state, phone) {
     /**
      * SessionCallback is triggered whenever the state of application changes due to an incoming call
@@ -263,11 +258,19 @@ function App() {
     registerHandler();
   }
 
+  function OutboundCallBack(eventType, callObj) {
+    console.log("************* App ***************")
+    console.log(eventType, callObj)
+    setOutboundStatus(eventType)
+    console.log("************ App ****************")
+  }
+
   function makeCall() {
     if(!regState.valueOf()) {
       console.log("Cannot Make Call as reg is not done");
       return
     }
+    setOutboundStatus("connecting....")
     console.log("Making Call to to: ", makeCallRef.current.value);
     var toNumber = makeCallRef.current.value;
     // callback for outboundcall
@@ -283,7 +286,9 @@ function App() {
     <Stack spacing={2}>
     <Item>
     <Input fullWidth={true} inputRef={makeCallRef} defaultValue=""></Input>
-      <br></br><br></br> 
+      <br></br>
+      <h3>Status: {outboundStatus}</h3>
+      <br></br> 
       <Button variant="outlined" onClick={makeCall}>MakeCall</Button>
     </Item>
     <Item>
