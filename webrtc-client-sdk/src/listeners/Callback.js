@@ -34,18 +34,16 @@ export var callbacks = {
 export var outboundCallbacks = {
     outboundCallBack: null,
     call: null,
-    phone:'',
     initalizeOutboundCallback: function(outboundEventCallBack){
         this.outboundCallBack = outboundEventCallBack;
     },
-    initializeCall: function(call, phone){
+    initializeCall: function(call){
         this.call = call;
-        this.phone = phone;
     },
     triggerCallback: function(eventType){
         const callbackFunc = this.outboundCallBack;
         const call = this.call;
-        return callbackFunc(call, eventType, this.phone);
+        return callbackFunc(eventType, call);
     }
 };
 

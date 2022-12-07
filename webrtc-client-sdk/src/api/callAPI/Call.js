@@ -82,7 +82,7 @@ export function Call()  {
         return CallDetails.getCallDetails();
     }
 
-    this.makeCall = function(to, from, virtual, token, callback) {
+    this.makeCall = async function(to, from, virtual, token, callback) {
         var resp = null, err = null, code = null;
         try {
             var toNum = "+91" + to
@@ -96,9 +96,23 @@ export function Call()  {
             var requestOptions = {
                 method: 'POST',
                 headers: myHeaders,
-                //redirect: 'follow',
+                redirect: 'follow',
             };
 
+            const response = await fetch(`/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${virtual}&From=${from}&To=${toNum}`, requestOptions);  
+      
+
+            if (!response.ok) {
+              err = await response.json()
+              code = response.status
+              callback(err, code, resp)
+              return
+            }
+       
+            resp = await response.json();
+            logger.log("err: ", err, " res: ", code, " data:", resp)
+            callback(err, code, resp)
+            /*
             fetch(
                 `/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${virtual}&From=${from}&To=${toNum}`,
                 requestOptions
@@ -118,6 +132,7 @@ export function Call()  {
                 logger.log("err: ", err, " res: ", code, " data:", resp)
                 callback(err, code, resp)
             });
+            */
         } catch (e) {
             console.log('inside exception', e);
         }
