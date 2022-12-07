@@ -27,6 +27,28 @@ export var callbacks = {
         return callbackFunc(call, eventType, this.phone);
     }
 };
+
+/**
+ * Initializes outbound callback
+ */
+export var outboundCallbacks = {
+    outboundCallBack: null,
+    call: null,
+    phone:'',
+    initalizeOutboundCallback: function(outboundEventCallBack){
+        this.outboundCallBack = outboundEventCallBack;
+    },
+    initializeCall: function(call, phone){
+        this.call = call;
+        this.phone = phone;
+    },
+    triggerCallback: function(eventType){
+        const callbackFunc = this.outboundCallBack;
+        const call = this.call;
+        return callbackFunc(call, eventType, this.phone);
+    }
+};
+
 /**
  * Initializes register callback and also sets to which phone registration was renewed
  */

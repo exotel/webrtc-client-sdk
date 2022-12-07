@@ -264,6 +264,7 @@ function App() {
     }
     console.log("Making Call to to: ", makeCallRef.current.value);
     var toNumber = makeCallRef.current.value;
+    // callback for outboundcall
     exWebClient.makeCall(toNumber, phone)
   }
 

@@ -21,7 +21,8 @@
   },
   "homepage": "https://bitbucket.org/Exotel/webrtc#readme",
   "dependencies": {
-    "@exotel-npm-dev/webrtc-core-sdk": "^1.0.0"
+    "@exotel-npm-dev/webrtc-core-sdk": "^1.0.0",
+    "request-promise": "^4.2.6"
   },
   "devDependencies": {
     "babel-loader": "^8.2.5",

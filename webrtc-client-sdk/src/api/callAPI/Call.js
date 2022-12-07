@@ -2,6 +2,7 @@ import { CallDetails } from "./CallDetails";
 import { webrtcLogger } from "../omAPI/WebrtcLogger"
 
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
+
 var logger = webrtcLogger()
 
 export function Call()  {
@@ -81,7 +82,8 @@ export function Call()  {
         return CallDetails.getCallDetails();
     }
 
-    this.makeCall = function(to, from, virtual, token) {
+    this.makeCall = function(to, from, virtual, token, callback) {
+        var resp = null, err = null, code = null;
         try {
             var toNum = "+91" + to
             var myHeaders = new Headers();
@@ -94,16 +96,28 @@ export function Call()  {
             var requestOptions = {
                 method: 'POST',
                 headers: myHeaders,
-                redirect: 'follow',
+                //redirect: 'follow',
             };
 
             fetch(
                 `/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${virtual}&From=${from}&To=${toNum}`,
                 requestOptions
             )
-            .then((response) => console.log("Response App" + response.json()))
-            .then((result) => console.log("Result App" + result))
-            .catch((error) => console.log('Error app', error));
+            .then((response) => {
+                logger.log("Response App: " + response.json())
+                code = response.status
+            })
+            .then((data) => {
+                logger.log("Result App: " + JSON.stringify(data))
+                resp = JSON.stringify(data)
+            })
+            .catch((error) => {
+                logger.log('Error app: ', error)
+                err = error
+            }).finally(() => {
+                logger.log("err: ", err, " res: ", code, " data:", resp)
+                callback(err, code, resp)
+            });
         } catch (e) {
             console.log('inside exception', e);
         }
