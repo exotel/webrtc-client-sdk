@@ -168,6 +168,12 @@ function App() {
     }
   }
 
+  function OutboundCallBack(eventType, callObj) {
+    console.log("************* App ***************")
+    console.log(eventType, callObj)
+    console.log("************ App ****************")
+  }
+
   function SessionCallback(state, phone) {
     /**
      * SessionCallback is triggered whenever the state of application changes due to an incoming call
@@ -190,7 +196,7 @@ function App() {
       sipAccountInfo['apikey'] = phone.ApiKey;
       sipAccountInfo['apitoken'] = phone.ApiToken;
       sipAccountInfo['virtualnumber'] = phone.VirtualNumber;
-      exWebClient.initWebrtc(sipAccountInfo, RegisterEventCallBack, CallListenerCallback, SessionCallback)
+      exWebClient.initWebrtc(sipAccountInfo, RegisterEventCallBack, CallListenerCallback, SessionCallback, OutboundCallBack)
     }  
   }
 

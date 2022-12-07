@@ -5,17 +5,25 @@ import { outboundCallbacks } from "./Callback";
 var logger = webrtcLogger()
 
 export function OutBoundCallListener() {
-    this.callSuccess = function(){
+    this.callback = null
+
+    this.initializeCall = function(callback) {
+        outboundCallbacks.initalizeOutboundCallback(callback)
+    }
+
+    this.callSuccess = function(data){
+        //outboundCallbacks.initalizeOutboundCallback(this.callback)
         logger.log("OutBoundCallListener:Initialise call")
-        outboundCallbacks.initializeCall(call,phone)
+        outboundCallbacks.initializeCall(data)
 
         logger.log("CallListener:Trigger Outgoing call")
         outboundCallbacks.triggerCallback("connected");
     }
 
-    this.callConectFailure = function(){
+    this.callFailure = function(err){
+        //outboundCallbacks.initalizeOutboundCallback(this.callback)
         logger.log("OutBoundCallListener:Initialise call")
-        outboundCallbacks.initializeCall(call,phone)
+        outboundCallbacks.initializeCall(err)
 
         logger.log("CallListener:Trigger Outgoing call")
         outboundCallbacks.triggerCallback("failed");
