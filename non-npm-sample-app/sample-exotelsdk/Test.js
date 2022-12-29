@@ -33,18 +33,35 @@ function CallListenerCallback(callObj, eventType, phone) {
  }
 
 function toggleMuteButton() {
-    if(document.getElementById("muteButton").innerHTML === "unmute"){
-        document.getElementById("muteButton").innerHTML = "mute";
-    } else {
-        document.getElementById("muteButton").innerHTML = "unmute";
+    if(call){
+        call.Mute();
+        if(document.getElementById("muteButton").innerHTML === "UNMUTE"){
+            document.getElementById("muteButton").innerHTML = "MUTE";
+        } else {
+            document.getElementById("muteButton").innerHTML = "UNMUTE";
+        }
     }
-    call.Mute();
 }
 
 function acceptCall() {
-    call.Answer();
+    if(call) {
+        call.Answer();
+    }
 }
 
 function rejectCall() {
-    call.Hangup();
+    if(call) {
+        call.Hangup();
+    }
+}
+
+function toggleHoldButton() {
+    if(call) {
+        call.HoldToggle();
+        if(document.getElementById("holdButton").innerHTML === "UNHOLD"){
+            document.getElementById("holdButton").innerHTML = "HOLD";
+        } else {
+            document.getElementById("holdButton").innerHTML = "UNHOLD";
+        }
+    }
 }

@@ -168,12 +168,12 @@ function UserAgentRegistration() {
 }
 
 function toggleMuteButton() {
-    if(document.getElementById("muteButton").innerHTML === "unmute"){
-        document.getElementById("muteButton").innerHTML = "mute";
-    } else {
-        document.getElementById("muteButton").innerHTML = "unmute";
-    }
     webrtcSDK.webrtcSIPPhone.webRTCMuteUnmute(null);
+    if(document.getElementById("muteButton").innerHTML === "UNMUTE"){
+        document.getElementById("muteButton").innerHTML = "MUTE";
+    } else {
+        document.getElementById("muteButton").innerHTML = "UNMUTE";
+    }
 }
 
 function acceptCall() {
@@ -182,4 +182,13 @@ function acceptCall() {
 
 function rejectCall() {
     webrtcSDK.webrtcSIPPhone.rejectCall();
+}
+
+function toggleHoldButton() {
+    webrtcSDK.webrtcSIPPhone.holdCall();
+    if(document.getElementById("holdButton").innerHTML === "UNHOLD"){
+        document.getElementById("holdButton").innerHTML = "HOLD";
+    } else {
+        document.getElementById("holdButton").innerHTML = "UNHOLD";
+    }
 }
