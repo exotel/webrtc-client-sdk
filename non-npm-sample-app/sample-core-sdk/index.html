@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WebPhone</title>
+
+<script type="text/javascript" src="../../webrtc-core-sdk/dist/webrtcsdk.js"></script>
+<script type="text/javascript" src="Test.js"></script>
+<script id="phone" type="application/json">
+[
+    {
+        "Username":"ashishrb544b97d",
+        "DisplayName":"Ashish",
+        "HostServer":"voip.exotel.in",
+        "Domain":"ccplexopoc1m.voip.exotel.com",
+        "Port":443,
+        "Password":"test1234",
+        "CallTimeout":1000,
+        "Security": "wss",
+        "EndPoint": "wss",
+        "AccountSID":"exotelt1",
+        "AccountNo":"ashishrb544b97d",
+        "AutoRegistration": true
+    }            
+]
+</script>
+
+</head>
+<body onload="UserAgentRegistration()" >
+
+	<b>Register Status : </b>
+	<b id="status"> Unregister</b>
+	<br />
+	<b>Call Status : </b>
+	<b id="call_status"> </b>
+	<br />
+	<br />
+    <button onclick="acceptCall()">Accept Call</button>
+	<button id="muteButton" onclick="toggleMuteButton()">MUTE</button>
+	<button onclick="rejectCall()">END CALL</button>
+
+	<audio id="ringtone" src="assets/sounds/ringtone.wav">
+	</audio>
+	<audio id="ringbacktone" src="assets/sounds/ringbacktone.wav">
+	</audio>
+	<audio id="dtmfTone" src="assets/sounds/dtmf.wav">
+	</audio>
+	<audio id="audio_remote" autoplay="autoplay"></audio>
+</body>
+</html>
