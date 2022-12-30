@@ -5,9 +5,9 @@
 index.html require exotel sdk bundle.
 
 Steps to generating webrtc core bundle.
-* go to core bundle npm module
+* go to webrtc client sdk 
 
-    `cd <path>/webrtc-core-bundle`
+    `cd <path>/webrtc-client-sdk`
 * generate core bundle
     ```
     npm install

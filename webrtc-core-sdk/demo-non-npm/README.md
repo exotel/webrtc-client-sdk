@@ -5,9 +5,9 @@
 index.html require webrtc core bundle.
 
 Steps to generating webrtc core bundle.
-* go to core bundle npm module
+* go to webrtc core sdk
 
-    `cd <path>/webrtc-core-bundle`
+    `cd <path>/webrtc-core-sdk`
 * generate core bundle
     ```
     npm install
