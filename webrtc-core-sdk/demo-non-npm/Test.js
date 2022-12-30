@@ -128,8 +128,12 @@ function ExDelegationHandler(exClient_) {
      registerEventCallback =(event, phone, param) => {
         
 	    console.log("Dialer: registerEventCallback: Received ---> " + event + 'phone....', phone + 'param....', param)
-
         document.getElementById("status").innerHTML = event;
+        if (event === "connected"){
+            document.getElementById("registerButton").innerHTML = "UNREGISTER";
+        } else {
+            document.getElementById("registerButton").innerHTML = "REGISTER";
+        }
 
     };
     
@@ -165,6 +169,15 @@ function UserAgentRegistration() {
     var synchronousHandler = new ExSynchronousHandler(ExClient);
 	webrtcSDK.webrtcSIPPhone.registerPhone("sipjs",delegationHandler);
     webrtcSDK.webrtcSIPPhone.registerWebRTCClient(sipAccountInfo, synchronousHandler);
+}
+
+function registerToggle() {
+    if(document.getElementById("registerButton").innerHTML === "REGISTER") {
+        UserAgentRegistration();
+    } else {
+        webrtcSDK.webrtcSIPPhone.sipUnRegisterWebRTC();
+    }
+    
 }
 
 function toggleMuteButton() {

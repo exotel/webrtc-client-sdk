@@ -19,13 +19,27 @@ function UserAgentRegistration() {
     exWebClient.DoRegister();
 }
 
+function registerToggle() {
+    if(document.getElementById("registerButton").innerHTML === "REGISTER") {
+        UserAgentRegistration();
+    } else {
+        exWebClient.unregister();
+    }
+}
+
 function CallListenerCallback(callObj, eventType, phone) {
     call = exWebClient.getCall();
     document.getElementById("call_status").innerHTML = eventType;
  }
 
   function RegisterEventCallBack (state, phone){
-     document.getElementById("status").innerHTML = state;
+    document.getElementById("status").innerHTML = state;
+     if (state === 'registered') {
+        document.getElementById("registerButton").innerHTML = "UNREGISTER";
+     } else {
+        document.getElementById("registerButton").innerHTML = "REGISTER";
+     }
+
   }
 
   function SessionCallback(state, phone) {
