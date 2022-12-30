@@ -5,14 +5,17 @@
 index.html require webrtc core bundle.
 
 Steps to generating webrtc core bundle.
+
 * go to webrtc core sdk
 
     `cd <path>/webrtc-core-sdk`
 * generate core bundle
+
     ```
     npm install
     npm run build
     ```
+    
 * `webrtcsdk.js` will generate in `dist` directory along with wav files.
 
 ## Running

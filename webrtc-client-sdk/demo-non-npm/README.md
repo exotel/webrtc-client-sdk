@@ -5,14 +5,17 @@
 index.html require exotel sdk bundle.
 
 Steps to generating webrtc core bundle.
+
 * go to webrtc client sdk 
 
     `cd <path>/webrtc-client-sdk`
 * generate core bundle
+
     ```
     npm install
     npm run build
     ```
+    
 * `exotelsdk.js` will generate in `dist` directory along with wav files.
 
 ## Running
