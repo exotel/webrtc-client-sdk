@@ -9,6 +9,7 @@ Steps to generating webrtc core bundle.
 * go to webrtc core sdk
 
     `cd <path>/webrtc-core-sdk`
+    
 * generate core bundle
 
     ```
