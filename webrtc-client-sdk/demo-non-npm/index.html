@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WebPhone</title>
+
+<script type="text/javascript" src="../dist/exotelsdk.js"></script>
+<script type="text/javascript" src="phone.js"></script>
+<script type="text/javascript" src="demo.js"></script>
+
+</head>
+<body >
+
+	<b>Register Status : </b>
+	<b id="status"> unregister</b>
+	<br />
+	<br />
+	<button id="registerButton" onclick="registerToggle()">REGISTER</button>
+	<br />
+	<br />
+	<b>Call Status : </b>
+	<b id="call_status"> </b>
+	<br />
+	<br />
+    <button onclick="acceptCall()">Accept Call</button>
+	<button onclick="rejectCall()">END CALL</button>
+	<button id="muteButton" onclick="toggleMuteButton()">MUTE</button>
+	<button id="holdButton" onclick="toggleHoldButton()">HOLD</button>
+
+	<audio id="ringtone" src="assets/sounds/ringtone.wav">
+	</audio>
+	<audio id="ringbacktone" src="assets/sounds/ringbacktone.wav">
+	</audio>
+	<audio id="dtmfTone" src="assets/sounds/dtmf.wav">
+	</audio>
+	<audio id="audio_remote" autoplay="autoplay"></audio>
+</body>
+</html>

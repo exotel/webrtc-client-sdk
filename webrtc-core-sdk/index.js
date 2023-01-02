@@ -1,1 +1,1 @@
-export * from  './src/webrtcSIPPhone';
+export * from './src/webrtcSIPPhone';
