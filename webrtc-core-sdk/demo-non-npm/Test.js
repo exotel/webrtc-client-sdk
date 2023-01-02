@@ -150,18 +150,18 @@ function ExDelegationHandler(exClient_) {
 var ExClient = new ExotelWebClient();
 
 function UserAgentRegistration() {
-    var phone = JSON.parse(document.getElementById('phone').textContent)[0]
+    var sipInfo = JSON.parse(phone)[0]
 
 	var sipAccountInfo= {
-		'userName':  phone.Username,
-		'authUser': phone.Username,
-		'sipdomain': phone.Domain,
-		'domain': phone.HostServer + ":" + phone.Port,
-		'displayname': phone.DisplayName,
-		'secret': phone.Password,
-		'port': phone.Port,
-		'security': phone.Security,
-        'endpoint':phone.EndPoint
+		'userName':  sipInfo.Username,
+		'authUser': sipInfo.Username,
+		'sipdomain': sipInfo.Domain,
+		'domain': sipInfo.HostServer + ":" + sipInfo.Port,
+		'displayname': sipInfo.DisplayName,
+		'secret': sipInfo.Password,
+		'port': sipInfo.Port,
+		'security': sipInfo.Security,
+        'endpoint':sipInfo.EndPoint
 	  };
 	sipAccountInfo["sipUri"] = "wss://" + sipAccountInfo["userName"] + "@" + sipAccountInfo["sipdomain"] + ":" + sipAccountInfo["port"];
 	sipAccountInfo["accountSid"] = "exotel1";
