@@ -29,3 +29,9 @@ In your web browser, open the `index.html` file in this directory to run the dem
 ## Development
 
 This demonstration are build on simple html which provides some basic functionality via a simple interface.
+
+## Issues
+### ringtone not playing
+
+1. remove the wav files from `../dist/`.
+2. copy the wav files from `assets/sounds` and paste to `../dist/`.
