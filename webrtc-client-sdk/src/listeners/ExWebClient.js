@@ -444,7 +444,7 @@ export class ExotelWebClient  {
         this.accountName = this.userName = sipAccountInfo.userName;
         this.authUser = subscriberName = sipAccountInfo.authUser;
         this.displayName = sipAccountInfo.displayName;
-        this.accountSid = 'exotelt1';
+        this.accountSid = accountSid;
         this.subscriberToken = sipAccountInfo.secret;
         this.secret = this.password = sipAccountInfo.secret;
         this.security = sipAccountInfo.security ? sipAccountInfo.security : "wss";

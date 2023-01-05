@@ -35,6 +35,7 @@ function App() {
   const [outboundStatus, setOutboundStatus ] = React.useState('MakeCall');
   const [tabValue, setTabValue] = React.useState(0);
   const [ registrationData, setRegistrationData ] = React.useState("Not Registered");
+  const [ regState, setRegState ] = React.useState(false);
   const [ diagnosticsValue, setDiagnostics ] = React.useState("Diagnostics Info");
   const [ diagnosticsLogsData, setDiagnosticsLogs ] = React.useState("Diagnostics Logs");
   const [ diagnosticsSpeakerValue, setDiagnosticsSpeakerValue ] = React.useState("");
@@ -52,7 +53,6 @@ function App() {
   const [ callEvent, setCallEvent ] = React.useState("");
   const [ callFrom, setCallFrom ] = React.useState("");
   const [ call, setCall ] = React.useState("");
-  const [ regState, setRegState ] = React.useState(false);
   const [ diagState, setDiagState ] = React.useState(false);
   const [ diagMicTestState, setMicTestState ] = React.useState(false);
   const [ diagSpeakerTestState, setSpeakerTestState ] = React.useState(false);
@@ -68,17 +68,7 @@ function App() {
 
   var sipAccountInfo= {
     'userName':  data[0].Username,
-    'authUser': data[0].Username,
-    'sipdomain': data[0].Domain,
-    'domain': data[0].HostServer + ":" + data[0].Port,
-    'displayname': data[0].DisplayName,
-    'secret': data[0].Password,
-    'port': data[0].Port,
-    'security': data[0].Security,
-    'endpoint': data[0].EndPoint,
-    'apikey': data[0].ApiKey,
-    'apitoken': data[0].ApiToken,
-    'vitualnumber': data[0].VirtualNumber
+    'accountSid': data[0].AccountSID,
   };
   
   var registrationRef = useRef(null);
@@ -177,24 +167,55 @@ function App() {
      console.log('Session state:', state, 'for number...', phone);    
  }
 
-  function initialise_callbacks() {
-    if (configUpdated) {
-      sipAccountInfo['userName'] = phone.Username;
-      sipAccountInfo['authUser'] = phone.Username;
-      sipAccountInfo['sipdomain'] = phone.Domain;
-      sipAccountInfo['domain'] =  phone.HostServer + ":" + phone.Port;
-      sipAccountInfo['displayname'] = phone.DisplayName;
-      sipAccountInfo['secret'] = phone.Password;
-      sipAccountInfo['port'] = phone.Port;
-      sipAccountInfo['security'] = phone.Security;
-      sipAccountInfo['endpoint'] = phone.EndPoint;
-      sipAccountInfo['apikey'] = phone.ApiKey;
-      sipAccountInfo['apitoken'] = phone.ApiToken;
-      sipAccountInfo['virtualnumber'] = phone.VirtualNumber;
-      exWebClient.initWebrtc(sipAccountInfo, RegisterEventCallBack, CallListenerCallback, SessionCallback, OutboundCallBack)
-    }  
+  function fetchDetail(account, username, callback) {
+    var myHeaders = new Headers();
+    myHeaders.append("Access-Control-Allow-Origin", "*");
+    myHeaders.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+    };
+
+    var url = `http://localhost:8080/v2/core/vendoruser?account=${account}&username=${username}`
+    fetch(url, requestOptions
+    ).then((response) => {
+        return response.json()
+    }).then((resp) => {
+        callback(resp)
+    }).catch(function(error) {
+        console.log('Error app: ', error)
+    })
   }
 
+  function initialise_callbacks() {
+    sipAccountInfo['userName'] = phone.Username;
+    sipAccountInfo['accountSid'] = phone.AccountSID;
+    fetchDetail(sipAccountInfo['accountSid'], sipAccountInfo['userName'], init_webclient)
+  }
+
+  function init_webclient(sipDetail) {
+    sipAccountInfo['accountSid'] = sipDetail.AccountSID;
+    sipAccountInfo['userName'] = sipDetail.Username;
+    sipAccountInfo['authUser'] = sipDetail.Username;
+    sipAccountInfo['sipdomain'] = sipDetail.Domain;
+    sipAccountInfo['domain'] =  sipDetail.HostServer + ":" + sipDetail.Port;
+    sipAccountInfo['displayname'] = sipDetail.DisplayName;
+    sipAccountInfo['secret'] = sipDetail.Password;
+    sipAccountInfo['port'] = sipDetail.Port;
+    sipAccountInfo['security'] = sipDetail.Security;
+    sipAccountInfo['endpoint'] = sipDetail.EndPoint;
+    sipAccountInfo['apikey'] = sipDetail.ApiKey;
+    sipAccountInfo['apitoken'] = sipDetail.ApiToken;
+    sipAccountInfo['virtualnumber'] = sipDetail.VirtualNumber;
+    console.log('fetchSipDetail data: ', sipAccountInfo);
+    exWebClient.initWebrtc(sipAccountInfo, RegisterEventCallBack, CallListenerCallback, SessionCallback, OutboundCallBack)
+    if(unregisterWait === "false") {
+      exWebClient.DoRegister()
+    } else {
+      exWebClient.unregister()
+    }
+  }
 
   /* UI update functions */
   function createData(
@@ -473,11 +494,7 @@ function App() {
     }
 
     unregisterWait = "false";
-
     initialise_callbacks();
-    console.log("App.js: Calling DoRegister")
-    exWebClient.DoRegister();
-    
   };
 
   const unregisterHandler = () => {
@@ -488,11 +505,8 @@ function App() {
       updateConfig();
     }
 
-    initialise_callbacks();
-
     unregisterWait = "true";
-
-    exWebClient.UnRegister();
+    initialise_callbacks();
   };  
 
   const registrationStatusChanged = () => {
