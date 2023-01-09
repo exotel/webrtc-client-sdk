@@ -1,7 +1,34 @@
 import { webrtcLogger } from "../api/omAPI/WebrtcLogger"
 import { callbacks } from "./Callback";
+import { outboundCallbacks } from "./Callback";
 
 var logger = webrtcLogger()
+
+export function OutBoundCallListener() {
+    this.callback = null
+
+    this.initializeCall = function(callback) {
+        outboundCallbacks.initalizeOutboundCallback(callback)
+    }
+
+    this.callSuccess = function(data){
+        //outboundCallbacks.initalizeOutboundCallback(this.callback)
+        logger.log("OutBoundCallListener:Initialise call")
+        outboundCallbacks.initializeCall(data)
+
+        logger.log("CallListener:Trigger Outgoing call")
+        outboundCallbacks.triggerCallback("connected");
+    }
+
+    this.callFailure = function(err){
+        //outboundCallbacks.initalizeOutboundCallback(this.callback)
+        logger.log("OutBoundCallListener:Initialise call")
+        outboundCallbacks.initializeCall(err)
+
+        logger.log("CallListener:Trigger Outgoing call")
+        outboundCallbacks.triggerCallback("failed");
+    }
+}
 
 export function CallListener() {
     this.onIncomingCall = function(call,phone){

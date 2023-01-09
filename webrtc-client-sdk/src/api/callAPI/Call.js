@@ -2,6 +2,7 @@ import { CallDetails } from "./CallDetails";
 import { webrtcLogger } from "../omAPI/WebrtcLogger"
 
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
+
 var logger = webrtcLogger()
 
 export function Call()  {
@@ -79,5 +80,61 @@ export function Call()  {
          * return call details object here
          */
         return CallDetails.getCallDetails();
+    }
+
+    this.makeCall = async function(to, from, virtual, token, callback) {
+        var resp = null, err = null, code = null;
+        try {
+            var toNum = "+91" + to
+            var myHeaders = new Headers();
+            myHeaders.append("Access-Control-Allow-Origin", "*");
+            myHeaders.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+            myHeaders.append(
+                'Authorization',
+                token);
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                redirect: 'follow',
+            };
+
+            const response = await fetch(`/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${virtual}&From=${from}&To=${toNum}`, requestOptions);  
+      
+
+            if (!response.ok) {
+              err = await response.json()
+              code = response.status
+              callback(err, code, resp)
+              return
+            }
+       
+            resp = await response.json();
+            logger.log("err: ", err, " res: ", code, " data:", resp)
+            callback(err, code, resp)
+            /*
+            fetch(
+                `/v1/Accounts/ccplexopoc1m/Calls/connect.json?CallerId=${virtual}&From=${from}&To=${toNum}`,
+                requestOptions
+            )
+            .then((response) => {
+                logger.log("Response App: " + response.json())
+                code = response.status
+            })
+            .then((data) => {
+                logger.log("Result App: " + JSON.stringify(data))
+                resp = JSON.stringify(data)
+            })
+            .catch((error) => {
+                logger.log('Error app: ', error)
+                err = error
+            }).finally(() => {
+                logger.log("err: ", err, " res: ", code, " data:", resp)
+                callback(err, code, resp)
+            });
+            */
+        } catch (e) {
+            console.log('inside exception', e);
+        }
     }
 }

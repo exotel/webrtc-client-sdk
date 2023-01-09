@@ -1,6 +1,7 @@
 import { Call }  from "../api/callAPI/Call";
 import { CallController } from "./CallCtrlerDummy";
 import { CallListener } from '../listeners/CallListener';
+import { OutBoundCallListener } from '../listeners/CallListener';
 import { DoRegister as DoRegisterRL } from '../api/registerAPI/RegisterListener';
 import { UnRegister as UnRegisterRL } from '../api/registerAPI/RegisterListener';
 import { ExotelVoiceClientListener } from '../listeners/ExotelVoiceClientListener';
@@ -22,6 +23,7 @@ import { webrtcTroubleshooterEventBus } from "./Callback";
 
 import { webrtcLogger } from "../api/omAPI/WebrtcLogger";
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
+import { Buffer } from 'buffer'
 
 var intervalId;
 var intervalIDMap = new Map();
@@ -203,13 +205,14 @@ export class ExotelWebClient  {
     call = null;
     eventListener = null;
     callListener = null;
+    outboundListener = new OutBoundCallListener();
     /* OLD-Way to be revisited for multile phone support */
     //this.webRTCPhones = {};
 
     sipAccountInfo = null;
 
     initWebrtc = (sipAccountInfo_, 
-        RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
+        RegisterEventCallBack, CallListenerCallback, SessionCallback, OutboundCallBack) => {
 
         if (!this.eventListener) {
             this.eventListener = new ExotelVoiceClientListener();
@@ -218,6 +221,10 @@ export class ExotelWebClient  {
         if (!this.callListener) {
             this.callListener = new CallListener();
         }
+
+        //if (!this.outboundListener) {
+        //    this.outboundListener = new OutBoundCallListener();
+        //}
 
         if (!this.ctrlr) {
             this.ctrlr = new CallController();
@@ -235,6 +242,7 @@ export class ExotelWebClient  {
         this.sipAccountInfo["sipUri"] = "wss://" + this.sipAccountInfo["userName"] + "@" + this.sipAccountInfo["sipdomain"] + ":" + this.sipAccountInfo["port"];
 
         callbacks.initializeCallback(CallListenerCallback);
+        this.outboundListener.initializeCall(OutboundCallBack)
         registerCallback.initializeRegisterCallback(RegisterEventCallBack);
         logger.log("Initializing session callback")
         sessionCallback.initializeSessionCallback(SessionCallback);
@@ -289,6 +297,27 @@ export class ExotelWebClient  {
 
     /**
      * function that returns the instance of the call controller object object
+    */
+    outboundCallback = (err, code, data) => {
+        logger.log("err: ", err, " res: ", code, " data:", data)
+        
+        if(err == null) {
+            this.outboundListener.callSuccess(data)
+        } else {
+            this.outboundListener.callFailure(err)
+        }
+    }
+    
+    makeCall = (toNumber, phone) => {
+        var callerId = phone.VirtualNumber;
+        var sip = "sip:" + phone.Username;
+        var token = "Basic " + Buffer.from(phone.ApiKey + ":" + phone.ApiToken).toString('base64');
+        logger.log("Dialer: makeCall: Received: ", toNumber, sip, token) 
+        this.getCall().makeCall(toNumber, sip, callerId, token, this.outboundCallback)
+    }
+
+    /**
+     * function that returns the instance of the call controller object object
      */
 
     getCallController =() => {
@@ -297,7 +326,7 @@ export class ExotelWebClient  {
 
     getCall =() => {
         if (!this.call) {
-            this.call = call = new Call();
+            this.call = new Call();
         }        
         return this.call;
     };
@@ -309,6 +338,9 @@ export class ExotelWebClient  {
         this.eventListener = eventListener;
     };
 
+    setOutboundCallListener = (outboundCallListener) => {
+        this.outboundCallListener = outboundCallListener
+    }
 
     /**
      * Event listener for registration, any change in registration state will trigger the callback here
@@ -412,7 +444,7 @@ export class ExotelWebClient  {
         this.accountName = this.userName = sipAccountInfo.userName;
         this.authUser = subscriberName = sipAccountInfo.authUser;
         this.displayName = sipAccountInfo.displayName;
-        this.accountSid = 'exotelt1';
+        this.accountSid = accountSid;
         this.subscriberToken = sipAccountInfo.secret;
         this.secret = this.password = sipAccountInfo.secret;
         this.security = sipAccountInfo.security ? sipAccountInfo.security : "wss";
@@ -431,8 +463,6 @@ export class ExotelWebClient  {
             webrtcPort = wsPort;
         }  
         
-
-
         this.sipAccntInfo['userName'] = this.userName;
         this.sipAccntInfo['authUser'] = subscriberName;
         this.sipAccntInfo['domain'] = hostName;

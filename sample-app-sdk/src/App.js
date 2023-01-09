@@ -32,8 +32,10 @@ var unregisterWait = "false";
 
 function App() {
   const [phone, setPhoneData ] = React.useState('');
+  const [outboundStatus, setOutboundStatus ] = React.useState('MakeCall');
   const [tabValue, setTabValue] = React.useState(0);
   const [ registrationData, setRegistrationData ] = React.useState("Not Registered");
+  const [ regState, setRegState ] = React.useState(false);
   const [ diagnosticsValue, setDiagnostics ] = React.useState("Diagnostics Info");
   const [ diagnosticsLogsData, setDiagnosticsLogs ] = React.useState("Diagnostics Logs");
   const [ diagnosticsSpeakerValue, setDiagnosticsSpeakerValue ] = React.useState("");
@@ -51,7 +53,6 @@ function App() {
   const [ callEvent, setCallEvent ] = React.useState("");
   const [ callFrom, setCallFrom ] = React.useState("");
   const [ call, setCall ] = React.useState("");
-  const [ regState, setRegState ] = React.useState(false);
   const [ diagState, setDiagState ] = React.useState(false);
   const [ diagMicTestState, setMicTestState ] = React.useState(false);
   const [ diagSpeakerTestState, setSpeakerTestState ] = React.useState(false);
@@ -67,14 +68,7 @@ function App() {
 
   var sipAccountInfo= {
     'userName':  data[0].Username,
-    'authUser': data[0].Username,
-    'sipdomain': data[0].Domain,
-    'domain': data[0].HostServer + ":" + data[0].Port,
-    'displayname': data[0].DisplayName,
-    'secret': data[0].Password,
-    'port': data[0].Port,
-    'security': data[0].Security,
-    'endpoint': data[0].EndPoint,
+    'accountSid': data[0].AccountSID,
   };
   
   var registrationRef = useRef(null);
@@ -89,6 +83,7 @@ function App() {
   var diagnosticsUdpRef = useRef(null);
   var diagnosticsHostRef = useRef(null);
   var diagnosticsReflexRef = useRef(null);
+  var makeCallRef = useRef(null);
   var exWebClient = new ExotelWebClient();
   var configRefs = {
     'Username':useRef(null),
@@ -135,8 +130,7 @@ function App() {
       setCallComing(false)
       setCallState(false)
     }
-
- }
+  }
 
   function RegisterEventCallBack (state, phone){
     /**
@@ -173,21 +167,55 @@ function App() {
      console.log('Session state:', state, 'for number...', phone);    
  }
 
-  function initialise_callbacks() {
-    if (configUpdated) {
-      sipAccountInfo['userName'] = phone.Username;
-      sipAccountInfo['authUser'] = phone.Username;
-      sipAccountInfo['sipdomain'] = phone.Domain;
-      sipAccountInfo['domain'] =  phone.HostServer + ":" + phone.Port;
-      sipAccountInfo['displayname'] = phone.DisplayName;
-      sipAccountInfo['secret'] = phone.Password;
-      sipAccountInfo['port'] = phone.Port;
-      sipAccountInfo['security'] = phone.Security;
-      sipAccountInfo['endpoint'] = phone.EndPoint;
-      exWebClient.initWebrtc(sipAccountInfo, RegisterEventCallBack, CallListenerCallback, SessionCallback)
-    }  
+  function fetchDetail(account, username, callback) {
+    var myHeaders = new Headers();
+    myHeaders.append("Access-Control-Allow-Origin", "*");
+    myHeaders.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+    };
+
+    var url = `http://localhost:8080/v2/core/vendoruser?account=${account}&username=${username}`
+    fetch(url, requestOptions
+    ).then((response) => {
+        return response.json()
+    }).then((resp) => {
+        callback(resp)
+    }).catch(function(error) {
+        console.log('Error app: ', error)
+    })
   }
 
+  function initialise_callbacks() {
+    sipAccountInfo['userName'] = phone.Username;
+    sipAccountInfo['accountSid'] = phone.AccountSID;
+    fetchDetail(sipAccountInfo['accountSid'], sipAccountInfo['userName'], init_webclient)
+  }
+
+  function init_webclient(sipDetail) {
+    sipAccountInfo['accountSid'] = sipDetail.AccountSID;
+    sipAccountInfo['userName'] = sipDetail.Username;
+    sipAccountInfo['authUser'] = sipDetail.Username;
+    sipAccountInfo['sipdomain'] = sipDetail.Domain;
+    sipAccountInfo['domain'] =  sipDetail.HostServer + ":" + sipDetail.Port;
+    sipAccountInfo['displayname'] = sipDetail.DisplayName;
+    sipAccountInfo['secret'] = sipDetail.Password;
+    sipAccountInfo['port'] = sipDetail.Port;
+    sipAccountInfo['security'] = sipDetail.Security;
+    sipAccountInfo['endpoint'] = sipDetail.EndPoint;
+    sipAccountInfo['apikey'] = sipDetail.ApiKey;
+    sipAccountInfo['apitoken'] = sipDetail.ApiToken;
+    sipAccountInfo['virtualnumber'] = sipDetail.VirtualNumber;
+    console.log('fetchSipDetail data: ', sipAccountInfo);
+    exWebClient.initWebrtc(sipAccountInfo, RegisterEventCallBack, CallListenerCallback, SessionCallback, OutboundCallBack)
+    if(unregisterWait === "false") {
+      exWebClient.DoRegister()
+    } else {
+      exWebClient.unregister()
+    }
+  }
 
   /* UI update functions */
   function createData(
@@ -211,6 +239,9 @@ function App() {
     newRows.push(createData('AccountSID', phone.AccountSID))
     newRows.push(createData('AccountNo', phone.AccountNo))
     newRows.push(createData('AutoRegistration', phone.AutoRegistration))
+    newRows.push(createData('ApiKey', phone.ApiKey))
+    newRows.push(createData('ApiToken', phone.ApiToken))
+    newRows.push(createData('VirtualNumber', phone.VirtualNumber))
     setRows(newRows);     
   }
 
@@ -241,8 +272,30 @@ function App() {
     phone.AccountNo = configRefs['AccountNo'].current.value;
     phone.AutoRegistration = configRefs['AutoRegistration'].current.value;
     phone.CallTimeout = configRefs['CallTimeout'].current.value;
+    phone.ApiKey = configRefs['ApiKey'].current.value;
+    phone.ApiToken = configRefs['ApiToken'].current.value;
+    phone.VirtualNumber = configRefs['VirtualNumber'].current.value;
 
     registerHandler();
+  }
+
+  function OutboundCallBack(eventType, callObj) {
+    console.log("************* App ***************")
+    console.log(eventType, callObj)
+    setOutboundStatus(eventType)
+    console.log("************ App ****************")
+  }
+
+  function makeCall() {
+    if(!regState.valueOf()) {
+      console.log("Cannot Make Call as reg is not done");
+      return
+    }
+    setOutboundStatus("connecting....")
+    console.log("Making Call to to: ", makeCallRef.current.value);
+    var toNumber = makeCallRef.current.value;
+    // callback for outboundcall
+    exWebClient.makeCall(toNumber, phone)
   }
 
   function callDemo() {
@@ -252,6 +305,13 @@ function App() {
   <Grid item xs={6}>
     <Item>
     <Stack spacing={2}>
+    <Item>
+    <Input fullWidth={true} inputRef={makeCallRef} defaultValue=""></Input>
+      <br></br>
+      <h3>Status: {outboundStatus}</h3>
+      <br></br> 
+      <Button variant="outlined" onClick={makeCall}>MakeCall</Button>
+    </Item>
     <Item>
     <textarea style={{ width: 400, height: 300, resize:'none' }} ref={registrationRef} value={registrationData} onChange={registrationStatusChanged}></textarea>
       <br></br>          
@@ -434,11 +494,7 @@ function App() {
     }
 
     unregisterWait = "false";
-
     initialise_callbacks();
-    console.log("App.js: Calling DoRegister")
-    exWebClient.DoRegister();
-    
   };
 
   const unregisterHandler = () => {
@@ -449,11 +505,8 @@ function App() {
       updateConfig();
     }
 
-    initialise_callbacks();
-
     unregisterWait = "true";
-
-    exWebClient.UnRegister();
+    initialise_callbacks();
   };  
 
   const registrationStatusChanged = () => {
