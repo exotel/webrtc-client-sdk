@@ -87,7 +87,7 @@ export function ExDelegationHandler(exClient_) {
         if (sipMethod == "CONNECTION") {
             exClient.registerEventCallback(eventType, exClient.userName)
         } else if (sipMethod == "CALL") {
-            exClient.callEventCallback(eventType, exClient.userName,exClient.call)
+            exClient.callEventCallback(eventType, exClient.callFromNumber,exClient.call)
         }
     }
 
@@ -155,8 +155,9 @@ export function ExDelegationHandler(exClient_) {
         logger.log("delegationHandler: stopCallStat\n");
     }
 
-    this.onRecieveInvite = function() {
+    this.onRecieveInvite = function(incomingSession) {
         logger.log("delegationHandler: onRecieveInvite\n");
+        exClient.callFromNumber = incomingSession.incomingInviteRequest.message.from.displayName;
     }
 
     this.onPickCall = function() {
@@ -203,6 +204,7 @@ export class ExotelWebClient  {
     call = null;
     eventListener = null;
     callListener = null;
+    callFromNumber = null;
     /* OLD-Way to be revisited for multile phone support */
     //this.webRTCPhones = {};
 

@@ -28,7 +28,7 @@ function registerToggle() {
 
 function CallListenerCallback(callObj, eventType, phone) {
     call = exWebClient.getCall();
-    document.getElementById("call_status").innerHTML = eventType;
+    document.getElementById("call_status").innerHTML = eventType +"  "+phone;
  }
 
   function RegisterEventCallBack (state, phone){
