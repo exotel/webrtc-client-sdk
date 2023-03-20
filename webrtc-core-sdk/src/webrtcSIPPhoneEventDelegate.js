@@ -129,9 +129,9 @@ const webrtcSIPPhoneEventDelegate = {
 		}
 	},
 	
-	onRecieveInvite: () => {
+	onRecieveInvite: (incomingSession) => {
 		if(delegate) {
-			delegate.onRecieveInvite();
+			delegate.onRecieveInvite(incomingSession);
 		}
 	},
 	

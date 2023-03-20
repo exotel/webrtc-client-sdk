@@ -520,8 +520,7 @@ function registerPhoneEventListeners() {
 
 	ctxSip.phone.delegate.onInvite = (incomingSession) => {
 		if (ctxSip.callActiveID == null) {
-			webrtcSIPPhoneEventDelegate.onRecieveInvite();
-			
+			webrtcSIPPhoneEventDelegate.onRecieveInvite(incomingSession);
 			webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL");
 			var s = incomingSession;
 			s.direction = 'incoming';

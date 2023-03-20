@@ -15,7 +15,7 @@ function ExDelegationHandler(exClient_) {
         if (sipMethod == "CONNECTION") {
             exClient.registerEventCallback(eventType, exClient.userName)
         } else if (sipMethod == "CALL") {
-            exClient.callEventCallback(eventType, exClient.userName,exClient.call)
+            exClient.callEventCallback(eventType, exClient.callFromNumber,exClient.call)
         }
     }
 
@@ -83,8 +83,11 @@ function ExDelegationHandler(exClient_) {
         console.log("delegationHandler: stopCallStat\n");
     }
 
-    this.onRecieveInvite = function() {
+    this.onRecieveInvite = function(incomingSession) {
         console.log("delegationHandler: onRecieveInvite\n");
+        var fromDID = incomingSession.incomingInviteRequest.message.from.displayName;
+        console.log("incoming call from ",fromDID);
+        exClient.callFromNumber = fromDID;
     }
 
     this.onPickCall = function() {
@@ -124,6 +127,7 @@ function ExDelegationHandler(exClient_) {
 }
 
  class ExotelWebClient  {
+    callFromNumber = "";
 
      registerEventCallback =(event, phone, param) => {
         
@@ -139,7 +143,16 @@ function ExDelegationHandler(exClient_) {
     
     callEventCallback =(event, phone, param) => {
 	    console.log("Dialer: callEventCallback: Received ---> " + event + 'param sent....' + param + 'for phone....' + phone)
-        document.getElementById("call_status").innerHTML = event;
+        
+        switch (event) {
+            case "connected":
+                document.getElementById("call_status").innerHTML = "connected with " + phone;
+                break;
+        
+            default:
+                document.getElementById("call_status").innerHTML = event;
+                break;
+        }
     };
     
     diagnosticEventCallback =(event, phone, param) => {
