@@ -25,7 +25,7 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.wav$/,exclude: /node_modules/, use: 'file-loader',type: 'asset/resource' },
+      { test: /\.wav$/, use: 'file-loader',type: 'asset/resource' },
       {
         test: /\.ts$/,
         exclude: /node_modules/,
