@@ -69,6 +69,37 @@ function fetchPublicIP(sipAccountInfo) {
     return; 
 };
 
+// dump call stats in logs . 
+//temp function for webview poc, will productize once finalized.
+function dumpStats(pc) {
+    if(pc) {
+        pc.getStats().then((stats) => {
+            let statsOutput = "";
+
+            stats.forEach((report) => {
+                statsOutput +=
+                `Report: ${report.type}\nID: ${report.id}\n` +
+                `Timestamp: ${report.timestamp}\n`;
+
+                // Now the statistics for this report; we intentionally drop the ones we
+                // sorted to the top above
+
+                Object.keys(report).forEach((statName) => {
+                if (
+                    statName !== "id" &&
+                    statName !== "timestamp" &&
+                    statName !== "type"
+                ) {
+                    statsOutput += ` ${statName}: ${report[statName]} \n`;
+                }
+                });
+            });
+
+            console.log("callstat dump : stats ",  statsOutput);
+        });
+    }
+}
+
 
 export function ExDelegationHandler(exClient_) {
     var exClient = exClient_;
@@ -178,6 +209,9 @@ export function ExDelegationHandler(exClient_) {
 
     this.initGetStats = function(pc, callid, username) {
         logger.log("delegationHandler: initGetStats\n");
+        exClient.dumpStatInterval =  setInterval(()=>  {
+            dumpStats(pc);
+        }, 2000);
     }
 
     this.onRegisterWebRTCSIPEngine = function(engine) {
@@ -209,6 +243,7 @@ export class ExotelWebClient  {
     //this.webRTCPhones = {};
 
     sipAccountInfo = null;
+    dumpStatInterval = null;
 
     initWebrtc = (sipAccountInfo_, 
         RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
@@ -351,8 +386,11 @@ export class ExotelWebClient  {
             this.callListener.onIncomingCall(param,phone)
         } else if (event === "connected") {
             this.callListener.onCallEstablished(param,phone);
-        } else if (event === "terminated") {
-            this.callListener.onCallEnded(param,phone);          
+        } else if (event === "terminated") {       
+            this.callListener.onCallEnded(param,phone);
+            if(this.dumpStatInterval) {
+                clearInterval(this.dumpStatInterval);          
+            }
         }
     };
     
