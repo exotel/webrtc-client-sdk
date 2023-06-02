@@ -211,7 +211,7 @@ export function ExDelegationHandler(exClient_) {
         logger.log("delegationHandler: initGetStats\n");
         exClient.dumpStatInterval =  setInterval(()=>  {
             dumpStats(pc);
-        }, 2000);
+        }, 3000);
     }
 
     this.onRegisterWebRTCSIPEngine = function(engine) {
