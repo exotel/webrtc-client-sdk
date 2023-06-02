@@ -67,8 +67,8 @@ function ExDelegationHandler(exClient_) {
         console.log("delegationHandler: setWebRTCFSMMapper : Initialisation complete \n");
     }
 
-    this.onCallStatSipJsTransportEvent = function() {
-        console.log("delegationHandler: onCallStatSipJsTransportEvent\n");
+    this.onCallStatSipJsTransportEvent = function(event) {
+        console.log("delegationHandler: onCallStatSipJsTransportEvent\n");       
     }
 
     this.onCallStatSipSendCallback = function() {

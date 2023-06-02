@@ -75,6 +75,7 @@ function postInit() {
 		Stream: null,
 		ringToneIntervalID: 0,
 		ringtoneCount:30,
+		doIceRestart:false,
 
 		startRingTone: function () {
 			try {
@@ -142,7 +143,7 @@ function postInit() {
 		},
 
 		newSession: function (newSess) {
-
+			ctxSip.doIceRestart  =false;
 			newSess.displayName = newSess.remoteIdentity.displayName || newSess.remoteIdentity.uri.user;
 			newSess.ctxid = ctxSip.getUniqueID();
 			ctxSip.callActiveID = newSess.ctxid;
@@ -194,11 +195,17 @@ function postInit() {
 					},
 					oniceconnectionstatechange: (event) => {
 						webrtcSIPPhoneEventDelegate.onStatPeerConnectionIceConnectionStateChange(event.target.iceConnectionState);
+						const newState = sdh.peerConnection.iceConnectionState;
+
+        				if (newState === 'disconnected') {
+							ctxSip.doIceRestart  =true;
+							SIPJSPhone.reconnectTransport();							
+						}
 					},
 					onicegatheringstatechange: (event) => {
 						webrtcSIPPhoneEventDelegate.onStatPeerConnectionIceGatheringStateChange(event.target.iceGatheringState);
 					}
-
+					
 				};
 
 			};
@@ -479,6 +486,10 @@ let registererStateEventListner = (newState) => {
 let registererWaitingChangeListener = (b) => {
 	if (registerer && registerer.state == SIP.RegistererState.Registered) {
 		onUserAgentRegistered();
+		// https://exotel.atlassian.net/browse/AP2AP-98
+		// adding reinvite support incase of network reconnection
+		iceRestart();
+		
 	}
 
 };
@@ -749,9 +760,6 @@ function onUserAgentTransportDisconnected() {
 				callBackHandler.onResponse("error");
 			}
 		}	
-	 
-	
-
 
 }
 
@@ -978,6 +986,34 @@ function onUserSessionAcceptFailed(e) {
 	uiCallTerminated('Media stream permission denied');
 }
 
+function iceRestart() {
+	console.log("checking ice restart condition");
+	if(ctxSip.callActiveID && ctxSip.doIceRestart) {
+		let session  = ctxSip.Sessions[ctxSip.callActiveID];
+		if(session && session.state == SIP.SessionState.Established) {
+			console.log("checking ice restart - ice restarting");
+			ctxSip.doIceRestart  =false;
+			let sdh = session._sessionDescriptionHandler;
+			sdh.peerConnection.restartIce();
+			setTimeout(function(){	
+				let options = {
+					sessionDescriptionHandlerOptions : {
+						offerOptions : {iceRestart : true}
+					}
+				};
+				session.invite(options).then(() => {
+					session.logger.debug('iceRestart: RE-invite completed');
+				}).catch((error) => {
+					if (error instanceof RequestPendingError) {
+						session.logger.error('iceRestart: RE-invite is already in progress');
+					}
+					throw error;
+				});
+			},1000);
+		}
+	}						
+}
+
 const SIPJSPhone = {
 
 		init: () => {
@@ -1181,10 +1217,17 @@ const SIPJSPhone = {
 		getWSSUrl: () => {
 			console.log("Returning txtWebsocketURL:", txtWebsocketURL);
 			return txtWebsocketURL;
+		},
+
+		reconnectTransport: () => {
+			SIPJSPhone.disconnect();
+			ctxSip.phone.transport.stateChange.addListener(transportStateChangeListener);
+			registerer = new SIP.Registerer(ctxSip.phone, { expires: 60, refreshFrequency: 80 });
+			ctxSip.phone.transport.connect();
 		}
 		/* NL Additions - End */
 
 
-	};
+};
 
 export default SIPJSPhone;

@@ -105,9 +105,9 @@ const webrtcSIPPhoneEventDelegate = {
 		}
 	},
 	
-	onCallStatSipJsTransportEvent : () => {
+	onCallStatSipJsTransportEvent : (event) => {
 		if(delegate) {
-			delegate.onCallStatSipJsTransportEvent();
+			delegate.onCallStatSipJsTransportEvent(event);
 		}
 	},
 	
