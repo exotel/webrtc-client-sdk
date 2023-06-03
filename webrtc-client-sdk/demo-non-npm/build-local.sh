@@ -1,0 +1,1 @@
+rm -rf dist;cd ..;npm uninstall @exotel-npm-dev/webrtc-core-sdk;npm install ../webrtc-core-sdk;npm run build;cp -r dist demo-non-npm/;cd demo-non-npm;http-server  -S -C ~/pki/cert.pem -K ~/pki/key.pem

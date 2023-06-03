@@ -74,28 +74,21 @@ function fetchPublicIP(sipAccountInfo) {
 function dumpStats(pc) {
     if(pc) {
         pc.getStats().then((stats) => {
-            let statsOutput = "";
-
+           
+            let allowedReportTypeFields = {
+                'inbound-rtp':['bytesReceived','jitter','packetsLost','packetsReceived'],
+                'outbound-rtp':['bytesSent','packetsSent']
+            }; 
             stats.forEach((report) => {
-                statsOutput +=
-                `Report: ${report.type}\nID: ${report.id}\n` +
-                `Timestamp: ${report.timestamp}\n`;
-
-                // Now the statistics for this report; we intentionally drop the ones we
-                // sorted to the top above
-
-                Object.keys(report).forEach((statName) => {
-                if (
-                    statName !== "id" &&
-                    statName !== "timestamp" &&
-                    statName !== "type"
-                ) {
-                    statsOutput += ` ${statName}: ${report[statName]} \n`;
+                if(allowedReportTypeFields.hasOwnProperty(report.type)) {     
+                    let fields = allowedReportTypeFields[report.type];
+                    let stat = {};
+                    fields.forEach((field) => {
+                        stat[field] = report[field];
+                    });
+                    console.log("callstat : " +  report.type + " : " + JSON.stringify(stat));
                 }
-                });
-            });
-
-            console.log("callstat dump : stats ",  statsOutput);
+            }); 
         });
     }
 }
