@@ -196,11 +196,7 @@ function postInit() {
 					oniceconnectionstatechange: (event) => {
 						webrtcSIPPhoneEventDelegate.onStatPeerConnectionIceConnectionStateChange(event.target.iceConnectionState);
 						const newState = sdh.peerConnection.iceConnectionState;
-
-        				if (newState === 'disconnected') {
-							ctxSip.doIceRestart  =true;
-							SIPJSPhone.reconnectTransport();							
-						}
+        				
 					},
 					onicegatheringstatechange: (event) => {
 						webrtcSIPPhoneEventDelegate.onStatPeerConnectionIceGatheringStateChange(event.target.iceGatheringState);
@@ -1220,7 +1216,12 @@ const SIPJSPhone = {
 		},
 
 		reconnectTransport: () => {
+			if(ctxSip.callActiveID == null) {
+				return;
+			}
 			SIPJSPhone.disconnect();
+			ctxSip.doIceRestart  =true;
+			
 			ctxSip.phone.transport.stateChange.addListener(transportStateChangeListener);
 			registerer = new SIP.Registerer(ctxSip.phone, { expires: 60, refreshFrequency: 80 });
 			ctxSip.phone.transport.connect();

@@ -499,6 +499,10 @@ export class ExotelWebClient  {
           */
          intervalIDMap.set(userName, intervalId);
     };
+
+    reconnect = () => {
+        webrtcSIPPhone.reconnect();
+    };
 }
 
 export default ExotelWebClient;

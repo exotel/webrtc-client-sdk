@@ -169,6 +169,16 @@ export const webrtcSIPPhone = {
 		} catch (e) {
 			console.log("getWSSUrl: Exception ", e)
 		}
+	},
+
+	reconnect() {
+		try {
+
+			SIPJSPhone.reconnectTransport();
+
+		} catch(e) {
+			console.log("reconnect : exception ",e);
+		}
 	}
 	/* NL Addition - End */
 
