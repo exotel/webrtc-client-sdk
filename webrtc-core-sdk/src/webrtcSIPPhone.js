@@ -173,9 +173,7 @@ export const webrtcSIPPhone = {
 
 	reconnect() {
 		try {
-
 			SIPJSPhone.reconnectTransport();
-
 		} catch(e) {
 			console.log("reconnect : exception ",e);
 		}
