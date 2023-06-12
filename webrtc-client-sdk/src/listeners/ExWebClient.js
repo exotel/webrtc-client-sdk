@@ -77,7 +77,8 @@ function dumpStats(pc) {
            
             let allowedReportTypeFields = {
                 'inbound-rtp':['bytesReceived','jitter','packetsLost','packetsReceived'],
-                'outbound-rtp':['bytesSent','packetsSent']
+                'outbound-rtp':['bytesSent','packetsSent'],
+                'candidate-pair':['currentRoundTripTime']
             }; 
             stats.forEach((report) => {
                 if(allowedReportTypeFields.hasOwnProperty(report.type)) {     
