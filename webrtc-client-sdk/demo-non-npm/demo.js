@@ -1,14 +1,21 @@
 const  exWebClient = new exotelSDK.ExotelWebClient();
 var call = null;
+var sipInfo = JSON.parse(phone)[0];
+let params = (new URL(document.location)).searchParams;
+let username = params.get("username");
+username = username ? username  : sipInfo.Username;
+let secret = params.get("secret");
+secret = secret ? secret : sipInfo.Password;
+console.log("username "+username+"&secret= "+secret);
 function UserAgentRegistration() {
-    var sipInfo = JSON.parse(phone)[0];
+  
 	var sipAccountInfo= {
-		'userName':  sipInfo.Username,
-		'authUser': sipInfo.Username,
+		'userName':  username,
+		'authUser': username,
 		'sipdomain': sipInfo.Domain,
 		'domain': sipInfo.HostServer + ":" + sipInfo.Port,
-		'displayname': sipInfo.DisplayName,
-		'secret': sipInfo.Password,
+		'displayname': username,
+		'secret': secret,
 		'port': sipInfo.Port,
 		'security': sipInfo.Security,
         'endpoint':sipInfo.EndPoint

@@ -76,13 +76,34 @@ function dumpStats(pc) {
         pc.getStats().then((stats) => {
            
             let allowedReportTypeFields = {
-                'inbound-rtp':['bytesReceived','jitter','packetsLost','packetsReceived'],
-                'outbound-rtp':['bytesSent','packetsSent'],
-                'candidate-pair':['currentRoundTripTime']
+                'inbound-rtp':{
+                    preprocessor : (report) => {
+                        report.currentJitterBufferDelay = report['jitterBufferDelay'] / report['jitterBufferEmittedCount'];
+                        return report;
+                    },
+                    params:['bytesReceived','jitter','packetsLost','packetsReceived','jitterBufferDelay','jitterBufferEmittedCount','currentJitterBufferDelay']
+                },
+                'outbound-rtp':{params:['bytesSent','packetsSent']},
+                'candidate-pair':{params : ['currentRoundTripTime']},
+                'media-playout':{
+                    preprocessor : (report) => {     
+                        report.currentPlayoutDelay = report['totalPlayoutDelay'] /  report['totalSamplesCount'];
+                        return report;
+                    },
+                    params : ['totalPlayoutDelay','totalSamplesCount','currentPlayoutDelay']
+
+                }
             }; 
             stats.forEach((report) => {
-                if(allowedReportTypeFields.hasOwnProperty(report.type)) {     
-                    let fields = allowedReportTypeFields[report.type];
+                
+                if(allowedReportTypeFields.hasOwnProperty(report.type)) {
+                   
+               
+                    let reportmeta = allowedReportTypeFields[report.type];
+                    if(reportmeta.hasOwnProperty("preprocessor")) {
+                        report = reportmeta.preprocessor(report);
+                    }
+                    let fields = allowedReportTypeFields[report.type]['params'];
                     let stat = {};
                     fields.forEach((field) => {
                         stat[field] = report[field];
