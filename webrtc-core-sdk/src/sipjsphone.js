@@ -393,7 +393,7 @@ function postInit() {
 function sipRegister() {
 
 	
-	
+	console.log("websdk testing [sipRegister] start");
 	cleanupRegistererTimer();
 
 	try {
@@ -442,6 +442,7 @@ function sipRegister() {
 		registerPhoneEventListeners();
 
 	} catch (e) {
+		console.log("websdk testing [sipRegister] exception",e);
 		webRTCStatus = "offline";
 		if (callBackHandler != null)
 			if (callBackHandler.onResponse)

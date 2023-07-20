@@ -8057,6 +8057,7 @@ function postInit() {
   initializeComplete = true;
 }
 function sipRegister() {
+  console.log("websdk testing [sipRegister] start");
   cleanupRegistererTimer();
   try {
     ctxSip.config = {
@@ -8098,6 +8099,7 @@ function sipRegister() {
     ctxSip.phone = new SIP.UserAgent(ctxSip.config);
     registerPhoneEventListeners();
   } catch (e) {
+    console.log("websdk testing [sipRegister] exception", e);
     webRTCStatus = "offline";
     if (callBackHandler != null) if (callBackHandler.onResponse) callBackHandler.onResponse("error");
   }
