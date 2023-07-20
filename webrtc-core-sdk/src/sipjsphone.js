@@ -60,7 +60,7 @@ export function getLogger() {
 /* NL Additions - End */
 
 //var intervalID = 0;
-function postInit() {
+function postInit(onInitDoneCallback) {
 
 	ctxSip = {
 		config: {},
@@ -388,6 +388,7 @@ function postInit() {
 	webrtcSIPPhoneEventDelegate.setWebRTCFSMMapper("sipjs");
 	logger.log("init: Initialization complete...")
 	initializeComplete = true;
+	onInitDoneCallback();
 }
 
 function sipRegister() {
@@ -980,14 +981,14 @@ function onUserSessionAcceptFailed(e) {
 
 const SIPJSPhone = {
 
-		init: () => {
+		init: (onInitDoneCallback) => {
 
 			videoLocal = document.getElementById("video_local");
 			videoRemote = document.getElementById("video_remote");
 			audioRemote = document.getElementById("audio_remote");
 			var preInit = function () {
 				logger.log("init:readyState, calling postInit")
-				postInit();
+				postInit(onInitDoneCallback);
 			}
 			var oReadyStateTimer = setInterval(function () {
 				if (document.readyState === "complete") {
