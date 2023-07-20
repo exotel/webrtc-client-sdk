@@ -33,17 +33,19 @@ export const webrtcSIPPhone = {
 
 	registerWebRTCClient: (sipAccountInfo, handler) => {
 		sipAccountInfoData = sipAccountInfo;
-		phone.init();
-		phone.loadCredentials(sipAccountInfo);
-		if (webrtcSIPPhone.getWebRTCStatus() == "offline") {
-			if (handler != null)
-				if (handler.onFailure)
-					handler.onFailure();
-		} else {
-			if (handler != null)
-				if (handler.onResponse)
-					handler.onResponse();
-		}
+		phone.init(() => {
+			phone.loadCredentials(sipAccountInfo);
+			if (webrtcSIPPhone.getWebRTCStatus() == "offline") {
+				if (handler != null)
+					if (handler.onFailure)
+						handler.onFailure();
+			} else {
+				if (handler != null)
+					if (handler.onResponse)
+						handler.onResponse();
+			}
+		});
+		
 	},
 
 
