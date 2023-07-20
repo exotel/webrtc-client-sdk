@@ -1,5 +1,4 @@
 package-lock.json
 node_modules
 bundle
-dist
 .DS_STORE
