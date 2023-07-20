@@ -1,0 +1,6 @@
+ Change Log
+
+## 21 Jul,2023
+
+### fixes 
+- [VWS-14] fix race condition for register request
