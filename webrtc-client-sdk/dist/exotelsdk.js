@@ -932,6 +932,7 @@ function DoRegister(sipAccountInfo, exWebClient) {
    * CHANGE IS REQUIRED - in the initialize function provision is to be given to pass Callback functions as arguments
    */
   try {
+    console.log("websdk testing [DoRegister] start");
     exWebClient.initialize(userContext, sipAccountInfo.domain,
     //hostname
     sipAccountInfo.userName,
@@ -1373,51 +1374,6 @@ function fetchPublicIP(sipAccountInfo) {
   return;
 }
 ;
-
-// dump call stats in logs . 
-//temp function for webview poc, will productize once finalized.
-function dumpStats(pc) {
-  if (pc) {
-    pc.getStats().then(stats => {
-      let allowedReportTypeFields = {
-        'inbound-rtp': {
-          preprocessor: report => {
-            report.currentJitterBufferDelay = report['jitterBufferDelay'] / report['jitterBufferEmittedCount'];
-            return report;
-          },
-          params: ['bytesReceived', 'jitter', 'packetsLost', 'packetsReceived', 'jitterBufferDelay', 'jitterBufferEmittedCount', 'currentJitterBufferDelay']
-        },
-        'outbound-rtp': {
-          params: ['bytesSent', 'packetsSent']
-        },
-        'candidate-pair': {
-          params: ['currentRoundTripTime']
-        },
-        'media-playout': {
-          preprocessor: report => {
-            report.currentPlayoutDelay = report['totalPlayoutDelay'] / report['totalSamplesCount'];
-            return report;
-          },
-          params: ['totalPlayoutDelay', 'totalSamplesCount', 'currentPlayoutDelay']
-        }
-      };
-      stats.forEach(report => {
-        if (allowedReportTypeFields.hasOwnProperty(report.type)) {
-          let reportmeta = allowedReportTypeFields[report.type];
-          if (reportmeta.hasOwnProperty("preprocessor")) {
-            report = reportmeta.preprocessor(report);
-          }
-          let fields = allowedReportTypeFields[report.type]['params'];
-          let stat = {};
-          fields.forEach(field => {
-            stat[field] = report[field];
-          });
-          console.log("callstat : " + report.type + " : " + JSON.stringify(stat));
-        }
-      });
-    });
-  }
-}
 function ExDelegationHandler(exClient_) {
   var exClient = exClient_;
   this.setTestingMode = function (mode) {
@@ -1502,9 +1458,6 @@ function ExDelegationHandler(exClient_) {
   };
   this.initGetStats = function (pc, callid, username) {
     logger.log("delegationHandler: initGetStats\n");
-    exClient.dumpStatInterval = setInterval(() => {
-      dumpStats(pc);
-    }, 3000);
   };
   this.onRegisterWebRTCSIPEngine = function (engine) {
     logger.log("delegationHandler: onRegisterWebRTCSIPEngine, engine=\n", engine);
@@ -1528,7 +1481,6 @@ class ExotelWebClient {
   //this.webRTCPhones = {};
 
   sipAccountInfo = null;
-  dumpStatInterval = null;
   initWebrtc = (sipAccountInfo_, RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
     if (!this.eventListener) {
       this.eventListener = new _listeners_ExotelVoiceClientListener__WEBPACK_IMPORTED_MODULE_4__.ExotelVoiceClientListener();
@@ -1651,9 +1603,6 @@ class ExotelWebClient {
       this.callListener.onCallEstablished(param, phone);
     } else if (event === "terminated") {
       this.callListener.onCallEnded(param, phone);
-      if (this.dumpStatInterval) {
-        clearInterval(this.dumpStatInterval);
-      }
     }
   };
 
@@ -1756,9 +1705,6 @@ class ExotelWebClient {
      * Store the intervalID against a map
      */
     intervalIDMap.set(userName, intervalId);
-  };
-  reconnect = () => {
-    _exotel_npm_dev_webrtc_core_sdk__WEBPACK_IMPORTED_MODULE_9__.webrtcSIPPhone.reconnect();
   };
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ExotelWebClient);
@@ -7843,7 +7789,6 @@ function postInit() {
     Stream: null,
     ringToneIntervalID: 0,
     ringtoneCount: 30,
-    doIceRestart: false,
     startRingTone: function () {
       try {
         var count = 0;
@@ -7909,7 +7854,6 @@ function postInit() {
       return Math.random().toString(36).substr(2, 9);
     },
     newSession: function (newSess) {
-      ctxSip.doIceRestart = false;
       newSess.displayName = newSess.remoteIdentity.displayName || newSess.remoteIdentity.uri.user;
       newSess.ctxid = ctxSip.getUniqueID();
       ctxSip.callActiveID = newSess.ctxid;
@@ -7953,7 +7897,6 @@ function postInit() {
           },
           oniceconnectionstatechange: event => {
             _webrtcSIPPhoneEventDelegate__WEBPACK_IMPORTED_MODULE_0__["default"].onStatPeerConnectionIceConnectionStateChange(event.target.iceConnectionState);
-            const newState = sdh.peerConnection.iceConnectionState;
           },
           onicegatheringstatechange: event => {
             _webrtcSIPPhoneEventDelegate__WEBPACK_IMPORTED_MODULE_0__["default"].onStatPeerConnectionIceGatheringStateChange(event.target.iceGatheringState);
@@ -8180,9 +8123,6 @@ let registererStateEventListner = newState => {
 let registererWaitingChangeListener = b => {
   if (registerer && registerer.state == SIP.RegistererState.Registered) {
     onUserAgentRegistered();
-    // https://exotel.atlassian.net/browse/AP2AP-98
-    // adding reinvite support incase of network reconnection
-    iceRestart();
   }
 };
 let transportStateChangeListener = newState => {
@@ -8567,35 +8507,6 @@ function onUserSessionAcceptFailed(e) {
   }
   uiCallTerminated('Media stream permission denied');
 }
-function iceRestart() {
-  console.log("checking ice restart condition");
-  if (ctxSip.callActiveID && ctxSip.doIceRestart) {
-    let session = ctxSip.Sessions[ctxSip.callActiveID];
-    if (session && session.state == SIP.SessionState.Established) {
-      console.log("checking ice restart - ice restarting");
-      ctxSip.doIceRestart = false;
-      let sdh = session._sessionDescriptionHandler;
-      sdh.peerConnection.restartIce();
-      setTimeout(function () {
-        let options = {
-          sessionDescriptionHandlerOptions: {
-            offerOptions: {
-              iceRestart: true
-            }
-          }
-        };
-        session.invite(options).then(() => {
-          session.logger.debug('iceRestart: RE-invite completed');
-        }).catch(error => {
-          if (error instanceof RequestPendingError) {
-            session.logger.error('iceRestart: RE-invite is already in progress');
-          }
-          throw error;
-        });
-      }, 1000);
-    }
-  }
-}
 const SIPJSPhone = {
   init: () => {
     videoLocal = document.getElementById("video_local");
@@ -8758,19 +8669,6 @@ const SIPJSPhone = {
   getWSSUrl: () => {
     console.log("Returning txtWebsocketURL:", txtWebsocketURL);
     return txtWebsocketURL;
-  },
-  reconnectTransport: () => {
-    if (ctxSip.callActiveID == null) {
-      return;
-    }
-    SIPJSPhone.disconnect();
-    ctxSip.doIceRestart = true;
-    ctxSip.phone.transport.stateChange.addListener(transportStateChangeListener);
-    registerer = new SIP.Registerer(ctxSip.phone, {
-      expires: 60,
-      refreshFrequency: 80
-    });
-    ctxSip.phone.transport.connect();
   }
   /* NL Additions - End */
 };
@@ -8921,13 +8819,6 @@ const webrtcSIPPhone = {
     } catch (e) {
       console.log("getWSSUrl: Exception ", e);
     }
-  },
-  reconnect() {
-    try {
-      _sipjsphone__WEBPACK_IMPORTED_MODULE_0__["default"].reconnectTransport();
-    } catch (e) {
-      console.log("reconnect : exception ", e);
-    }
   }
   /* NL Addition - End */
 };
@@ -9031,9 +8922,9 @@ const webrtcSIPPhoneEventDelegate = {
       delegate.setWebRTCFSMMapper();
     }
   },
-  onCallStatSipJsTransportEvent: event => {
+  onCallStatSipJsTransportEvent: () => {
     if (delegate) {
-      delegate.onCallStatSipJsTransportEvent(event);
+      delegate.onCallStatSipJsTransportEvent();
     }
   },
   onCallStatSipSendCallback: (tsipData, sipStack) => {

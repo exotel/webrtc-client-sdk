@@ -16,6 +16,7 @@ export function DoRegister(sipAccountInfo, exWebClient) {
      * CHANGE IS REQUIRED - in the initialize function provision is to be given to pass Callback functions as arguments
      */
      try {
+         console.log("websdk testing [DoRegister] start");
         exWebClient.initialize(userContext,
         sipAccountInfo.domain, //hostname
          sipAccountInfo.userName, //subscriberName
@@ -23,6 +24,7 @@ export function DoRegister(sipAccountInfo, exWebClient) {
          sipAccountInfo.accountSid,//accountSid
          '', sipAccountInfo); // subscriberToken
     } catch(e) {
+      
         logger.log("Register failed ", e)
     } 
     
