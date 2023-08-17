@@ -521,11 +521,11 @@ function registerPhoneEventListeners() {
 
 	ctxSip.phone.delegate.onInvite = (incomingSession) => {
 		if (ctxSip.callActiveID == null) {
-			webrtcSIPPhoneEventDelegate.onRecieveInvite(incomingSession);
-			webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL");
 			var s = incomingSession;
 			s.direction = 'incoming';
 			ctxSip.newSession(s);
+			webrtcSIPPhoneEventDelegate.onRecieveInvite(incomingSession);
+			webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL");
 		} else {
 			incomingSession.reject();
 		}
