@@ -1,0 +1,9 @@
+ Change Log
+
+## 17 Aug,2023
+-[VWS-15] fix race condition of accept and incoming event
+
+## 21 Jul,2023
+
+### fixes 
+- [VWS-14] fix race condition for register request
