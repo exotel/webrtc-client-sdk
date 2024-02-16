@@ -9,7 +9,7 @@ import webrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 
 var phone = null;
 let webrtcSIPEngine = null;
-function sendWebRTCEventsToFSM (eventType, sipMethod) {
+function sendWebRTCEventsToFSM(eventType, sipMethod) {
 	webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM(eventType, sipMethod);
 }
 
@@ -45,7 +45,7 @@ export const webrtcSIPPhone = {
 						handler.onResponse();
 			}
 		});
-		
+
 	},
 
 
@@ -73,7 +73,7 @@ export const webrtcSIPPhone = {
 	muteAction: (bMute) => {
 		phone.sipMute(bMute);
 	},
-	
+
 	holdAction: (bHold) => {
 		phone.sipHold(bHold);
 	},
@@ -84,7 +84,7 @@ export const webrtcSIPPhone = {
 
 	pickCall: () => {
 		phone.pickPhoneCall();
-		
+
 		webrtcSIPPhoneEventDelegate.onPickCall();
 	},
 
@@ -100,7 +100,7 @@ export const webrtcSIPPhone = {
 
 
 	playBeepTone: () => {
-			phone.playBeep();
+		phone.playBeep();
 
 	},
 
@@ -117,9 +117,9 @@ export const webrtcSIPPhone = {
 		phone.sipUnRegister();
 	},
 
-	
 
-	registerPhone: (engine,delegate) => {
+
+	registerPhone: (engine, delegate) => {
 		webrtcSIPEngine = engine;
 		switch (engine) {
 			case "sipjs":
@@ -134,28 +134,28 @@ export const webrtcSIPPhone = {
 
 	},
 
-	getWebRTCStatus : () => { 
+	getWebRTCStatus: () => {
 		var status = phone.getStatus();
 		return status;
 	},
-	
-	disconnect : () => {
-		if(phone) {
+
+	disconnect: () => {
+		if (phone) {
 			phone.disconnect();
 		}
 	},
-	
-	connect : () => {
+
+	connect: () => {
 		phone.connect();
 	},
-	
+
 	getSIPAccountInfo() {
 		return sipAccountInfoData;
 	},
 	getWebRTCSIPEngine() {
 		return webrtcSIPEngine;
 	},
-	
+
 	/* NL Addition - Start */
 	getSpeakerTestTone() {
 		try {
@@ -171,8 +171,26 @@ export const webrtcSIPPhone = {
 		} catch (e) {
 			console.log("getWSSUrl: Exception ", e)
 		}
-	}
+	},
 	/* NL Addition - End */
+
+	getTransportState() {
+		try {
+			return SIPJSPhone.getTransportState();
+		} catch (e) {
+			console.log("getTransportState: Exception ", e);
+			return "unknown";
+		}
+	},
+
+	getRegistrationState() {
+		try {
+			return SIPJSPhone.getRegistrationState();
+		} catch (e) {
+			console.log("getTransportState: Exception ", e);
+			return "unknown";
+		}
+	}
 
 };
 
