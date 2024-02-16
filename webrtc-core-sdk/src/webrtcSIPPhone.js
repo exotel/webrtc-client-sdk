@@ -179,6 +179,7 @@ export const webrtcSIPPhone = {
 			return SIPJSPhone.getTransportState();
 		} catch (e) {
 			console.log("getTransportState: Exception ", e);
+			return "unknown";
 		}
 	},
 
@@ -187,6 +188,7 @@ export const webrtcSIPPhone = {
 			return SIPJSPhone.getRegistrationState();
 		} catch (e) {
 			console.log("getTransportState: Exception ", e);
+			return "unknown";
 		}
 	}
 
