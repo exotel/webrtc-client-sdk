@@ -479,26 +479,39 @@ export class ExotelWebClient {
             .getUserMedia(constraints)
             .then(function (mediaStream) {
                 var transportState = webrtcSIPPhone.getTransportState();
+
                 switch (transportState) {
                     case "":
                         callback("not_intialized");
                         break;
+                    case "unknown":
+                    case "Connecting":
+                        callback(transportState);
+                        break;
 
-                    case "Connected":
+                    default:
                         var registerationState = webrtcSIPPhone.getRegistrationState();
                         switch (registerationState) {
                             case "":
                                 callback("websocket_connection_failed");
                                 break;
+                            case "Registered":
+                                if (transportState != "Connected") {
+                                    callback("Disconnected");
+                                } else {
+                                    callback(registerationState);
+                                }
+                                break;
                             default:
                                 callback(registerationState);
+
                         }
-                        break;
-                    default:
-                        callback(transportState);
+
+
                 }
             })
             .catch(function (error) {
+                console.log("something went wrong during checkClientStatus ", error);
                 callback("media_permission_denied");
             });
     };
