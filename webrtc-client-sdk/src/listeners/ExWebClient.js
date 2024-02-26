@@ -482,7 +482,7 @@ export class ExotelWebClient {
                 transportState = transportState.toLowerCase();
                 switch (transportState) {
                     case "":
-                        callback("not_intialized");
+                        callback("not_initialized");
                         break;
                     case "unknown":
                     case "connecting":
