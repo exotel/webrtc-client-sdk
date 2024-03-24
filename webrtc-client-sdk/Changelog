@@ -1,6 +1,8 @@
  Change Log
+## v1.0.10 24 March 2024
+-[VST-609] added DTMF support in SDK
 
-## v1.0.7 16 Feb 2024
+## v1.0.9 16 Feb 2024
 -[VST-566] upgraded coreSDK , and exoposed checkClientStatus API
 
 ## 17 Aug,2023

@@ -4,8 +4,8 @@ import { webrtcLogger } from "../omAPI/WebrtcLogger"
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
 var logger = webrtcLogger()
 
-export function Call()  {
-    this.Answer = function() {
+export function Call() {
+    this.Answer = function () {
         /**
          * When agent accepts phone, add appropriate msg to be sent to webclient
          */
@@ -13,7 +13,7 @@ export function Call()  {
         webrtcSIPPhone.pickCall();
     }
 
-    this.Hangup = function() {
+    this.Hangup = function () {
         /**
          * When call is terminated
          */
@@ -21,7 +21,7 @@ export function Call()  {
         webrtcSIPPhone.rejectCall();
     }
 
-    this.MuteToggle = function() {
+    this.MuteToggle = function () {
         /**
          * When agent clicks on mute
          */
@@ -30,7 +30,7 @@ export function Call()  {
         webrtcSIPPhone.webRTCMuteUnmute(null);
     }
 
-    this.Mute = function() {
+    this.Mute = function () {
         /**
          * When agent clicks on mute
          */
@@ -39,7 +39,7 @@ export function Call()  {
         webrtcSIPPhone.webRTCMuteUnmute(dummyFlag);
     }
 
-    this.UnMute = function() {
+    this.UnMute = function () {
         /**
          * When agent clicks on mute
          */
@@ -48,7 +48,7 @@ export function Call()  {
         webrtcSIPPhone.webRTCMuteUnmute(dummyFlag);
     }
 
-    this.HoldToggle = function() {
+    this.HoldToggle = function () {
         /**
          * When user clicks on hold
          */
@@ -56,7 +56,7 @@ export function Call()  {
         webrtcSIPPhone.holdCall();
     }
 
-    this.Hold = function() {
+    this.Hold = function () {
         /**
          * When user clicks on hold
          */
@@ -65,19 +65,27 @@ export function Call()  {
         webrtcSIPPhone.holdCall();
     }
 
-    this.UnHold = function() {
+    this.UnHold = function () {
         /**
          * When user clicks on hold
          */
-         logger.log('unhold clicked')
-         let dummyFlag = true;
-         webrtcSIPPhone.holdCall();
+        logger.log('unhold clicked')
+        let dummyFlag = true;
+        webrtcSIPPhone.holdCall();
     }
 
-    this.callDetails = function() {
+    this.callDetails = function () {
         /**
          * return call details object here
          */
         return CallDetails.getCallDetails();
+    }
+
+    this.sendDTMF = function (digit) {
+        /**
+         * sends dtmf digit as SIP info over websocket 
+         */
+        logger.log("trying to send dtmf " + digit);
+        webrtcSIPPhone.sendDTMFWebRTC(digit);
     }
 }

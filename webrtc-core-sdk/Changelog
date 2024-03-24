@@ -1,4 +1,6 @@
 Change Log
+## v1.0.10 24 March, 2024
+-[VST-609] dtmf tone sound fix
 
 ## v1.0.7 16 Feb,2024
 -[VST-566] exposed api to get last transport state, and registerer state

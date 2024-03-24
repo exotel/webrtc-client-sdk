@@ -21,6 +21,8 @@ var ringtone = document.createElement("audio");
 ringtone.src = require("./static/ringtone.wav");
 var ringbacktone = document.createElement("audio");
 ringbacktone.src = require("./static/ringbacktone.wav");
+var dtmftone = document.createElement("audio");
+dtmftone.src = require("./static/dtmf.wav");
 
 videoLocal = document.createElement("video");//getElementById("video_local");
 videoRemote = document.createElement("video");//getElementById("video_remote");
@@ -67,7 +69,7 @@ function postInit(onInitDoneCallback) {
 		config: {},
 		ringtone: ringtone,
 		ringbacktone: ringbacktone,
-		dtmfTone: document.getElementById('dtmfTone'),
+		dtmfTone: dtmftone,
 		beeptone: beeptone,
 		Sessions: [],
 		callTimers: {},
