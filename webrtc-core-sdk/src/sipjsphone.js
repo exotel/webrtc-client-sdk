@@ -299,7 +299,7 @@ function postInit(onInitDoneCallback) {
 				}
 
 				const dtmf = digit;
-				const duration = 2000;
+				const duration = 240;
 				const body = {
 					contentDisposition: "render",
 					contentType: "application/dtmf-relay",
