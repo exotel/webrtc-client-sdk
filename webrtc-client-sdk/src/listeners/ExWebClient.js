@@ -479,25 +479,26 @@ export class ExotelWebClient {
             .getUserMedia(constraints)
             .then(function (mediaStream) {
                 var transportState = webrtcSIPPhone.getTransportState();
-
+                transportState = transportState.toLowerCase();
                 switch (transportState) {
                     case "":
-                        callback("not_intialized");
+                        callback("not_initialized");
                         break;
                     case "unknown":
-                    case "Connecting":
+                    case "connecting":
                         callback(transportState);
                         break;
 
                     default:
                         var registerationState = webrtcSIPPhone.getRegistrationState();
+                        registerationState = registerationState.toLowerCase();
                         switch (registerationState) {
                             case "":
                                 callback("websocket_connection_failed");
                                 break;
-                            case "Registered":
-                                if (transportState != "Connected") {
-                                    callback("Disconnected");
+                            case "registered":
+                                if (transportState != "connected") {
+                                    callback("disconnected");
                                 } else {
                                     callback(registerationState);
                                 }
