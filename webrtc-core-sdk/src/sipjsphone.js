@@ -1197,7 +1197,39 @@ const SIPJSPhone = {
 		return lastRegistererState;
 	},
 
+    async changeInputDevice(deviceId, onSuccess, onError) {
+		console.log(`in changeInputDevice() of sipjsphone.js`);
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: { deviceId: { exact: deviceId } }
+            });
+            console.log(`Input device changed to: ${deviceId}`);
+            if (onSuccess) onSuccess(deviceId);
+        } catch (error) {
+            console.error('Error changing input device:', error);
+            if (onError) onError(error);
+        }
+    },
 
+    async changeOutputDevice(deviceId, onSuccess, onError) {
+		console.log(`in changeOutputDevice() of sipjsphone.js`);
+
+        const audioElement = audioRemote;
+        if (typeof audioElement.sinkId !== 'undefined') {
+            try {
+                await audioElement.setSinkId(deviceId);
+                console.log(`Output device changed to: ${deviceId}`);
+                if (onSuccess) onSuccess(deviceId);
+            } catch (error) {
+                console.error('Error changing output device:', error);
+                if (onError) onError(error);
+            }
+        } else {
+            const errorMsg = 'Browser does not support output device selection.';
+            console.error(errorMsg);
+            if (onError) onError(errorMsg);
+        }
+    }
 
 };
 
