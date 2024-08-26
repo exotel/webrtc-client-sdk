@@ -1,9 +1,9 @@
-import webrtcSIPPhone from "./webrtcSIPPhone";
 export const audioDeviceManager = {
     resetInputDevice: false,
     resetOutputDevice: false,
     currentInputDeviceCallback: null,
     currentOutputDeviceCallback: null,
+    onAudioDeviceChangeCallback: null,
 
     // Method to set callbacks for input and output device changes
     setDeviceChangeCallbacks(currentInputDeviceCallback, currentOutputDeviceCallback) {
@@ -21,10 +21,18 @@ export const audioDeviceManager = {
         this.resetOutputDevice = value;
     },
 
+    // set onAudioDeviceChangeCallback
+    setAudioDeviceChangeCallback(callback) {
+        this.onAudioDeviceChangeCallback = callback;
+    },
     // method callback when audio device change at runtime
     onAudioDeviceChange(event) {
-        webrtcSIPPhone.onAudioDeviceChange(event);
+        if (this.onAudioDeviceChangeCallback == null) {
+            return;
+        }
+        this.onAudioDeviceChangeCallback(event);
     }
+
 };
 
 navigator.mediaDevices.addEventListener('devicechange', audioDeviceManager.onAudioDeviceChange);

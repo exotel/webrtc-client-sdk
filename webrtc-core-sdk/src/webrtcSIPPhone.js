@@ -213,5 +213,7 @@ export const webrtcSIPPhone = {
 
 };
 
+audioDeviceManager.setAudioDeviceChangeCallback(webrtcSIPPhone.onAudioDeviceChange);
+
 
 export default webrtcSIPPhone;
