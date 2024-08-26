@@ -1,4 +1,7 @@
  Change Log
+## v1.0.11 26 August, 2024
+-[VST-807] Added real-time selection for microphone and speaker devices, and implemented callbacks to notify the application when a device change occurs.
+
 ## v1.0.10 24 March 2024
 -[VST-609] added DTMF support in SDK
 
