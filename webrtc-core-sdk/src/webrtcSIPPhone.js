@@ -3,9 +3,9 @@
  * 
  */
 
+import audioDeviceManager from './audioDeviceManager';
 import SIPJSPhone from './sipjsphone';
 import webrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
-
 
 var phone = null;
 let webrtcSIPEngine = null;
@@ -190,6 +190,20 @@ export const webrtcSIPPhone = {
 			console.log("getTransportState: Exception ", e);
 			return "unknown";
 		}
+	},
+
+	changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd) {
+        console.log(`in changeAudioInputDevice() of webrtcSIPPhone.js`);
+        SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd);
+    },
+
+    changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd) {
+        console.log(`in changeAudioOutputDevice() of webrtcSIPPhone.js`);
+		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd);
+	},
+
+	setDeviceChangeCallbacks(currentInputDeviceCallback,currentOutputDeviceCallback) {
+		audioDeviceManager.setDeviceChangeCallbacks(currentInputDeviceCallback,currentOutputDeviceCallback);
 	}
 
 };

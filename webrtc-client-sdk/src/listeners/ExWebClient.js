@@ -1,27 +1,17 @@
 import { Call } from "../api/callAPI/Call";
-import { CallController } from "./CallCtrlerDummy";
+import { DoRegister as DoRegisterRL, UnRegister as UnRegisterRL } from '../api/registerAPI/RegisterListener';
 import { CallListener } from '../listeners/CallListener';
-import { DoRegister as DoRegisterRL } from '../api/registerAPI/RegisterListener';
-import { UnRegister as UnRegisterRL } from '../api/registerAPI/RegisterListener';
 import { ExotelVoiceClientListener } from '../listeners/ExotelVoiceClientListener';
 import { SessionListener as SessionListenerSL } from '../listeners/SessionListeners';
+import { CallController } from "./CallCtrlerDummy";
 
-import { initDiagnostics as initDiagnosticsDL } from '../api/omAPI/DiagnosticsListener';
-import { startNetworkDiagnostics as startNetworkDiagnosticsDL } from '../api/omAPI/DiagnosticsListener';
-import { stopNetworkDiagnostics as stopNetworkDiagnosticsDL } from '../api/omAPI/DiagnosticsListener';
-import { startSpeakerDiagnosticsTest as startSpeakerDiagnosticsTestDL } from '../api/omAPI/DiagnosticsListener';
-import { stopSpeakerDiagnosticsTest as stopSpeakerDiagnosticsTestDL } from '../api/omAPI/DiagnosticsListener';
-import { startMicDiagnosticsTest as startMicDiagnosticsTestDL } from '../api/omAPI/DiagnosticsListener';
-import { stopMicDiagnosticsTest as stopMicDiagnosticsTestDL } from '../api/omAPI/DiagnosticsListener';
-import { closeDiagnostics as closeDiagnosticsDL } from '../api/omAPI/DiagnosticsListener';
+import { closeDiagnostics as closeDiagnosticsDL, initDiagnostics as initDiagnosticsDL, startMicDiagnosticsTest as startMicDiagnosticsTestDL, startNetworkDiagnostics as startNetworkDiagnosticsDL, startSpeakerDiagnosticsTest as startSpeakerDiagnosticsTestDL, stopMicDiagnosticsTest as stopMicDiagnosticsTestDL, stopNetworkDiagnostics as stopNetworkDiagnosticsDL, stopSpeakerDiagnosticsTest as stopSpeakerDiagnosticsTestDL } from '../api/omAPI/DiagnosticsListener';
 
-import { callbacks } from '../listeners/Callback';
-import { registerCallback } from '../listeners/Callback';
-import { sessionCallback } from '../listeners/Callback';
+import { callbacks, registerCallback, sessionCallback } from '../listeners/Callback';
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
-import { webrtcLogger } from "../api/omAPI/WebrtcLogger";
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
+import { webrtcLogger } from "../api/omAPI/WebrtcLogger";
 
 var intervalId;
 var intervalIDMap = new Map();
@@ -243,6 +233,10 @@ export class ExotelWebClient {
         this.setEventListener(this.eventListener);
         return true;
     };
+
+    registerAudioDeviceChangeCallback = (CurrentInputDeviceCallback,CurrentOutputDeviceCallback) => {
+        webrtcSIPPhone.setDeviceChangeCallbacks(CurrentInputDeviceCallback,CurrentOutputDeviceCallback)
+    }
 
     DoRegister = () => {
         DoRegisterRL(this.sipAccountInfo, this)
@@ -516,6 +510,16 @@ export class ExotelWebClient {
                 callback("media_permission_denied");
             });
     };
+
+    changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd) {
+        console.log(`in changeAudioInputDevice() of ExWebClient.js`);
+        webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd);
+    }
+
+    changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd) {
+        console.log(`in changeAudioOutputDevice() of ExWebClient.js`);
+		webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd);
+	}
 }
 
 export default ExotelWebClient;

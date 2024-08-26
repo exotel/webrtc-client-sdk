@@ -3,6 +3,7 @@
  */
 
 var SIP = require('./sip-0.20.0.js')
+import { audioDeviceManager } from './audioDeviceManager.js';
 import webrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 
 var lastTransportState = "";
@@ -623,6 +624,7 @@ function onInvitationSessionAccepted(newSess) {
 
 	if (audioRemote) {
 		assignStream(newSess.sessionDescriptionHandler.remoteMediaStream, audioRemote);
+		resetAudioDevice();
 	}
 
 	webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('accepted');
@@ -664,6 +666,25 @@ function onInvitationSessionTerminated() {
 	if (callBackHandler != null)
 		if (callBackHandler.onResponse)
 			callBackHandler.onResponse("disconnected");
+}
+
+function resetAudioDevice() {
+    if (audioDeviceManager.resetOutputDevice) {
+        SIPJSPhone.changeAudioOutputDevice(
+            'default',
+            (deviceId) => alert(`Output device changed successfully to: ${deviceId}`),
+            (error) => alert(`Failed to change output device: ${error}`),
+            true
+        );
+    }
+    if (audioDeviceManager.resetInputDevice) {
+        SIPJSPhone.changeAudioInputDevice(
+            'default',
+            (deviceId) => alert(`Input device changed successfully to: ${deviceId}`),
+            (error) => alert(`Failed to change input device: ${error}`),
+            true
+        );
+    }
 }
 
 
@@ -1197,7 +1218,49 @@ const SIPJSPhone = {
 		return lastRegistererState;
 	},
 
-
+	async changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd) {
+    console.log(`in changeAudioInputDevice() of sipjsphone.js`);
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: { deviceId: { exact: deviceId } }
+        });
+        console.log(`Input device changed to: ${deviceId}`);
+        audioDeviceManager.setResetInputDeviceFlag(resetInputDeviceOnCallEnd);
+        // Finding the device name using the deviceId
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const inputDevice = devices.find(device => device.deviceId === deviceId && device.kind === 'audioinput');
+        const deviceName = inputDevice ? inputDevice.label : 'Unknown Device';
+        if (onSuccess) onSuccess(deviceName);
+        audioDeviceManager.currentInputDeviceCallback(deviceName);
+    } catch (error) {
+        console.error('Error changing input device:', error);
+        if (onError) onError(error);
+    }
+},
+async changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd) {
+    console.log(`in changeAudioOutputDevice() of sipjsphone.js`);
+    const audioElement = audioRemote;
+    if (typeof audioElement.sinkId !== 'undefined') {
+        try {
+            await audioElement.setSinkId(deviceId);
+            console.log(`Output device changed to: ${deviceId}`);
+            audioDeviceManager.setResetOutputDeviceFlag(resetOutputDeviceOnCallEnd);
+            // Finding the device name using the deviceId
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const outputDevice = devices.find(device => device.deviceId === deviceId && device.kind === 'audiooutput');
+            const deviceName = outputDevice ? outputDevice.label : 'Unknown Device';
+            if (onSuccess) onSuccess(deviceName);
+            audioDeviceManager.currentOutputDeviceCallback(deviceName);
+        } catch (error) {
+            console.error('Error changing output device:', error);
+            if (onError) onError(error);
+        }
+    } else {
+        const errorMsg = 'Browser does not support output device selection.';
+        console.error(errorMsg);
+        if (onError) onError(errorMsg);
+    }
+}
 
 };
 
