@@ -204,6 +204,11 @@ export const webrtcSIPPhone = {
 
 	setDeviceChangeCallbacks(currentInputDeviceCallback, currentOutputDeviceCallback) {
 		audioDeviceManager.setDeviceChangeCallbacks(currentInputDeviceCallback, currentOutputDeviceCallback);
+	},
+
+	onAudioDeviceChange(event) {
+		console.log("got audio device change event");
+		console.log(event);
 	}
 
 };
