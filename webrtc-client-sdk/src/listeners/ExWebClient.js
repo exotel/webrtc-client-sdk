@@ -234,8 +234,8 @@ export class ExotelWebClient {
         return true;
     };
 
-    registerAudioDeviceChangeCallback = (CurrentInputDeviceCallback,CurrentOutputDeviceCallback) => {
-        webrtcSIPPhone.setDeviceChangeCallbacks(CurrentInputDeviceCallback,CurrentOutputDeviceCallback)
+    registerAudioDeviceChangeCallback = (CurrentInputDeviceCallback, CurrentOutputDeviceCallback) => {
+        webrtcSIPPhone.setDeviceChangeCallbacks(CurrentInputDeviceCallback, CurrentOutputDeviceCallback)
     }
 
     DoRegister = () => {
@@ -511,15 +511,15 @@ export class ExotelWebClient {
             });
     };
 
-    changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd) {
+    changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd = false) {
         console.log(`in changeAudioInputDevice() of ExWebClient.js`);
         webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd);
     }
 
-    changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd) {
+    changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd = false) {
         console.log(`in changeAudioOutputDevice() of ExWebClient.js`);
-		webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd);
-	}
+        webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd);
+    }
 }
 
 export default ExotelWebClient;

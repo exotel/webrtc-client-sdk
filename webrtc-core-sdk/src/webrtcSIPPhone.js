@@ -192,18 +192,18 @@ export const webrtcSIPPhone = {
 		}
 	},
 
-	changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd) {
-        console.log(`in changeAudioInputDevice() of webrtcSIPPhone.js`);
-        SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd);
-    },
+	changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd = false) {
+		console.log(`in changeAudioInputDevice() of webrtcSIPPhone.js`);
+		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd);
+	},
 
-    changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd) {
-        console.log(`in changeAudioOutputDevice() of webrtcSIPPhone.js`);
+	changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd = false) {
+		console.log(`in changeAudioOutputDevice() of webrtcSIPPhone.js`);
 		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd);
 	},
 
-	setDeviceChangeCallbacks(currentInputDeviceCallback,currentOutputDeviceCallback) {
-		audioDeviceManager.setDeviceChangeCallbacks(currentInputDeviceCallback,currentOutputDeviceCallback);
+	setDeviceChangeCallbacks(currentInputDeviceCallback, currentOutputDeviceCallback) {
+		audioDeviceManager.setDeviceChangeCallbacks(currentInputDeviceCallback, currentOutputDeviceCallback);
 	}
 
 };
