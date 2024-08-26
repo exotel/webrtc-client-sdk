@@ -201,7 +201,7 @@ export class ExotelWebClient {
     sipAccountInfo = null;
 
     initWebrtc = (sipAccountInfo_,
-        RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
+        RegisterEventCallBack, CallListenerCallback, SessionCallback, CurrentInputDeviceCallback, CurrentOutputDeviceCallback) => {
 
         if (!this.eventListener) {
             this.eventListener = new ExotelVoiceClientListener();
@@ -231,6 +231,7 @@ export class ExotelWebClient {
         logger.log("Initializing session callback")
         sessionCallback.initializeSessionCallback(SessionCallback);
         this.setEventListener(this.eventListener);
+        webrtcSIPPhone.setDeviceChangeCallbacks(CurrentInputDeviceCallback,CurrentOutputDeviceCallback)
         return true;
     };
 

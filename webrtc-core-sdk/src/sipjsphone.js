@@ -612,6 +612,12 @@ function sipPhoneLogger(level, category, label, content) {
 
 }
 
+function deviceChange() {
+	resetInputDevice = false;
+	resetOutputDevice = false;
+	currentInputDeviceCallback = null;
+    currentOutputDeviceCallback = null;
+}
 
 function onInvitationSessionAccepted(newSess) {
 
@@ -623,6 +629,18 @@ function onInvitationSessionAccepted(newSess) {
 
 	if (audioRemote) {
 		assignStream(newSess.sessionDescriptionHandler.remoteMediaStream, audioRemote);
+			if (deviceChange.resetOutputDevice) {
+				SIPJSPhone.changeOutputDevice(`default`,
+				(deviceId) => alert(`Output device changed successfully to: ${deviceId}`),
+				(error) => alert(`Failed to change Output device: ${error}`),
+			    true)
+			}
+			if (deviceChange.resetInputDevice) {
+				SIPJSPhone.changeInputDevice(`default`,
+				(deviceId) => alert(`Input device changed successfully to: ${deviceId}`),
+				(error) => alert(`Failed to change input device: ${error}`),
+			    true)
+			}
 	}
 
 	webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('accepted');
@@ -1197,39 +1215,60 @@ const SIPJSPhone = {
 		return lastRegistererState;
 	},
 
-    async changeInputDevice(deviceId, onSuccess, onError) {
-		console.log(`in changeInputDevice() of sipjsphone.js`);
+async changeInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd) {
+    console.log(`in changeInputDevice() of sipjsphone.js`);
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: { deviceId: { exact: deviceId } }
+        });
+        console.log(`Input device changed to: ${deviceId}`);
+        deviceChange.resetInputDevice = resetInputDeviceOnCallEnd;
+
+        // Finding the device name using the deviceId
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const inputDevice = devices.find(device => device.deviceId === deviceId && device.kind === 'audioinput');
+        const deviceName = inputDevice ? inputDevice.label : 'Unknown Device';
+
+        if (onSuccess) onSuccess(deviceName);
+        deviceChange.currentInputDeviceCallback(deviceName);
+    } catch (error) {
+        console.error('Error changing input device:', error);
+        if (onError) onError(error);
+    }
+},
+
+async changeOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd) {
+    console.log(`in changeOutputDevice() of sipjsphone.js`);
+
+    const audioElement = audioRemote;
+    if (typeof audioElement.sinkId !== 'undefined') {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                audio: { deviceId: { exact: deviceId } }
-            });
-            console.log(`Input device changed to: ${deviceId}`);
-            if (onSuccess) onSuccess(deviceId);
+            await audioElement.setSinkId(deviceId);
+            console.log(`Output device changed to: ${deviceId}`);
+            deviceChange.resetOutputDevice = resetOutputDeviceOnCallEnd;
+
+            // Finding the device name using the deviceId
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const outputDevice = devices.find(device => device.deviceId === deviceId && device.kind === 'audiooutput');
+            const deviceName = outputDevice ? outputDevice.label : 'Unknown Device';
+
+            if (onSuccess) onSuccess(deviceName);
+            deviceChange.currentOutputDeviceCallback(deviceName);
         } catch (error) {
-            console.error('Error changing input device:', error);
+            console.error('Error changing output device:', error);
             if (onError) onError(error);
         }
-    },
-
-    async changeOutputDevice(deviceId, onSuccess, onError) {
-		console.log(`in changeOutputDevice() of sipjsphone.js`);
-
-        const audioElement = audioRemote;
-        if (typeof audioElement.sinkId !== 'undefined') {
-            try {
-                await audioElement.setSinkId(deviceId);
-                console.log(`Output device changed to: ${deviceId}`);
-                if (onSuccess) onSuccess(deviceId);
-            } catch (error) {
-                console.error('Error changing output device:', error);
-                if (onError) onError(error);
-            }
-        } else {
-            const errorMsg = 'Browser does not support output device selection.';
-            console.error(errorMsg);
-            if (onError) onError(errorMsg);
-        }
+    } else {
+        const errorMsg = 'Browser does not support output device selection.';
+        console.error(errorMsg);
+        if (onError) onError(errorMsg);
     }
+},
+
+deviceChangeCallbacks(currentInputDeviceCallback,currentOutputDeviceCallback) {
+	deviceChange.currentInputDeviceCallback = currentInputDeviceCallback;
+	deviceChange.currentOutputDeviceCallback = currentOutputDeviceCallback;
+}
 
 };
 

@@ -6,9 +6,6 @@
 import SIPJSPhone from './sipjsphone';
 import webrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 
-var resetInputDevice = null
-var resetOutputDevice = null
-
 var phone = null;
 let webrtcSIPEngine = null;
 function sendWebRTCEventsToFSM(eventType, sipMethod) {
@@ -94,21 +91,6 @@ export const webrtcSIPPhone = {
 		phone.sipHangUp();
 
 		webrtcSIPPhoneEventDelegate.onRejectCall();
-		if (resetOutputDevice === true) {
-        changeOutputDevice(
-            'default',
-            (deviceId) => alert(`Output device changed successfully to: ${deviceId}`),
-            (error) => alert(`Failed to change output device: ${error}`)
-        );
-    }
-
-    if (resetInputDevice === true) {
-        changeInputDevice(
-            'default',
-            (deviceId) => alert(`Input device changed successfully to: ${deviceId}`),
-            (error) => alert(`Failed to change input device: ${error}`)
-        );
-    }
 	},
 
 	reRegisterWebRTCPhone: () => {
@@ -211,14 +193,16 @@ export const webrtcSIPPhone = {
 
 	changeInputDevice(deviceId, onSuccess, onError,resetInputDeviceOnCallEnd) {
 		console.log(`in changeInputDevice() of webrtcSIPPhone.js`);
-		SIPJSPhone.changeInputDevice(deviceId, onSuccess, onError);
-		resetInputDevice = resetInputDeviceOnCallEnd
+		SIPJSPhone.changeInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd);
 	},
 
 	changeOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd) {
 		console.log(`in changeOutputDevice() of webrtcSIPPhone.js`);
-		SIPJSPhone.changeOutputDevice(deviceId, onSuccess, onError);
-		resetOutputDevice = resetOutputDeviceOnCallEnd
+		SIPJSPhone.changeOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd);
+	},
+	
+	setDeviceChangeCallbacks(currentInputDeviceCallback,currentOutputDeviceCallback) {
+		SIPJSPhone.deviceChangeCallbacks(currentInputDeviceCallback,currentOutputDeviceCallback)
 	}
 
 };
