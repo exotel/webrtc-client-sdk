@@ -11,12 +11,11 @@ import { callbacks, registerCallback, sessionCallback } from '../listeners/Callb
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
-import { webrtcLogger } from "../api/omAPI/WebrtcLogger";
 
 var intervalId;
 var intervalIDMap = new Map();
 
-var logger = webrtcLogger();
+var logger = webrtcSIPPhone.getLogger();
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -233,10 +232,6 @@ export class ExotelWebClient {
         this.setEventListener(this.eventListener);
         return true;
     };
-
-    registerAudioDeviceChangeCallback = (CurrentInputDeviceCallback, CurrentOutputDeviceCallback) => {
-        webrtcSIPPhone.setDeviceChangeCallbacks(CurrentInputDeviceCallback, CurrentOutputDeviceCallback)
-    }
 
     DoRegister = () => {
         DoRegisterRL(this.sipAccountInfo, this)
@@ -506,19 +501,27 @@ export class ExotelWebClient {
                 }
             })
             .catch(function (error) {
-                console.log("something went wrong during checkClientStatus ", error);
+                logger.log("something went wrong during checkClientStatus ", error);
                 callback("media_permission_denied");
             });
     };
 
-    changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd = false) {
-        console.log(`in changeAudioInputDevice() of ExWebClient.js`);
-        webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd);
+    changeAudioInputDevice(deviceId, onSuccess, onError) {
+        logger.log(`in changeAudioInputDevice() of ExWebClient.js`);
+        webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
     }
 
-    changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd = false) {
-        console.log(`in changeAudioOutputDevice() of ExWebClient.js`);
-        webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd);
+    changeAudioOutputDevice(deviceId, onSuccess, onError) {
+        logger.log(`in changeAudioOutputDevice() of ExWebClient.js`);
+        webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
+    }
+
+    registerLoggerCallback(callback) {
+        logger.registerLoggerCallback(callback);
+    }
+
+    registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback) {
+        webrtcSIPPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback);
     }
 }
 

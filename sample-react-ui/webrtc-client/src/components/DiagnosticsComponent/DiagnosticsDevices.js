@@ -52,20 +52,20 @@ function DiagnosticsDevices({
   handleStopSpeakerTestFailure,
   handleStopMicTestSuccess,
   handleStopMicTestFailure,
-  handleRestartSpeaker,        
-  handleRestartMic,        
+  handleRestartSpeaker,
+  handleRestartMic,
 }) {
   const useReactRef = useRef(null)
   const [open, setOpen] = React.useState(true);
   const channel = new BroadcastChannel("app-data");
   const [imageMine, setImageMine] = useState(null)
   const [errorMine, setErrorMine] = useState(null)
-  var restartSpeakerEnabled=false    
+  var restartSpeakerEnabled = false
   const [image1, takeScreenShot] = useScreenshot({
     type: "image/jpeg",
     quality: 1.0
   });
-  
+
   const handleClose = () => {
     setOpen(!open);
   };
@@ -105,36 +105,36 @@ function DiagnosticsDevices({
       allowTaint: true,
       logging: true
     }).then((canvas) => {
-        console.log("html2canvas returned canvas ", canvas);
-        const croppedCanvas = document.createElement('canvas')
+      console.log("html2canvas returned canvas ", canvas);
+      const croppedCanvas = document.createElement('canvas')
 
-        const croppedCanvasContext = croppedCanvas.getContext('2d')
-        // init data
-        const cropPositionTop = 0
-        const cropPositionLeft = 0
-        const cropWidth = canvas.width
-        const cropHeight = canvas.height
+      const croppedCanvasContext = croppedCanvas.getContext('2d')
+      // init data
+      const cropPositionTop = 0
+      const cropPositionLeft = 0
+      const cropWidth = canvas.width
+      const cropHeight = canvas.height
 
-        croppedCanvas.width = cropWidth
-        croppedCanvas.height = cropHeight
-        document.body.appendChild(canvas);
-        croppedCanvasContext.drawImage(
-          canvas,
-          cropPositionLeft,
-          cropPositionTop,
-        )
+      croppedCanvas.width = cropWidth
+      croppedCanvas.height = cropHeight
+      document.body.appendChild(canvas);
+      croppedCanvasContext.drawImage(
+        canvas,
+        cropPositionLeft,
+        cropPositionTop,
+      )
 
-        const base64Image = canvas.toDataURL(type, quality)
+      const base64Image = canvas.toDataURL(type, quality)
 
-        setImageMine(base64Image)
-        return base64Image
-      }).catch((error) => {
-        console.log("html2canvas error: ", error);
-        setErrorMine(error);
-      })
+      setImageMine(base64Image)
+      return base64Image
+    }).catch((error) => {
+      console.log("html2canvas error: ", error);
+      setErrorMine(error);
+    })
   }
 
-  const download = (image, { name = "DiagnosticDevices", extension = "jpeg" } = {}) => { 
+  const download = (image, { name = "DiagnosticDevices", extension = "jpeg" } = {}) => {
     const a = document.createElement("a");
     a.href = image;
     a.download = name + "." + extension;
@@ -144,8 +144,8 @@ function DiagnosticsDevices({
       var event = new MouseEvent('click');
       a.dispatchEvent(event);
       document.body.removeChild(a);
-    }); 
-  };  
+    });
+  };
 
 
   const downloadScreenshotDevices = () => takeScreenShotDirect(useReactRef.current).then(download);
@@ -170,14 +170,14 @@ function DiagnosticsDevices({
 
   function getNumeric(str) {
     try {
-    
-    if (typeof str != "number") return 0 // we only process numbers!  
+
+      if (typeof str != "number") return 0 // we only process numbers!  
 
       if (!isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
         !isNaN(parseFloat(str))) { // ...and ensure strings of whitespace fail 
-            return str;
+        return str;
       } else {
-            return 0;
+        return 0;
       }
 
     } catch (e) {
@@ -185,9 +185,9 @@ function DiagnosticsDevices({
     }
   }
 
-  micStatus =  (micValue > 0)?true:false;
-  speakerStatus =  (speakerValue > 0)?true:false;
-  browserVersion = window.localStorage.getItem('browserVersion'); 
+  micStatus = (micValue > 0) ? true : false;
+  speakerStatus = (speakerValue > 0) ? true : false;
+  browserVersion = window.localStorage.getItem('browserVersion');
   micDescr = window.localStorage.getItem("micDescr")
   speakerDescr = window.localStorage.getItem("speakerDescr")
   micInfo = window.localStorage.getItem('micInfo');
@@ -221,7 +221,7 @@ function DiagnosticsDevices({
         </DialogTitle>
 
         <DialogContent id="alert-dialog-description">
-          <Card sx={{ maxWidth: 450 , color:yellow  }}>
+          <Card sx={{ maxWidth: 450, color: yellow }}>
             <CardContent>
               <Typography
                 gutterBottom
@@ -229,209 +229,209 @@ function DiagnosticsDevices({
                 component="span"
               ></Typography>
 
-                <Typography component="span" variant="body1">
-                  <div className="browser-version">
+              <Typography component="span" variant="body1">
+                <div className="browser-version">
                   Browser : {browserVersion}
-                  </div>
+                </div>
 
-                  {(micInfo)?
+                {(micInfo) ?
                   (<div className="browser-version">
-                  Mic : {micInfo}
-                  </div>):null}
-                  {(speakerInfo)?
+                    Mic : {micInfo}
+                  </div>) : null}
+                {(speakerInfo) ?
                   (<div className="browser-version">
-                  Speaker : {speakerInfo}
-                  </div>):null}
+                    Speaker : {speakerInfo}
+                  </div>) : null}
 
-                </Typography>
-
-
-                <br></br>
-                <br></br>
-
-                <Card sx={{ maxWidth: 450 }}>
-                      <Typography component="span" variant="body2" >
-                        <div  className="flex-container-device">
-                        <div className="flex-container-device-title">
-                                &nbsp; Mic testing
-                                <div className="flex-child-device-title">
-                                    { (micDescr === "")? (<HourglassFullIcon style={{ color: "blue" }} />)
-                                       :
-                                      (micStatus) ? (
-                                          <CheckCircleIcon style={{ color: "green" }} />
-                                      ) : (
-                                          <ErrorIcon style={{ color: "red" }} />
-                                      )}
-                                </div>
-                        </div>
-
-                        
-                        <LinearProgress variant="determinate" value={getNumeric(micValue)} />
+              </Typography>
 
 
-                        <Accordion>
-                            <AccordionSummary
-                              expandIcon={<ExpandMoreIcon />}
-                              aria-controls="panel1a-content"
-                              id="panel1a-header"
-                            >
-                              <Typography component="span"> 
-                                <div className="flex-container-device-question">
-                                Do you see the microphone levels fluctuating as you speak? 
-                                </div>
-                                <div className="flex-container">
+              <br></br>
+              <br></br>
 
-                              <div className="flex-child">
+              <Card sx={{ maxWidth: 450 }}>
+                <Typography component="span" variant="body2" >
+                  <div className="flex-container-device">
+                    <div className="flex-container-device-title">
+                      &nbsp; Mic testing
+                      <div className="flex-child-device-title">
+                        {(micDescr === "") ? (<HourglassFullIcon style={{ color: "blue" }} />)
+                          :
+                          (micStatus) ? (
+                            <CheckCircleIcon style={{ color: "green" }} />
+                          ) : (
+                            <ErrorIcon style={{ color: "red" }} />
+                          )}
+                      </div>
+                    </div>
+
+
+                    <LinearProgress variant="determinate" value={getNumeric(micValue)} />
+
+
+                    <Accordion>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1a-content"
+                        id="panel1a-header"
+                      >
+                        <Typography component="span">
+                          <div className="flex-container-device-question">
+                            Do you see the microphone levels fluctuating as you speak?
+                          </div>
+                          <div className="flex-container">
+
+                            <div className="flex-child">
                               <input
                                 type="submit"
                                 size="small"
                                 value="Yes"
                                 onClick={handleStopMicTestSuccess}
                               />
-                              </div>                                
-                              <div className="flex-child">
+                            </div>
+                            <div className="flex-child">
                               <input
                                 type="submit"
                                 size="small"
                                 value="No"
                                 onClick={handleStopMicTestFailure}
                               />
-                              </div>     
-                              <div className="flex-child">
-                                 {micUserResponse}         
-                              </div>                                                          
-                              </div>
-                              </Typography>
-                              
-                            </AccordionSummary>
-                            <AccordionDetails>
-                              <Typography component="span"> The test has been successfully executed </Typography>
-                            </AccordionDetails>
-                          </Accordion>
-
+                            </div>
+                            <div className="flex-child">
+                              {micUserResponse}
+                            </div>
                           </div>
-                          </Typography>
-                  </Card>
+                        </Typography>
 
-                  <br></br>                        
-                  <br></br>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography component="span"> The test has been successfully executed </Typography>
+                      </AccordionDetails>
+                    </Accordion>
 
-                  <Card sx={{ maxWidth: 450 }}>
+                  </div>
+                </Typography>
+              </Card>
 
-                  <Typography component="span" variant="body2">
-                  <div  className="flex-container-device">
-                  <div className="flex-container-device-title">
-                         &nbsp; Speaker testing
-                         <div className="flex-child-device-title">
-                            {(speakerDescr === "")? (<HourglassFullIcon style={{ color: "blue" }} />)
-                              :
-                                (speakerStatus) ? (
-                                    <CheckCircleIcon style={{ color: "green" }} />
-                                ) : (
-                                    <ErrorIcon style={{ color: "red" }} />
-                                )}
+              <br></br>
+              <br></br>
+
+              <Card sx={{ maxWidth: 450 }}>
+
+                <Typography component="span" variant="body2">
+                  <div className="flex-container-device">
+                    <div className="flex-container-device-title">
+                      &nbsp; Speaker testing
+                      <div className="flex-child-device-title">
+                        {(speakerDescr === "") ? (<HourglassFullIcon style={{ color: "blue" }} />)
+                          :
+                          (speakerStatus) ? (
+                            <CheckCircleIcon style={{ color: "green" }} />
+                          ) : (
+                            <ErrorIcon style={{ color: "red" }} />
+                          )}
+                      </div>
+                    </div>
+
+                    <LinearProgress variant="determinate" value={getNumeric(speakerValue)} />
+
+                    <Accordion>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel2a-content"
+                        id="panel2a-header"
+                      >
+                        <Typography component="span">
+                          <div className="flex-container-device-question">
+                            Do you hear a sound playing?
                           </div>
-                   </div>  
 
-                   <LinearProgress variant="determinate" value={getNumeric(speakerValue)} />
-
-                  <Accordion>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel2a-content"
-                      id="panel2a-header"
-                    >
-                      <Typography component="span">
-                        <div className="flex-container-device-question">
-                          Do you hear a sound playing? 
-                        </div>
-
-                        <div className="flex-container">
-                        <div className="flex-child">
+                          <div className="flex-container">
+                            <div className="flex-child">
                               <input
                                 type="submit"
                                 size="small"
                                 value="Yes"
                                 onClick={sendDiagnosticsTestSuccess}
                               />
-                              </div>                                
-                              <div className="flex-child">
+                            </div>
+                            <div className="flex-child">
                               <input
                                 type="submit"
                                 size="small"
                                 value="No"
                                 onClick={sendDiagnosticsTestFailure}
                               />
-                              </div>   
-                              {(restartSpeakerEnabled) ? (
+                            </div>
+                            {(restartSpeakerEnabled) ? (
                               <div className="flex-child">
-                              <input
-                                type="submit"
-                                size="small"
-                                value="Restart Speaker Test"
-                                onClick={handleRestartSpeaker}
-                              />
-                              </div> 
-                              ) : null }
-                              <div className="flex-child">
-                                 {speakerUserResponse}         
-                              </div>                                                              
-                        </div>
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography component="span"> The test has been successfully executed </Typography>
-                    </AccordionDetails>
-                  </Accordion>
+                                <input
+                                  type="submit"
+                                  size="small"
+                                  value="Restart Speaker Test"
+                                  onClick={handleRestartSpeaker}
+                                />
+                              </div>
+                            ) : null}
+                            <div className="flex-child">
+                              {speakerUserResponse}
+                            </div>
+                          </div>
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography component="span"> The test has been successfully executed </Typography>
+                      </AccordionDetails>
+                    </Accordion>
                   </div>
-              </Typography>
+                </Typography>
               </Card>
 
               <br>
-              </br>                        
+              </br>
 
             </CardContent>
           </Card>
         </DialogContent>
-        
+
         <Card sx={{ maxWidth: 350 }}>
-        <div className="flex-container">
-          &nbsp;           
-          &nbsp;
-          &nbsp;
+          <div className="flex-container">
+            &nbsp;
+            &nbsp;
+            &nbsp;
 
-          <div className="flex-child">
-          <input
-            type="submit"
-            size="small"
-            value="Start Again"
-            onClick={handleDiagnosticsDevicesRetest}
-          />
+            <div className="flex-child">
+              <input
+                type="submit"
+                size="small"
+                value="Start Again"
+                onClick={handleDiagnosticsDevicesRetest}
+              />
+            </div>
+
+            <div className="flex-child">
+              <input
+                type="submit"
+                size="small"
+                value="Send Troubleshoot Log"
+                onClick={sendDiagnosticsReport}
+              />
+            </div>
+
+            <div className="flex-child">
+              <input
+                type="submit"
+                size="small"
+                value="Next"
+                onClick={sendDiagnosticsNext}
+              />
+            </div>
+
           </div>
-
-          <div className="flex-child">
-          <input
-            type="submit"
-            size="small"
-            value="Send Troubleshoot Log"
-            onClick={sendDiagnosticsReport}
-          />
-          </div>
-
-          <div className="flex-child">
-          <input
-            type="submit"
-            size="small"
-            value="Next"
-            onClick={sendDiagnosticsNext}
-          />
-        </div>
-
-          </div>
-          <br/>
-          <br/>
+          <br />
+          <br />
         </Card>
-        <br/>
+        <br />
       </Dialog>
     </div>
   );

@@ -1,9 +1,10 @@
 import { diagnosticsCallback } from '../../listeners/Callback';
-import {ameyoWebRTCTroubleshooter} from './Diagnostics';
-import { webrtcLogger } from "./WebrtcLogger"
+import { ameyoWebRTCTroubleshooter } from './Diagnostics';
+import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
 
 
-var logger = webrtcLogger()
+var logger = webrtcSIPPhone.getLogger();
+
 export function initDiagnostics(setDiagnosticsReportCallback, keyValueSetCallback) {
     if (!keyValueSetCallback || !setDiagnosticsReportCallback) {
         logger.log("Callbacks are not set")
@@ -12,7 +13,7 @@ export function initDiagnostics(setDiagnosticsReportCallback, keyValueSetCallbac
     diagnosticsCallback.setKeyValueCallback(keyValueSetCallback);
     diagnosticsCallback.setDiagnosticsReportCallback(setDiagnosticsReportCallback);
     let version = ameyoWebRTCTroubleshooter.getBrowserData();
-    diagnosticsCallback.keyValueSetCallback('browserVersion','ready', version)
+    diagnosticsCallback.keyValueSetCallback('browserVersion', 'ready', version)
     return;
 }
 
@@ -26,7 +27,7 @@ export function startSpeakerDiagnosticsTest() {
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
-    logger.log("Request to startSpeakerTest:\n") ;
+    logger.log("Request to startSpeakerTest:\n");
     ameyoWebRTCTroubleshooter.startSpeakerTest()
     return;
 }
@@ -36,14 +37,14 @@ export function stopSpeakerDiagnosticsTest(speakerTestResponse) {
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
 
-    logger.log("Request to stopSpeakerTest - Suuccessful Test:\n") ;
+    logger.log("Request to stopSpeakerTest - Suuccessful Test:\n");
     if (speakerTestResponse == 'yes') {
         ameyoWebRTCTroubleshooter.stopSpeakerTesttoneWithSuccess()
     } else if (speakerTestResponse == 'no') {
         ameyoWebRTCTroubleshooter.stopSpeakerTesttoneWithFailure()
     } else {
         ameyoWebRTCTroubleshooter.stopSpeakerTest()
-    }    
+    }
     return;
 }
 
@@ -51,7 +52,7 @@ export function startMicDiagnosticsTest() {
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
-    logger.log("Request to startMicTest:\n") ;
+    logger.log("Request to startMicTest:\n");
     ameyoWebRTCTroubleshooter.startMicTest()
     return;
 }
@@ -60,7 +61,7 @@ export function stopMicDiagnosticsTest(micTestResponse) {
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
-    logger.log("Request to stopMicTest - Successful Test:\n") ;
+    logger.log("Request to stopMicTest - Successful Test:\n");
     if (micTestResponse == 'yes') {
         ameyoWebRTCTroubleshooter.stopMicTestSuccess()
     } else if (micTestResponse == 'no') {
@@ -78,7 +79,7 @@ export function startNetworkDiagnostics() {
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
-    logger.log("Request to start network diagnostics:\n") ;
+    logger.log("Request to start network diagnostics:\n");
     ameyoWebRTCTroubleshooter.startWSAndUserRegistrationTest();
     return;
 }
@@ -86,10 +87,10 @@ export function startNetworkDiagnostics() {
 /**
  * Function to troubleshoot the environment
  */
- export function stopNetworkDiagnostics() {
+export function stopNetworkDiagnostics() {
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
-    logger.log("Request to stop network diagnostics:\n") ;
+    logger.log("Request to stop network diagnostics:\n");
     return;
 }

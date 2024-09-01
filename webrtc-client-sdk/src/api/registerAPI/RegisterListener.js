@@ -1,6 +1,6 @@
-import { webrtcLogger } from "../omAPI/WebrtcLogger"
+import { webrtcSIPPhone } from "@exotel-npm-dev/webrtc-core-sdk";
 
-var logger = webrtcLogger()
+var logger = webrtcSIPPhone.getLogger();
 
 /**
  * Function to register the phone onto a webRTC client
@@ -15,17 +15,17 @@ export function DoRegister(sipAccountInfo, exWebClient) {
     /**
      * CHANGE IS REQUIRED - in the initialize function provision is to be given to pass Callback functions as arguments
      */
-     try {
+    try {
         exWebClient.initialize(userContext,
-        sipAccountInfo.domain, //hostname
-         sipAccountInfo.userName, //subscriberName
-         sipAccountInfo.displayname,//displayName
-         sipAccountInfo.accountSid,//accountSid
-         '', sipAccountInfo); // subscriberToken
-    } catch(e) {
+            sipAccountInfo.domain, //hostname
+            sipAccountInfo.userName, //subscriberName
+            sipAccountInfo.displayname,//displayName
+            sipAccountInfo.accountSid,//accountSid
+            '', sipAccountInfo); // subscriberToken
+    } catch (e) {
         logger.log("Register failed ", e)
-    } 
-    
+    }
+
 }
 
 
@@ -34,7 +34,7 @@ export function DoRegister(sipAccountInfo, exWebClient) {
  * @param {*} sipAccountInfo 
  * @param {*} exWebClient 
  */
-export function UnRegister(sipAccountInfo, exWebClient){
+export function UnRegister(sipAccountInfo, exWebClient) {
     try {
         exWebClient.unregister(sipAccountInfo);
     } catch (e) {

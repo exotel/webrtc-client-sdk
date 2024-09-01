@@ -4,11 +4,11 @@
 
 var SIP = require('./sip-0.20.0.js')
 import { audioDeviceManager } from './audioDeviceManager.js';
+import coreSDKLogger from './coreSDKLogger.js';
 import webrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 
 var lastTransportState = "";
 var lastRegistererState = "";
-var videoRemote, videoLocal, audioRemote;
 var initializeComplete = false;
 var webRTCStatus = "offline"; // ready -> registered, offline -> unregistered,
 var callBackHandler = null;
@@ -25,8 +25,8 @@ ringbacktone.src = require("./static/ringbacktone.wav");
 var dtmftone = document.createElement("audio");
 dtmftone.src = require("./static/dtmf.wav");
 
-videoLocal = document.createElement("video");//getElementById("video_local");
-videoRemote = document.createElement("video");//getElementById("video_remote");
+var audioRemote = document.createElement("audio");
+
 
 let txtDisplayName, txtPrivateIdentity, txtHostNameWithPort, txtHostName, txtWebSocketPort, txtAccountName;
 let txtSecurity, txtSipDomain, txtWSPort, txtSipPort, txtSipSecurePort, txtContactHost, endpoint;
@@ -37,7 +37,8 @@ let register_flag = false;
 var ctxSip = {};
 var registerer = null;
 
-const logger = console; //AmeyoLogger.get("sipjsphone");
+
+const logger = coreSDKLogger;
 logger.log(SIP);
 /* NL Additions - Start */
 
@@ -48,7 +49,7 @@ export function getLogger() {
 		uaLogger = userAgent.getLogger("sip.WebrtcLib")
 		//let loggerFactory = userAgent.getLoggerFactory()
 	} catch (e) {
-		console.log("No userAgent.getLogger: Using console log")
+		logger.log("No userAgent.getLogger: Using console log")
 		return console;
 	}
 
@@ -56,7 +57,7 @@ export function getLogger() {
 		return uaLogger;
 	}
 	else {
-		console.log("No Logger: Using console log")
+		logger.log("No Logger: Using console log")
 		return logger;
 	}
 }
@@ -336,7 +337,7 @@ function postInit(onInitDoneCallback) {
 		phoneMute: function (sessionid, bMute) {
 			if (sessionid) {
 				var s = ctxSip.Sessions[sessionid];
-				console.log("phoneMute: bMute", bMute)
+				logger.log("phoneMute: bMute", bMute)
 				toggleMute(s, bMute);
 				bMicEnable = !bMute;
 			}
@@ -345,7 +346,7 @@ function postInit(onInitDoneCallback) {
 		phoneHold: function (sessionid, bHold) {
 			if (sessionid) {
 				var s = ctxSip.Sessions[sessionid];
-				console.log("phoneHold: bHold", bHold)
+				logger.log("phoneHold: bHold", bHold)
 				toggleHold(s, bHold);
 				bHoldEnable = bHold;
 			}
@@ -379,7 +380,7 @@ function postInit(onInitDoneCallback) {
 				return true;
 			} else {
 				ctxSip.setError(true, 'Unsupported Browser.', 'Your browser does not support the features required for this phone.');
-				window.console.error("WebRTC support not found");
+				logger.error("WebRTC support not found");
 				return false;
 			}
 		}
@@ -608,24 +609,15 @@ function sipPhoneLogger(level, category, label, content) {
 			logger.log(level + " sipjslog: " + category + ": " + content);
 		}
 	} catch (e) {
-		logger.error("ERROR", e);
+		logger.error("sipjsphone:sipPhoneLogger ERROR", e);
 	}
 
 }
 
 
 function onInvitationSessionAccepted(newSess) {
-
-	if (!audioRemote) {
-		audioRemote = document.createElement("audio");
-		//audioRemote.setAttribute("id", "audio_remote");
-		console.log("No audio remote id .... ")
-	}
-
-	if (audioRemote) {
-		assignStream(newSess.sessionDescriptionHandler.remoteMediaStream, audioRemote);
-		resetAudioDevice();
-	}
+	ctxSip.Stream = newSess.sessionDescriptionHandler.localMediaStream;
+	assignStream(newSess.sessionDescriptionHandler.remoteMediaStream, audioRemote);
 
 	webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('accepted');
 	webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("connected", "CALL");
@@ -648,6 +640,7 @@ function onInvitationSessionAccepted(newSess) {
 }
 
 function onInvitationSessionTerminated() {
+	SIPJSPhone.stopStreamTracks(ctxSip.Stream);
 	webrtcSIPPhoneEventDelegate.stopCallStat();
 	webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('terminated');
 	ctxSip.stopRingTone();
@@ -666,25 +659,6 @@ function onInvitationSessionTerminated() {
 	if (callBackHandler != null)
 		if (callBackHandler.onResponse)
 			callBackHandler.onResponse("disconnected");
-}
-
-function resetAudioDevice() {
-    if (audioDeviceManager.resetOutputDevice) {
-        SIPJSPhone.changeAudioOutputDevice(
-            'default',
-            (deviceId) => alert(`Output device changed successfully to: ${deviceId}`),
-            (error) => alert(`Failed to change output device: ${error}`),
-            true
-        );
-    }
-    if (audioDeviceManager.resetInputDevice) {
-        SIPJSPhone.changeAudioInputDevice(
-            'default',
-            (deviceId) => alert(`Input device changed successfully to: ${deviceId}`),
-            (error) => alert(`Failed to change input device: ${error}`),
-            true
-        );
-    }
 }
 
 
@@ -910,13 +884,13 @@ function enableReceiverTracks(s, enable) {
 			throw new Error("Peer connection closed.");
 		}
 		peerConnection.getReceivers().forEach((receiver) => {
-			console.log("Receiver ", receiver)
+			logger.log("Receiver ", receiver)
 			if (receiver.track) {
 				receiver.track.enabled = enable;
 			}
 		});
 	} catch (e) {
-		console.log("enableReceiverTracks: Error in updating receiver tracks  ", e)
+		logger.log("enableReceiverTracks: Error in updating receiver tracks  ", e)
 
 	}
 }
@@ -935,7 +909,7 @@ function enableSenderTracks(s, enable) {
 			}
 		});
 	} catch (e) {
-		console.log("enableSenderTracks: Error in updating sender tracks  ", e)
+		logger.log("enableSenderTracks: Error in updating sender tracks  ", e)
 	}
 }
 
@@ -963,6 +937,8 @@ function toggleHold(s, hold) {
 }
 
 function assignStream(stream, element) {
+	if (audioDeviceManager.currentAudioOutputDeviceId != "default")
+		element.setSinkId(audioDeviceManager.currentAudioOutputDeviceId);
 	// Set element source.
 	element.autoplay = true; // Safari does not allow calling .play() from a
 	// non user action
@@ -970,16 +946,16 @@ function assignStream(stream, element) {
 
 	// Load and start playback of media.
 	element.play().catch((error) => {
-		console.error("Failed to play media");
-		console.error(error);
+		logger.error("Failed to play media");
+		logger.error(error);
 	});
 
 	// If a track is added, load and restart playback of media.
 	stream.onaddtrack = () => {
 		element.load(); // Safari does not work otheriwse
 		element.play().catch((error) => {
-			console.error("Failed to play remote media on add track");
-			console.error(error);
+			logger.error("Failed to play remote media on add track");
+			logger.error(error);
 		});
 	};
 
@@ -987,8 +963,8 @@ function assignStream(stream, element) {
 	stream.onremovetrack = () => {
 		element.load(); // Safari does not work otheriwse
 		element.play().catch((error) => {
-			console.error("Failed to play remote media on remove track");
-			console.error(error);
+			logger.error("Failed to play remote media on remove track");
+			logger.error(error);
 		});
 	};
 }
@@ -1008,9 +984,6 @@ const SIPJSPhone = {
 
 	init: (onInitDoneCallback) => {
 
-		videoLocal = document.getElementById("video_local");
-		videoRemote = document.getElementById("video_remote");
-		audioRemote = document.getElementById("audio_remote");
 		var preInit = function () {
 			logger.log("init:readyState, calling postInit")
 			postInit(onInitDoneCallback);
@@ -1146,9 +1119,20 @@ const SIPJSPhone = {
 		var newSess = ctxSip.Sessions[ctxSip.callActiveID];
 		logger.log("pickphonecall ", ctxSip.callActiveID);
 		if (newSess) {
-			newSess.accept().catch((e) => {
-				onUserSessionAcceptFailed(e);
-			});
+			if (audioDeviceManager.currentAudioInputDeviceId != "default") {
+				newSess.accept({
+					sessionDescriptionHandlerOptions: {
+						constraints: { audio: { deviceId: audioDeviceManager.currentAudioInputDeviceId }, video: false }
+					}
+				}).catch((e) => {
+					onUserSessionAcceptFailed(e);
+				});
+			} else {
+
+				newSess.accept().catch((e) => {
+					onUserSessionAcceptFailed(e);
+				});
+			}
 		}
 
 	},
@@ -1199,69 +1183,135 @@ const SIPJSPhone = {
 	},
 	/* NL Additions - Start */
 	getSpeakerTestTone: () => {
-		console.log("Returning speaker test tone:", ringtone);
+		logger.log("Returning speaker test tone:", ringtone);
 		return ringtone;
 	},
 
 
 	getWSSUrl: () => {
-		console.log("Returning txtWebsocketURL:", txtWebsocketURL);
+		logger.log("Returning txtWebsocketURL:", txtWebsocketURL);
 		return txtWebsocketURL;
 	},
 	/* NL Additions - End */
 	getTransportState: () => {
-		console.log("Returning Transport State : ", lastTransportState);
+		logger.log("Returning Transport State : ", lastTransportState);
 		return lastTransportState;
 	},
 	getRegistrationState: () => {
-		console.log("Returning Registration State : ", lastRegistererState);
+		logger.log("Returning Registration State : ", lastRegistererState);
 		return lastRegistererState;
 	},
 
-	async changeAudioInputDevice(deviceId, onSuccess, onError, resetInputDeviceOnCallEnd) {
-    console.log(`in changeAudioInputDevice() of sipjsphone.js`);
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            audio: { deviceId: { exact: deviceId } }
-        });
-        console.log(`Input device changed to: ${deviceId}`);
-        audioDeviceManager.setResetInputDeviceFlag(resetInputDeviceOnCallEnd);
-        // Finding the device name using the deviceId
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const inputDevice = devices.find(device => device.deviceId === deviceId && device.kind === 'audioinput');
-        const deviceName = inputDevice ? inputDevice.label : 'Unknown Device';
-        if (onSuccess) onSuccess(deviceName);
-        audioDeviceManager.currentInputDeviceCallback(deviceName);
-    } catch (error) {
-        console.error('Error changing input device:', error);
-        if (onError) onError(error);
-    }
-},
-async changeAudioOutputDevice(deviceId, onSuccess, onError, resetOutputDeviceOnCallEnd) {
-    console.log(`in changeAudioOutputDevice() of sipjsphone.js`);
-    const audioElement = audioRemote;
-    if (typeof audioElement.sinkId !== 'undefined') {
-        try {
-            await audioElement.setSinkId(deviceId);
-            console.log(`Output device changed to: ${deviceId}`);
-            audioDeviceManager.setResetOutputDeviceFlag(resetOutputDeviceOnCallEnd);
-            // Finding the device name using the deviceId
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const outputDevice = devices.find(device => device.deviceId === deviceId && device.kind === 'audiooutput');
-            const deviceName = outputDevice ? outputDevice.label : 'Unknown Device';
-            if (onSuccess) onSuccess(deviceName);
-            audioDeviceManager.currentOutputDeviceCallback(deviceName);
-        } catch (error) {
-            console.error('Error changing output device:', error);
-            if (onError) onError(error);
-        }
-    } else {
-        const errorMsg = 'Browser does not support output device selection.';
-        console.error(errorMsg);
-        if (onError) onError(errorMsg);
-    }
-}
+	changeAudioInputDevice(deviceId, onSuccess, onError) {
+		audioDeviceManager.changeAudioInputDevice(deviceId, function (stream) {
+			const trackChanged = SIPJSPhone.replaceSenderTrack(stream, deviceId);
+			if (trackChanged) {
+				audioDeviceManager.currentAudioInputDeviceId = deviceId;
+				logger.log(`SIPJSPhone:changeAudioInputDevice Input device changed to: ${deviceId}`);
+
+				onSuccess();
+			} else {
+				logger.error("SIPJSPhone:changeAudioInputDevice failed");
+				onError("something went wrong , try again");
+			}
+		}, onError);
+	},
+	onRemoteAudioOutputDeviceChanged(deviceId) {
+		ringtone.setSinkId(deviceId).catch((e) => {
+			logger.error("sipjsphone:onRemoteAudioOutputDeviceChanged ringtone changedevice failure ", e);
+		});
+	},
+	changeAudioOutputDevice(deviceId, onSuccess, onError) {
+		if (!ctxSip.callActiveID) {
+			audioRemote = document.createElement("audio");
+		}
+		audioDeviceManager.changeAudioOutputDevice(audioRemote, deviceId, function () {
+			SIPJSPhone.onRemoteAudioOutputDeviceChanged(deviceId);
+			onSuccess();
+		}, onError);
+	},
+
+	stopStreamTracks(stream) {
+		try {
+			if (stream) {
+				const tracks = stream.getTracks();
+				tracks.forEach((track) => {
+					track.stop();
+				});
+			}
+		} catch (e) {
+			logger.error("sipjsphone:stopStreamTracks failed to stop tracks");
+		}
+	},
+	replaceSenderTrack(stream, deviceId) {
+		try {
+
+			if (audioDeviceManager.currentAudioInputDeviceId == deviceId) {
+				SIPJSPhone.stopStreamTracks(stream);
+				return false;
+			}
+			if (ctxSip.callActiveID) {
+				ctxSip.Stream = stream;
+				const s = ctxSip.Sessions[ctxSip.callActiveID];
+				const pc = s.sessionDescriptionHandler.peerConnection;
+				if (pc.getSenders) {
+					try {
+						const [audioTrack] = stream.getAudioTracks();
+						const sender = pc.getSenders().find((s) => s.track.kind === audioTrack.kind);
+						sender.track.stop();
+						sender.replaceTrack(audioTrack);
+					} catch (e) {
+						logger.error(`replaceSenderTrack unable to replace track for stream for device id ${deviceId} `, stream);
+					}
+				}
+			} else {
+				SIPJSPhone.stopStreamTracks(stream);
+			}
+			return true;
+		} catch (e) {
+			return false;
+		}
+
+	},
+	registerLogger(customLogger) {
+		logger = customLogger;
+	},
+	audioInputDeviceChangeCallback: null,
+	audioOutputDeviceChangeCallback: null,
+	registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback) {
+		logger.log(`SIPJSPhone:registerAudioDeviceChangeCallback  entry`);
+		SIPJSPhone.audioInputDeviceChangeCallback = audioInputDeviceChangeCallback;
+		SIPJSPhone.audioOutputDeviceChangeCallback = audioOutputDeviceChangeCallback;
+
+	}
 
 };
+
+
+navigator.mediaDevices.addEventListener('devicechange', function (event) {
+	try {
+		if (!ctxSip.callActiveID) {
+			audioRemote = document.createElement("audio");
+		}
+		audioDeviceManager.onAudioDeviceChange(audioRemote,
+			function (stream, deviceId) {
+				const trackChanged = SIPJSPhone.replaceSenderTrack(stream, deviceId);
+				if (trackChanged) {
+					audioDeviceManager.currentAudioInputDeviceId = deviceId;
+					if (SIPJSPhone.audioInputDeviceChangeCallback) {
+						SIPJSPhone.audioInputDeviceChangeCallback(deviceId);
+					}
+				}
+			}, function (deviceId) {
+				SIPJSPhone.onRemoteAudioOutputDeviceChanged(deviceId);
+				audioDeviceManager.currentAudioOutputDeviceId = deviceId;
+				if (SIPJSPhone.audioOutputDeviceChangeCallback) {
+					SIPJSPhone.audioOutputDeviceChangeCallback(deviceId);
+				}
+			});
+	} catch (e) {
+		logger.error("SIPJSPhone:ondevicechange something went wrong during device change", e);
+	}
+});
 
 export default SIPJSPhone;
