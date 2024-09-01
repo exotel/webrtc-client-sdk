@@ -3,12 +3,14 @@
  * 
  */
 
+import coreSDKLogger from './coreSDKLogger';
 import SIPJSPhone from './sipjsphone';
 import webrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 
-
 var phone = null;
 let webrtcSIPEngine = null;
+const logger = coreSDKLogger;
+
 function sendWebRTCEventsToFSM(eventType, sipMethod) {
 	webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM(eventType, sipMethod);
 }
@@ -161,7 +163,7 @@ export const webrtcSIPPhone = {
 		try {
 			return SIPJSPhone.getSpeakerTestTone()
 		} catch (e) {
-			console.log("getSpeakerTestTone: Exception ", e)
+			logger.log("getSpeakerTestTone: Exception ", e)
 		}
 	},
 
@@ -169,7 +171,7 @@ export const webrtcSIPPhone = {
 		try {
 			return SIPJSPhone.getWSSUrl()
 		} catch (e) {
-			console.log("getWSSUrl: Exception ", e)
+			logger.log("getWSSUrl: Exception ", e)
 		}
 	},
 	/* NL Addition - End */
@@ -178,7 +180,7 @@ export const webrtcSIPPhone = {
 		try {
 			return SIPJSPhone.getTransportState();
 		} catch (e) {
-			console.log("getTransportState: Exception ", e);
+			logger.log("getTransportState: Exception ", e);
 			return "unknown";
 		}
 	},
@@ -187,9 +189,26 @@ export const webrtcSIPPhone = {
 		try {
 			return SIPJSPhone.getRegistrationState();
 		} catch (e) {
-			console.log("getTransportState: Exception ", e);
+			logger.log("getTransportState: Exception ", e);
 			return "unknown";
 		}
+	},
+
+	changeAudioInputDevice(deviceId, onSuccess, onError) {
+		logger.log(`webrtcSIPPhone:changeAudioInputDevice  entry`);
+		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
+	},
+
+	changeAudioOutputDevice(deviceId, onSuccess, onError) {
+		logger.log(`webrtcSIPPhone:changeAudioOutputDevice entry`);
+		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
+	},
+	registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback) {
+		logger.log(`webrtcSIPPhone:registerAudioDeviceChangeCallback  entry`);
+		SIPJSPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback);
+	},
+	getLogger() {
+		return coreSDKLogger;
 	}
 
 };

@@ -1,4 +1,7 @@
 Change Log
+## v1.0.12 01 September, 2024
+-[VST-807] Added real-time selection for microphone and speaker devices, and implemented callbacks to notify the application when a device change occurs. also added logger callback
+
 ## v1.0.10 24 March, 2024
 -[VST-609] dtmf duration reduced to 240ms
 
