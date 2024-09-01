@@ -1,6 +1,6 @@
 {
   "name": "@exotel-npm-dev/webrtc-client-sdk",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "client sdk for webrtc based on webrtc core sdk",
   "main": "index.js",
   "scripts": {
