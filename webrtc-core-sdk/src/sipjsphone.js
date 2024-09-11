@@ -38,7 +38,7 @@ var ctxSip = {};
 var registerer = null;
 
 
-const logger = coreSDKLogger;
+let logger = coreSDKLogger;
 logger.log(SIP);
 /* NL Additions - Start */
 
