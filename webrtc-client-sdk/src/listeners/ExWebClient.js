@@ -148,6 +148,7 @@ export function ExDelegationHandler(exClient_) {
     this.onRecieveInvite = function (incomingSession) {
         logger.log("delegationHandler: onRecieveInvite\n");
         exClient.callFromNumber = incomingSession.incomingInviteRequest.message.from.displayName;
+        CallDetails.sipHeaders = incomingSession.incomingInviteRequest.message.headers
         CallDetails.callSid = incomingSession.incomingInviteRequest.message.headers['X-Exotel-Callsid'][0].raw;
     }
 
