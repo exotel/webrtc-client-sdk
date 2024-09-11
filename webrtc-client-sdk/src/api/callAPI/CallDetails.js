@@ -11,50 +11,52 @@ export var CallDetails = {
     callAnswerTime: '',
     callEndReason: '',
     sessionId: '',
+    callSid: '',
+    sipHeaders: {},
 
-    setCallDetails: function (callId,remoteId,remoteDisplayName,callDirection,
-        callState,callDuration, callStartedTime, callEstablishedTime, callEndedTime, callAnswerTime, callEndReason, sessionId) {
-            this.callId = callId;
-            this.remoteId = remoteId;
-            this.remoteDisplayName = remoteDisplayName;
-            this.callDirection = callDirection;
-            this.callState = callState;
-            this.callDuration = callDuration;
-            this.callStartedTime = callStartedTime;
-            this.callEstablishedTime = callEstablishedTime;
-            this.callEndedTime = callEndedTime;
-            this.callAnswerTime = callAnswerTime;
-            this.callEndReason = callEndReason;
-            this.sessionId = sessionId;
-        },
-    getCallId: function(){
+    setCallDetails: function (callId, remoteId, remoteDisplayName, callDirection,
+        callState, callDuration, callStartedTime, callEstablishedTime, callEndedTime, callAnswerTime, callEndReason, sessionId) {
+        this.callId = callId;
+        this.remoteId = remoteId;
+        this.remoteDisplayName = remoteDisplayName;
+        this.callDirection = callDirection;
+        this.callState = callState;
+        this.callDuration = callDuration;
+        this.callStartedTime = callStartedTime;
+        this.callEstablishedTime = callEstablishedTime;
+        this.callEndedTime = callEndedTime;
+        this.callAnswerTime = callAnswerTime;
+        this.callEndReason = callEndReason;
+        this.sessionId = sessionId;
+    },
+    getCallId: function () {
         return this.callId;
     },
-    getRemoteId: function(){
-        return  this.remoteId;
+    getRemoteId: function () {
+        return this.remoteId;
     },
-    getRemoteDisplayName: function() {
+    getRemoteDisplayName: function () {
         return this.remoteDisplayName;
     },
-    getCallDirection: function() {
+    getCallDirection: function () {
         return this.callDirection;
     },
-    getCallDuration: function() {
+    getCallDuration: function () {
         return this.callDuration;
     },
-    getCallEstablishedTime: function() {
+    getCallEstablishedTime: function () {
         return this.callEstablishedTime;
     },
-    getCallStartedTime: function() {
-        return  this.callStartedTime;
+    getCallStartedTime: function () {
+        return this.callStartedTime;
     },
-    getCallEndedTime: function() {
+    getCallEndedTime: function () {
         return this.callEndedTime;
     },
-    getSessionId: function() {
+    getSessionId: function () {
         return this.sessionId;
     },
-    getCallDetails: function(){
+    getCallDetails: function () {
         let callDetailsObj = {
             callId: this.callId,
             remoteId: this.remoteId,
@@ -68,6 +70,8 @@ export var CallDetails = {
             callAnswerTime: this.callAnswerTime,
             callEndReason: this.callEndReason,
             sessionId: this.sessionId,
+            callSid: this.callSid,
+            sipHeaders: this.sipHeaders
         }
         return callDetailsObj;
     }
