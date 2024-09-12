@@ -59,23 +59,6 @@ function fetchPublicIP(sipAccountInfo) {
     return;
 };
 
-function extractRawValues(obj) {
-    const result = {};
-
-    for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            if (Array.isArray(obj[key])) {
-                // Create an array of 'raw' values for the current key
-                result[key] = obj[key].map(item => item.raw);
-            } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-                // Recursively extract raw values from nested objects
-                result[key] = extractRawValues(obj[key]);
-            }
-        }
-    }
-
-    return result;
-};
 
 export function ExDelegationHandler(exClient_) {
     var exClient = exClient_;
@@ -165,8 +148,20 @@ export function ExDelegationHandler(exClient_) {
     this.onRecieveInvite = function (incomingSession) {
         logger.log("delegationHandler: onRecieveInvite\n");
         exClient.callFromNumber = incomingSession.incomingInviteRequest.message.from.displayName;
-        CallDetails.sipHeaders = extractRawValues(incomingSession.incomingInviteRequest.message.headers)
         CallDetails.callSid = incomingSession.incomingInviteRequest.message.headers['X-Exotel-Callsid'][0].raw;
+        CallDetails.callId = incomingSession.incomingInviteRequest.message.headers['Call-ID'][0].raw;
+        const result = {};
+        const obj = incomingSession.incomingInviteRequest.message.headers;
+        for (let key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                if (obj[key].length == 1) {
+                    result[key] = obj[key][0].raw;
+                } else if (obj[key].length > 1) {
+                    result[key] = obj[key].map(item => item.raw);
+                }
+            }
+        }
+        CallDetails.sipHeaders = result;
     }
 
     this.onPickCall = function () {
