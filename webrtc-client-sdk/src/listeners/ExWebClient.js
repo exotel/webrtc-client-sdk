@@ -11,6 +11,7 @@ import { callbacks, registerCallback, sessionCallback } from '../listeners/Callb
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
+import { CallDetails } from "../api/callAPI/CallDetails";
 
 var intervalId;
 var intervalIDMap = new Map();
@@ -147,6 +148,20 @@ export function ExDelegationHandler(exClient_) {
     this.onRecieveInvite = function (incomingSession) {
         logger.log("delegationHandler: onRecieveInvite\n");
         exClient.callFromNumber = incomingSession.incomingInviteRequest.message.from.displayName;
+        CallDetails.callSid = incomingSession.incomingInviteRequest.message.headers['X-Exotel-Callsid'][0].raw;
+        CallDetails.callId = incomingSession.incomingInviteRequest.message.headers['Call-ID'][0].raw;
+        const result = {};
+        const obj = incomingSession.incomingInviteRequest.message.headers;
+        for (let key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                if (obj[key].length == 1) {
+                    result[key] = obj[key][0].raw;
+                } else if (obj[key].length > 1) {
+                    result[key] = obj[key].map(item => item.raw);
+                }
+            }
+        }
+        CallDetails.sipHeaders = result;
     }
 
     this.onPickCall = function () {
