@@ -205,7 +205,7 @@ export class ExotelWebClient {
 
 
     ctrlr = null;
-    call = null;
+    call;
     eventListener = null;
     callListener = null;
     callFromNumber = null;
