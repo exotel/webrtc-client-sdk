@@ -209,6 +209,7 @@ export class ExotelWebClient {
     eventListener = null;
     callListener = null;
     callFromNumber = null;
+    shouldAutoRetry = false;
     /* OLD-Way to be revisited for multile phone support */
     //this.webRTCPhones = {};
 
@@ -249,10 +250,12 @@ export class ExotelWebClient {
     };
 
     DoRegister = () => {
+        this.shouldAutoRetry = true;
         DoRegisterRL(this.sipAccountInfo, this)
     };
 
     UnRegister = () => {
+        this.shouldAutoRetry = false;
         UnRegisterRL(this.sipAccountInfo, this)
     };
 
@@ -336,6 +339,12 @@ export class ExotelWebClient {
              * If registration fails
              */
             this.eventListener.onInitializationFailure(phone);
+            if (this.shouldAutoRetry) {
+                // Set a 500 ms timer before retrying
+                setTimeout(() => {
+                    this.DoRegister();
+                }, 500); 
+            }
         } else if (event === "sent_request") {
             /**
              * If registration request waiting...
@@ -375,6 +384,7 @@ export class ExotelWebClient {
      * @param {*} sipAccountInfo 
      */
     unregister = (sipAccountInfo) => {
+        this.shouldAutoRetry = false;
         // webrtcSIPPhone.unregister(sipAccountInfo)
         webrtcSIPPhone.sipUnRegisterWebRTC();
     };
