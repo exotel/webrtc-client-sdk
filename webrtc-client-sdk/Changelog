@@ -1,5 +1,8 @@
 Change Log
 
+## v1.0.15 21 November, 2024
+-[VST-885] Retry Support for SDK Websocket Connection
+
 ## v1.0.14 12 September, 2024
 -[VST-807] Added call details with callsid and sip headers
 

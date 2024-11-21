@@ -210,6 +210,9 @@ export class ExotelWebClient {
     callListener = null;
     callFromNumber = null;
     shouldAutoRetry = false;
+    unregisterInitiated = false;
+    registrationInProgress = false;
+    isReadyToRegister = true;
     /* OLD-Way to be revisited for multile phone support */
     //this.webRTCPhones = {};
 
@@ -250,12 +253,17 @@ export class ExotelWebClient {
     };
 
     DoRegister = () => {
+        if (!this.isReadyToRegister){
+            logger.log("SDK is not ready to register")
+            return
+        }
+        this.isReadyToRegister = false;
+        this.registrationInProgress = true;
         this.shouldAutoRetry = true;
         DoRegisterRL(this.sipAccountInfo, this)
     };
 
     UnRegister = () => {
-        this.shouldAutoRetry = false;
         UnRegisterRL(this.sipAccountInfo, this)
     };
 
@@ -334,16 +342,22 @@ export class ExotelWebClient {
              * When registration is successful then send the phone number of the same to UI
              */
             this.eventListener.onInitializationSuccess(phone);
+            this.registrationInProgress = false;
+            if (this.unregisterInitiated) {
+                this.unregisterInitiated = false;
+                this.unregister();
+            }
         } else if (event === "failed_to_start" || event === "transport_error") {
             /**
              * If registration fails
              */
             this.eventListener.onInitializationFailure(phone);
+            if (this.unregisterInitiated) {
+                this.shouldAutoRetry = false;
+                this.unregisterInitiated = false;
+            }
             if (this.shouldAutoRetry) {
-                // Set a 500 ms timer before retrying
-                setTimeout(() => {
-                    this.DoRegister();
-                }, 500); 
+                this.DoRegister();
             }
         } else if (event === "sent_request") {
             /**
@@ -384,9 +398,14 @@ export class ExotelWebClient {
      * @param {*} sipAccountInfo 
      */
     unregister = (sipAccountInfo) => {
-        this.shouldAutoRetry = false;
         // webrtcSIPPhone.unregister(sipAccountInfo)
-        webrtcSIPPhone.sipUnRegisterWebRTC();
+        this.shouldAutoRetry = false;
+        this.isReadyToRegister = true;
+        if (this.registrationInProgress) {
+            this.unregisterInitiated = true;
+        } else {
+            webrtcSIPPhone.sipUnRegisterWebRTC();
+        }
     };
 
 
