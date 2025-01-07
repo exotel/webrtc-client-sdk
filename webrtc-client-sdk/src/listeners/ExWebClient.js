@@ -565,6 +565,11 @@ export class ExotelWebClient {
         webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
     }
 
+    setPreferredCodec(codecName) {
+        logger.log(`in setPreferredCodec() of ExWebClient.js`);
+        webrtcSIPPhone.setPreferredCodec(codecName);
+    }
+
     registerLoggerCallback(callback) {
         logger.registerLoggerCallback(callback);
     }
