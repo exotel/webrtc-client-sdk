@@ -400,12 +400,12 @@ function postInit(onInitDoneCallback) {
 const addPreferredCodec = (description) => {
 	logger.log("sipjsphone:addPreferredCodec entry");
     // Ensure a preferred codec is set
-    if (!SIPJSPhone.codecDetails) {
+    if (!SIPJSPhone.preferredCodec) {
         logger.info("sipjsphone:addPreferredCodec: No preferred codec set. Using default.");
         return Promise.resolve(description);
     }
 
-    const { payloadType, rtpMap, fmtp } = SIPJSPhone.codecDetails;
+    const { payloadType, rtpMap, fmtp } = SIPJSPhone.preferredCodec;
     const codecRtpMap = `a=rtpmap:${payloadType} ${rtpMap}`;
     const codecFmtp = fmtp ? `a=fmtp:${payloadType} ${fmtp}` : "";
 
@@ -1205,14 +1205,14 @@ const SIPJSPhone = {
 			opus: { payloadType: 111, rtpMap: "opus/48000/2", fmtp: "minptime=10;useinbandfec=1" },
 		};
 	
-		const codecDetails = codecPayloadTypes[codecName.toLowerCase()];
-		if (!codecDetails) {
+		const preferredCodec = codecPayloadTypes[codecName.toLowerCase()];
+		if (!preferredCodec) {
 			logger.error("sipjsphone:setPreferredCodec: Unsupported codec '${codecName}' specified.");
-			SIPJSPhone.codecDetails = null; // Clear codec details if unsupported
+			SIPJSPhone.preferredCodec = null; // Clear codec details if unsupported
 			return;
 		}
 	
-		SIPJSPhone.codecDetails = codecDetails;
+		SIPJSPhone.preferredCodec = preferredCodec;
 		logger.log("sipjsphone:setPreferredCodec: Preferred codec set to '${codecName}'.");
 	},
 
