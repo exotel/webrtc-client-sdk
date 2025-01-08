@@ -566,7 +566,7 @@ export class ExotelWebClient {
     }
 
     setPreferredCodec(codecName) {
-        logger.log(`in setPreferredCodec() of ExWebClient.js`);
+		logger.log("ExWebClient:setPreferredCodec entry");
         webrtcSIPPhone.setPreferredCodec(codecName);
     }
 

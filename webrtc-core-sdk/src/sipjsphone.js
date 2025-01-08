@@ -400,7 +400,7 @@ function postInit(onInitDoneCallback) {
 const addPreferredCodec = (description) => {
     // Ensure a preferred codec is set
     if (!SIPJSPhone.codecDetails) {
-        logger.error("addPreferredCodec: No preferred codec set. Use setPreferredCodec first.");
+        logger.info("sipjsphone:addPreferredCodec: No preferred codec set. Using default.");
         return Promise.resolve(description);
     }
 
@@ -408,7 +408,7 @@ const addPreferredCodec = (description) => {
     const codecRtpMap = `a=rtpmap:${payloadType} ${rtpMap}`;
     const codecFmtp = fmtp ? `a=fmtp:${payloadType} ${fmtp}` : "";
 
-    logger.log(`addPreferredCodec: Original SDP:`, description.sdp);
+    logger.log(`sipjsphone:addPreferredCodec: Original SDP:`, description.sdp);
 
     // Parse SDP into lines
     let sdpLines = description.sdp.split("\r\n");
@@ -418,7 +418,7 @@ const addPreferredCodec = (description) => {
     const audioMLineIndex = sdpLines.findIndex((line) => line.startsWith("m=audio"));
 
     if (existingOpusIndex !== -1 && audioMLineIndex !== -1) {
-        logger.log("addPreferredCodec: Opus codec already exists. Prioritizing it.");
+        logger.log("sipjsphone:addPreferredCodec: Opus codec already exists. Prioritizing it.");
 
         // Extract and modify the audio m-line
         let audioMLine = sdpLines[audioMLineIndex];
@@ -442,7 +442,7 @@ const addPreferredCodec = (description) => {
         // Update the audio m-line
         sdpLines[audioMLineIndex] = `${mLineStart.join(" ")} ${mLineCodecs.join(" ")}`;
     } else if (audioMLineIndex !== -1) {
-        logger.log("addPreferredCodec: Opus codec not found. Adding it to SDP.");
+        logger.log("sipjsphone:addPreferredCodec: Opus codec not found. Adding it to SDP.");
 
         // Extract and modify the audio m-line
         let audioMLine = sdpLines[audioMLineIndex];
@@ -466,7 +466,7 @@ const addPreferredCodec = (description) => {
             sdpLines.splice(audioMLineIndex + 2, 0, codecFmtp); // Add fmtp after rtpmap
         }
     } else {
-        logger.error("addPreferredCodec: No audio m-line found in SDP. Cannot modify.");
+        logger.error("sipjsphone:addPreferredCodec: No audio m-line found in SDP. Cannot modify.");
         return Promise.resolve(description);
     }
 
@@ -475,7 +475,7 @@ const addPreferredCodec = (description) => {
 
     // Combine back into SDP
     description.sdp = sdpLines.join("\r\n");
-    logger.log(`addPreferredCodec: Modified SDP:`, description.sdp);
+    logger.log(`sipjsphone:addPreferredCodec: Modified SDP:`, description.sdp);
 
     return Promise.resolve(description);
 };
@@ -1205,13 +1205,13 @@ const SIPJSPhone = {
 	
 		const codecDetails = codecPayloadTypes[codecName.toLowerCase()];
 		if (!codecDetails) {
-			logger.error(`sipjsphone:setPreferredCodec: Unsupported codec '${codecName}' specified.`);
+			logger.error("sipjsphone:setPreferredCodec: Unsupported codec '${codecName}' specified.");
 			SIPJSPhone.codecDetails = null; // Clear codec details if unsupported
 			return;
 		}
 	
 		SIPJSPhone.codecDetails = codecDetails;
-		logger.log(`sipjsphone:setPreferredCodec: Preferred codec set to '${codecName}'.`);
+		logger.log("sipjsphone:setPreferredCodec: Preferred codec set to '${codecName}'.");
 	},
 
 	pickPhoneCall: () => {

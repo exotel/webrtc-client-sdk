@@ -205,7 +205,7 @@ export const webrtcSIPPhone = {
 	},
 
 	setPreferredCodec(codecName) {
-		logger.log(`webrtcSIPPhone:setPreferredCodec entry`);
+		logger.log("webrtcSIPPhone:setPreferredCodec entry");
 		SIPJSPhone.setPreferredCodec(codecName);
 	},
 
