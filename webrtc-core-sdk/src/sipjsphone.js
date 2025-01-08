@@ -398,6 +398,7 @@ function postInit(onInitDoneCallback) {
 }
 
 const addPreferredCodec = (description) => {
+	logger.log("sipjsphone:addPreferredCodec entry");
     // Ensure a preferred codec is set
     if (!SIPJSPhone.codecDetails) {
         logger.info("sipjsphone:addPreferredCodec: No preferred codec set. Using default.");
@@ -1199,6 +1200,7 @@ const SIPJSPhone = {
 	},
 
 	setPreferredCodec: (codecName) => {
+		logger.log("sipjsphone:setPreferredCodec entry");
 		const codecPayloadTypes = {
 			opus: { payloadType: 111, rtpMap: "opus/48000/2", fmtp: "minptime=10;useinbandfec=1" },
 		};
