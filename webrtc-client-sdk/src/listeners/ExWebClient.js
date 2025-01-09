@@ -360,7 +360,7 @@ export class ExotelWebClient {
             }
             if (this.shouldAutoRetry) {
                 logger.log("ExWebClient:registerEventCallback Autoretrying");
-                DoRegisterRL(this.sipAccountInfo, this);
+                DoRegisterRL(this.sipAccountInfo, this, 5000);
             }
         } else if (event === "sent_request") {
             /**
