@@ -209,6 +209,10 @@ export class ExotelWebClient {
     eventListener = null;
     callListener = null;
     callFromNumber = null;
+    shouldAutoRetry = false;
+    unregisterInitiated = false;
+    registrationInProgress = false;
+    isReadyToRegister = true;
     /* OLD-Way to be revisited for multile phone support */
     //this.webRTCPhones = {};
 
@@ -249,10 +253,17 @@ export class ExotelWebClient {
     };
 
     DoRegister = () => {
-        DoRegisterRL(this.sipAccountInfo, this)
+        logger.log("ExWebClient:DoRegister Entry")
+        if (!this.isReadyToRegister){
+            logger.warn("ExWebClient:DoRegister SDK is not ready to register");
+            return false;
+        }
+        DoRegisterRL(this.sipAccountInfo, this);
+        return true;
     };
 
     UnRegister = () => {
+        logger.log("ExWebClient:UnRegister Entry")
         UnRegisterRL(this.sipAccountInfo, this)
     };
 
@@ -331,11 +342,26 @@ export class ExotelWebClient {
              * When registration is successful then send the phone number of the same to UI
              */
             this.eventListener.onInitializationSuccess(phone);
+            this.registrationInProgress = false;
+            if (this.unregisterInitiated) {
+                logger.log("ExWebClient:registerEventCallback unregistering due to unregisterInitiated");
+                this.unregisterInitiated = false;
+                this.unregister();
+            }
         } else if (event === "failed_to_start" || event === "transport_error") {
             /**
              * If registration fails
              */
             this.eventListener.onInitializationFailure(phone);
+            if (this.unregisterInitiated) {
+                this.shouldAutoRetry = false;
+                this.unregisterInitiated = false;
+                this.isReadyToRegister = true;
+            }
+            if (this.shouldAutoRetry) {
+                logger.log("ExWebClient:registerEventCallback Autoretrying");
+                DoRegisterRL(this.sipAccountInfo, this);
+            }
         } else if (event === "sent_request") {
             /**
              * If registration request waiting...
@@ -375,8 +401,14 @@ export class ExotelWebClient {
      * @param {*} sipAccountInfo 
      */
     unregister = (sipAccountInfo) => {
-        // webrtcSIPPhone.unregister(sipAccountInfo)
-        webrtcSIPPhone.sipUnRegisterWebRTC();
+        logger.log("ExWebClient:unregister Entry");
+        this.shouldAutoRetry = false;
+        this.unregisterInitiated = true;
+        if (!this.registrationInProgress) {
+            setTimeout(function() {
+                webrtcSIPPhone.sipUnRegisterWebRTC();
+            }, 500);
+        }
     };
 
 
@@ -390,9 +422,11 @@ export class ExotelWebClient {
     initialize = (uiContext, hostName, subscriberName,
         displayName, accountSid, subscriberToken,
         sipAccountInfo) => {
-
         let wssPort = sipAccountInfo.port;
         let wsPort = 4442;
+        this.isReadyToRegister = false;
+        this.registrationInProgress = true;
+        this.shouldAutoRetry = true;
         this.sipAccntInfo = {
             'userName': '',
             'authUser': '',
