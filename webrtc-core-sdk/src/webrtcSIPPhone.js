@@ -203,9 +203,9 @@ export const webrtcSIPPhone = {
 		logger.log(`webrtcSIPPhone:changeAudioOutputDevice entry`);
 		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
 	},
-	registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback) {
+	registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
 		logger.log(`webrtcSIPPhone:registerAudioDeviceChangeCallback  entry`);
-		SIPJSPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback);
+		SIPJSPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
 	},
 	getLogger() {
 		return coreSDKLogger;
