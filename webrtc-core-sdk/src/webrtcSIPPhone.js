@@ -203,12 +203,6 @@ export const webrtcSIPPhone = {
 		logger.log(`webrtcSIPPhone:changeAudioOutputDevice entry`);
 		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
 	},
-
-	setPreferredCodec(codecName) {
-		logger.log("webrtcSIPPhone:setPreferredCodec entry");
-		SIPJSPhone.setPreferredCodec(codecName);
-	},
-
 	registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback) {
 		logger.log(`webrtcSIPPhone:registerAudioDeviceChangeCallback  entry`);
 		SIPJSPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback);

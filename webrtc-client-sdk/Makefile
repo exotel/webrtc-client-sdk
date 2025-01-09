@@ -14,5 +14,3 @@ dep:
 	npm uninstall @exotel-npm-dev/webrtc-core-sdk
 	npm install @exotel-npm-dev/webrtc-core-sdk@latest
 
-publish: build
-	npm publish
