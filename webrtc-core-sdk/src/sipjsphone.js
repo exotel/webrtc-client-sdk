@@ -409,7 +409,7 @@ const addPreferredCodec = (description) => {
     const codecRtpMap = `a=rtpmap:${payloadType} ${rtpMap}`;
     const codecFmtp = fmtp ? `a=fmtp:${payloadType} ${fmtp}` : "";
 
-    logger.log(`sipjsphone:addPreferredCodec: Original SDP:`, description.sdp);
+    logger.log("sipjsphone:addPreferredCodec: Original SDP:", description.sdp);
 
     // Parse SDP into lines
     let sdpLines = description.sdp.split("\r\n");
@@ -476,7 +476,7 @@ const addPreferredCodec = (description) => {
 
     // Combine back into SDP
     description.sdp = sdpLines.join("\r\n");
-    logger.log(`sipjsphone:addPreferredCodec: Modified SDP:`, description.sdp);
+    logger.log("sipjsphone:addPreferredCodec: Modified SDP:", description.sdp);
 
     return Promise.resolve(description);
 };
@@ -1207,13 +1207,13 @@ const SIPJSPhone = {
 	
 		const preferredCodec = codecPayloadTypes[codecName.toLowerCase()];
 		if (!preferredCodec) {
-			logger.error("sipjsphone:setPreferredCodec: Unsupported codec '${codecName}' specified.");
+			logger.error("sipjsphone:setPreferredCodec: Unsupported code" + codecName + "specified.");
 			SIPJSPhone.preferredCodec = null; // Clear codec details if unsupported
 			return;
 		}
 	
 		SIPJSPhone.preferredCodec = preferredCodec;
-		logger.log("sipjsphone:setPreferredCodec: Preferred codec set to '${codecName}'.");
+		logger.log("sipjsphone:setPreferredCodec: Preferred codec set to " + codecName);
 	},
 
 	pickPhoneCall: () => {
