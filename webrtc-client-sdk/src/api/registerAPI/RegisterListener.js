@@ -7,7 +7,7 @@ var logger = webrtcSIPPhone.getLogger();
  * @param {*} sipAccountInfo 
  * @param {*} exWebClient 
  */
-export function DoRegister(sipAccountInfo, exWebClient) {
+export function DoRegister(sipAccountInfo, exWebClient, delay = 500) {
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
@@ -16,15 +16,14 @@ export function DoRegister(sipAccountInfo, exWebClient) {
      * CHANGE IS REQUIRED - in the initialize function provision is to be given to pass Callback functions as arguments
      */
     try {
-        setTimeout(function() {
+        setTimeout(function () {
             exWebClient.initialize(userContext,
                 sipAccountInfo.domain, //hostname
                 sipAccountInfo.userName, //subscriberName
                 sipAccountInfo.displayname,//displayName
                 sipAccountInfo.accountSid,//accountSid
                 '', sipAccountInfo); // subscriberToken        
-        }, 500);
-        
+        }, delay);
     } catch (e) {
         logger.log("Register failed ", e)
     }
