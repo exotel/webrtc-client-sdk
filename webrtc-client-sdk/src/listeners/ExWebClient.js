@@ -254,7 +254,7 @@ export class ExotelWebClient {
 
     DoRegister = () => {
         logger.log("ExWebClient:DoRegister Entry")
-        if (!this.isReadyToRegister){
+        if (!this.isReadyToRegister) {
             logger.warn("ExWebClient:DoRegister SDK is not ready to register");
             return false;
         }
@@ -405,7 +405,7 @@ export class ExotelWebClient {
         this.shouldAutoRetry = false;
         this.unregisterInitiated = true;
         if (!this.registrationInProgress) {
-            setTimeout(function() {
+            setTimeout(function () {
                 webrtcSIPPhone.sipUnRegisterWebRTC();
             }, 500);
         }
@@ -563,6 +563,11 @@ export class ExotelWebClient {
     changeAudioOutputDevice(deviceId, onSuccess, onError) {
         logger.log(`in changeAudioOutputDevice() of ExWebClient.js`);
         webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
+    }
+
+    setPreferredCodec(codecName) {
+        logger.log("ExWebClient:setPreferredCodec entry");
+        webrtcSIPPhone.setPreferredCodec(codecName);
     }
 
     registerLoggerCallback(callback) {
