@@ -397,6 +397,90 @@ function postInit(onInitDoneCallback) {
 	onInitDoneCallback();
 }
 
+const addPreferredCodec = (description) => {
+	logger.log("sipjsphone:addPreferredCodec entry");
+	// Ensure a preferred codec is set
+	if (!SIPJSPhone.preferredCodec) {
+		logger.info("sipjsphone:addPreferredCodec: No preferred codec set. Using default.");
+		return Promise.resolve(description);
+	}
+
+	const { payloadType, rtpMap, fmtp } = SIPJSPhone.preferredCodec;
+	const codecRtpMap = `a=rtpmap:${payloadType} ${rtpMap}`;
+	const codecFmtp = fmtp ? `a=fmtp:${payloadType} ${fmtp}` : "";
+
+	logger.log("sipjsphone:addPreferredCodec: Original SDP:", description.sdp);
+
+	// Parse SDP into lines
+	let sdpLines = description.sdp.split("\r\n");
+
+	// Check if Opus is already in the SDP
+	const existingOpusIndex = sdpLines.findIndex((line) => line.includes(`a=rtpmap`) && line.includes("opus/48000/2"));
+	const audioMLineIndex = sdpLines.findIndex((line) => line.startsWith("m=audio"));
+
+	if (existingOpusIndex !== -1 && audioMLineIndex !== -1) {
+		logger.log("sipjsphone:addPreferredCodec: Opus codec already exists. Prioritizing it.");
+
+		// Extract and modify the audio m-line
+		let audioMLine = sdpLines[audioMLineIndex];
+		audioMLine = audioMLine.replace("RTP/SAVP", "RTP/AVP");
+
+		const codecs = audioMLine.split(" ");
+		const mLineStart = codecs.slice(0, 3); // "m=audio <port> <protocol>"
+		const mLineCodecs = codecs.slice(3);
+
+		// Move existing Opus payload type to the top
+		const opusPayloadType = sdpLines[existingOpusIndex].match(/a=rtpmap:(\d+)/)[1];
+		const opusIndex = mLineCodecs.indexOf(opusPayloadType);
+
+		if (opusIndex !== -1) {
+			// Remove Opus from its current position
+			mLineCodecs.splice(opusIndex, 1);
+		}
+		// Add Opus to the beginning of the codec list
+		mLineCodecs.unshift(opusPayloadType);
+
+		// Update the audio m-line
+		sdpLines[audioMLineIndex] = `${mLineStart.join(" ")} ${mLineCodecs.join(" ")}`;
+	} else if (audioMLineIndex !== -1) {
+		logger.log("sipjsphone:addPreferredCodec: Opus codec not found. Adding it to SDP.");
+
+		// Extract and modify the audio m-line
+		let audioMLine = sdpLines[audioMLineIndex];
+		audioMLine = audioMLine.replace("RTP/SAVP", "RTP/AVP");
+
+		const codecs = audioMLine.split(" ");
+		const mLineStart = codecs.slice(0, 3); // "m=audio <port> <protocol>"
+		const mLineCodecs = codecs.slice(3);
+
+		// Add Opus payload type to the top
+		mLineCodecs.unshift(payloadType.toString());
+
+		// Update the audio m-line
+		sdpLines[audioMLineIndex] = `${mLineStart.join(" ")} ${mLineCodecs.join(" ")}`;
+
+		// Add Opus-specific attributes to the SDP
+		if (!sdpLines.includes(codecRtpMap)) {
+			sdpLines.splice(audioMLineIndex + 1, 0, codecRtpMap); // Add rtpmap after m=audio
+		}
+		if (fmtp && !sdpLines.includes(codecFmtp)) {
+			sdpLines.splice(audioMLineIndex + 2, 0, codecFmtp); // Add fmtp after rtpmap
+		}
+	} else {
+		logger.error("sipjsphone:addPreferredCodec: No audio m-line found in SDP. Cannot modify.");
+		return Promise.resolve(description);
+	}
+
+	// Remove any duplicate lines
+	sdpLines = [...new Set(sdpLines)];
+
+	// Combine back into SDP
+	description.sdp = sdpLines.join("\r\n");
+	logger.log("sipjsphone:addPreferredCodec: Modified SDP:", description.sdp);
+
+	return Promise.resolve(description);
+};
+
 function sipRegister() {
 
 	lastRegistererState = "";
@@ -1115,6 +1199,23 @@ const SIPJSPhone = {
 		return bMicEnable;
 	},
 
+	setPreferredCodec: (codecName) => {
+		logger.log("sipjsphone:setPreferredCodec entry");
+		const codecPayloadTypes = {
+			opus: { payloadType: 111, rtpMap: "opus/48000/2", fmtp: "minptime=10;useinbandfec=1" },
+		};
+
+		const preferredCodec = codecPayloadTypes[codecName.toLowerCase()];
+		if (!preferredCodec) {
+			logger.error("sipjsphone:setPreferredCodec: Unsupported code" + codecName + "specified.");
+			SIPJSPhone.preferredCodec = null; // Clear codec details if unsupported
+			return;
+		}
+
+		SIPJSPhone.preferredCodec = preferredCodec;
+		logger.log("sipjsphone:setPreferredCodec: Preferred codec set to " + codecName);
+	},
+
 	pickPhoneCall: () => {
 		var newSess = ctxSip.Sessions[ctxSip.callActiveID];
 		logger.log("pickphonecall ", ctxSip.callActiveID);
@@ -1123,13 +1224,16 @@ const SIPJSPhone = {
 				newSess.accept({
 					sessionDescriptionHandlerOptions: {
 						constraints: { audio: { deviceId: audioDeviceManager.currentAudioInputDeviceId }, video: false }
-					}
+					},
+					sessionDescriptionHandlerModifiers: [addPreferredCodec]
 				}).catch((e) => {
 					onUserSessionAcceptFailed(e);
 				});
 			} else {
 
-				newSess.accept().catch((e) => {
+				newSess.accept({
+					sessionDescriptionHandlerModifiers: [addPreferredCodec]
+				}).catch((e) => {
 					onUserSessionAcceptFailed(e);
 				});
 			}
