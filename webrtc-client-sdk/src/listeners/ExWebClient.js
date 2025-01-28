@@ -147,11 +147,18 @@ export function ExDelegationHandler(exClient_) {
 
     this.onRecieveInvite = function (incomingSession) {
         logger.log("delegationHandler: onRecieveInvite\n");
-        exClient.callFromNumber = incomingSession.incomingInviteRequest.message.from.displayName;
-        CallDetails.callSid = incomingSession.incomingInviteRequest.message.headers['X-Exotel-Callsid'][0].raw;
-        CallDetails.callId = incomingSession.incomingInviteRequest.message.headers['Call-ID'][0].raw;
-        const result = {};
         const obj = incomingSession.incomingInviteRequest.message.headers;
+        exClient.callFromNumber = incomingSession.incomingInviteRequest.message.from.displayName;
+        if (obj.hasOwnProperty("X-Exotel-Callsid")) {
+            CallDetails.callSid = obj['X-Exotel-Callsid'][0].raw;
+        }
+        if (obj.hasOwnProperty("Call-ID")) {
+            CallDetails.callId = obj['Call-ID'][0].raw;
+        }
+        if (obj.hasOwnProperty("LegSid")) {
+            CallDetails.legSid = obj['LegSid'][0].raw;
+        }
+        const result = {};
         for (let key in obj) {
             if (obj.hasOwnProperty(key)) {
                 if (obj[key].length == 1) {
