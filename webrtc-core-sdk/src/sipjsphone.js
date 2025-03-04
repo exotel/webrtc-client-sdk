@@ -278,7 +278,7 @@ function postInit(onInitDoneCallback) {
 			} else if (s.reject) {
 				s.reject({
 					statusCode: 486,
-					reasonPhrase: "Agent Busy"
+					reasonPhrase: "Busy"
 				});
 			} else if (s.cancel) {
 				s.cancel();
@@ -621,7 +621,7 @@ function registerPhoneEventListeners() {
 		} else {
 			incomingSession.reject({
 				statusCode: 480,
-				reasonPhrase: "Unknown - 4001"
+				reasonPhrase: "4001"
 			});
 		}
 	};
