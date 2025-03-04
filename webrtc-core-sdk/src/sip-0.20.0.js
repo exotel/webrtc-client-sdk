@@ -915,9 +915,8 @@ class Invitation extends _session__WEBPACK_IMPORTED_MODULE_0__.Session {
      * for all errors, there are a handful of common exceptions we pay some extra attention to.
      * @param error - The error which occurred.
      */
-    handleResponseError(error) {
+    andleResponseError(error) {
         let statusCode = 480; // "Temporarily Unavailable"
-        let reasonPhrase = "Temporarily Unavailable"; // Default for 480
         // Log Error message
         if (error instanceof Error) {
             this.logger.error(error.message);
@@ -931,7 +930,6 @@ class Invitation extends _session__WEBPACK_IMPORTED_MODULE_0__.Session {
         if (error instanceof _exceptions__WEBPACK_IMPORTED_MODULE_7__.ContentTypeUnsupportedError) {
             this.logger.error("A session description handler occurred while sending response (content type unsupported");
             statusCode = 415; // "Unsupported Media Type"
-            reasonPhrase = "Unsupported Media Type";
         }
         else if (error instanceof _exceptions__WEBPACK_IMPORTED_MODULE_8__.SessionDescriptionHandlerError) {
             this.logger.error("A session description handler occurred while sending response");
@@ -942,14 +940,10 @@ class Invitation extends _session__WEBPACK_IMPORTED_MODULE_0__.Session {
         else if (error instanceof _core__WEBPACK_IMPORTED_MODULE_10__.TransactionStateError) {
             this.logger.error("Session changed state before response could be formulated and sent");
         }
-        else if (error instanceof DOMException && error.name === "NotAllowedError") {
-            reasonPhrase = "Media Permission Denied";
-            this.logger.error("Microphone permission denied. Rejecting with 480 Media Permission Denied");
-        }        
         // Reject if still in "initial" or "establishing" state.
         if (this.state === _session_state__WEBPACK_IMPORTED_MODULE_1__.SessionState.Initial || this.state === _session_state__WEBPACK_IMPORTED_MODULE_1__.SessionState.Establishing) {
             try {
-                this.incomingInviteRequest.reject({ statusCode: statusCode,reasonPhrase: reasonPhrase });
+                this.incomingInviteRequest.reject({ statusCode });
                 this.stateTransition(_session_state__WEBPACK_IMPORTED_MODULE_1__.SessionState.Terminated);
             }
             catch (e) {
