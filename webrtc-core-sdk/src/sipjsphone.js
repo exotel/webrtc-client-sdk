@@ -621,7 +621,7 @@ function registerPhoneEventListeners() {
 		} else {
 			incomingSession.reject({
 				statusCode: 480,
-				reasonPhrase: "Unknown"
+				reasonPhrase: "Unknown - 4001"
 			});
 		}
 	};
@@ -1221,37 +1221,25 @@ const SIPJSPhone = {
 		logger.log("sipjsphone:setPreferredCodec: Preferred codec set to " + codecName);
 	},
 
-	pickPhoneCall: async () => {
+	pickPhoneCall: () => {
 		var newSess = ctxSip.Sessions[ctxSip.callActiveID];
 		logger.log("pickphonecall ", ctxSip.callActiveID);
 		if (newSess) {
-			try {
-				// Check microphone permission
-				const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-				stream.getTracks().forEach(track => track.stop()); // Release media resources
-	
-				// Proceed with accepting the call
-				if (audioDeviceManager.currentAudioInputDeviceId !== "default") {
-					newSess.accept({
-						sessionDescriptionHandlerOptions: {
-							constraints: { audio: { deviceId: audioDeviceManager.currentAudioInputDeviceId }, video: false }
-						},
-						sessionDescriptionHandlerModifiers: [addPreferredCodec]
-					}).catch((e) => {
-						onUserSessionAcceptFailed(e);
-					});
-				} else {
-					newSess.accept({
-						sessionDescriptionHandlerModifiers: [addPreferredCodec]
-					}).catch((e) => {
-						onUserSessionAcceptFailed(e);
-					});
-				}
-			} catch (error) {
-				logger.log("Microphone permission denied, rejecting call...");
-				newSess.reject({
-					statusCode: 480,
-					reasonPhrase: "Media Permission Denied"
+			if (audioDeviceManager.currentAudioInputDeviceId != "default") {
+				newSess.accept({
+					sessionDescriptionHandlerOptions: {
+						constraints: { audio: { deviceId: audioDeviceManager.currentAudioInputDeviceId }, video: false }
+					},
+					sessionDescriptionHandlerModifiers: [addPreferredCodec]
+				}).catch((e) => {
+					onUserSessionAcceptFailed(e);
+				});
+			} else {
+
+				newSess.accept({
+					sessionDescriptionHandlerModifiers: [addPreferredCodec]
+				}).catch((e) => {
+					onUserSessionAcceptFailed(e);
 				});
 			}
 		}
