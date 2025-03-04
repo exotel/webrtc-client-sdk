@@ -915,7 +915,7 @@ class Invitation extends _session__WEBPACK_IMPORTED_MODULE_0__.Session {
      * for all errors, there are a handful of common exceptions we pay some extra attention to.
      * @param error - The error which occurred.
      */
-    andleResponseError(error) {
+    handleResponseError(error) {
         let statusCode = 480; // "Temporarily Unavailable"
         // Log Error message
         if (error instanceof Error) {
