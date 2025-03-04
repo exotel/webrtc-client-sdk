@@ -276,8 +276,10 @@ function postInit(onInitDoneCallback) {
 			} else if (s.state == SIP.SessionState.Established) {
 				s.bye();
 			} else if (s.reject) {
-				s.reject();
-
+				s.reject({
+					statusCode: 486,
+					reasonPhrase: "Agent Busy"
+				});
 			} else if (s.cancel) {
 				s.cancel();
 			}
@@ -617,7 +619,10 @@ function registerPhoneEventListeners() {
 			webrtcSIPPhoneEventDelegate.onRecieveInvite(incomingSession);
 			webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL");
 		} else {
-			incomingSession.reject();
+			incomingSession.reject({
+				statusCode: 480,
+				reasonPhrase: "Unknown"
+			});
 		}
 	};
 
@@ -1216,25 +1221,37 @@ const SIPJSPhone = {
 		logger.log("sipjsphone:setPreferredCodec: Preferred codec set to " + codecName);
 	},
 
-	pickPhoneCall: () => {
+	pickPhoneCall: async () => {
 		var newSess = ctxSip.Sessions[ctxSip.callActiveID];
 		logger.log("pickphonecall ", ctxSip.callActiveID);
 		if (newSess) {
-			if (audioDeviceManager.currentAudioInputDeviceId != "default") {
-				newSess.accept({
-					sessionDescriptionHandlerOptions: {
-						constraints: { audio: { deviceId: audioDeviceManager.currentAudioInputDeviceId }, video: false }
-					},
-					sessionDescriptionHandlerModifiers: [addPreferredCodec]
-				}).catch((e) => {
-					onUserSessionAcceptFailed(e);
-				});
-			} else {
-
-				newSess.accept({
-					sessionDescriptionHandlerModifiers: [addPreferredCodec]
-				}).catch((e) => {
-					onUserSessionAcceptFailed(e);
+			try {
+				// Check microphone permission
+				const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+				stream.getTracks().forEach(track => track.stop()); // Release media resources
+	
+				// Proceed with accepting the call
+				if (audioDeviceManager.currentAudioInputDeviceId !== "default") {
+					newSess.accept({
+						sessionDescriptionHandlerOptions: {
+							constraints: { audio: { deviceId: audioDeviceManager.currentAudioInputDeviceId }, video: false }
+						},
+						sessionDescriptionHandlerModifiers: [addPreferredCodec]
+					}).catch((e) => {
+						onUserSessionAcceptFailed(e);
+					});
+				} else {
+					newSess.accept({
+						sessionDescriptionHandlerModifiers: [addPreferredCodec]
+					}).catch((e) => {
+						onUserSessionAcceptFailed(e);
+					});
+				}
+			} catch (error) {
+				logger.log("Microphone permission denied, rejecting call...");
+				newSess.reject({
+					statusCode: 480,
+					reasonPhrase: "Media Permission Denied"
 				});
 			}
 		}
