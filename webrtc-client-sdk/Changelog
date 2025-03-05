@@ -1,5 +1,8 @@
 Change Log
 
+## v1.0.21 05 March, 2025
+-[VST-954] Added custom sip codes and reason phrase for when agent are disconnecting and sdk is disconnecting call
+
 ## v1.0.20 28 January, 2025
 -[VST-940] Added checks for X-Exotel-Callsid, Call-ID, and LegSid headers in onRecieveInvite.
 

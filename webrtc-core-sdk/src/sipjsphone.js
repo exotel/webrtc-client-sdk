@@ -276,8 +276,10 @@ function postInit(onInitDoneCallback) {
 			} else if (s.state == SIP.SessionState.Established) {
 				s.bye();
 			} else if (s.reject) {
-				s.reject();
-
+				s.reject({
+					statusCode: 486,
+					reasonPhrase: "Busy"
+				});
 			} else if (s.cancel) {
 				s.cancel();
 			}
@@ -617,7 +619,10 @@ function registerPhoneEventListeners() {
 			webrtcSIPPhoneEventDelegate.onRecieveInvite(incomingSession);
 			webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL");
 		} else {
-			incomingSession.reject();
+			incomingSession.reject({
+				statusCode: 480,
+				reasonPhrase: "4001"
+			});
 		}
 	};
 
