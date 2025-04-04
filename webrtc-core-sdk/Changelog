@@ -1,7 +1,7 @@
 Change Log
 
 ## v1.0.19 04 April, 2025
--[VST-973] API Get/Download WebSDK SDK logs
+-[VST-973] logs refactoring mute functionality enhancements
 
 ## v1.0.18 05 March, 2025
 -[VST-954] Added custom sip codes and reason phrase for when agent are disconnecting and sdk is disconnecting call
