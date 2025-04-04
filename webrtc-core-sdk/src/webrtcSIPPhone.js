@@ -12,6 +12,7 @@ let webrtcSIPEngine = null;
 const logger = coreSDKLogger;
 
 function sendWebRTCEventsToFSM(eventType, sipMethod) {
+	logger.log("webrtcSIPPhone: sendWebRTCEventsToFSM entry with args: ",eventType,sipMethod);
 	webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM(eventType, sipMethod);
 }
 
@@ -21,6 +22,7 @@ export const webrtcSIPPhone = {
 
 
 	isConnected: () => {
+		logger.log("webrtcSIPPhone: isConnected entry");
 		var status = phone.getStatus();
 		if (status != "offline") {
 			return true;
@@ -30,10 +32,12 @@ export const webrtcSIPPhone = {
 	},
 
 	sendDTMFWebRTC: (dtmfValue) => {
+		logger.log("webrtcSIPPhone: sendDTMFWebRTC entry with arg: ",dtmfValue);
 		phone.sipSendDTMF(dtmfValue);
 	},
 
 	registerWebRTCClient: (sipAccountInfo, handler) => {
+		logger.log("webrtcSIPPhone: registerWebRTCClient entry with args: ",sipAccountInfo,handler);
 		sipAccountInfoData = sipAccountInfo;
 		phone.init(() => {
 			phone.loadCredentials(sipAccountInfo);
@@ -52,76 +56,92 @@ export const webrtcSIPPhone = {
 
 
 	configureWebRTCClientDevice: (handler) => {
+		logger.log("webrtcSIPPhone: configureWebRTCClientDevice entry with arg: ",handler);
 		phone.registerCallBacks(handler);
 	},
 
 	setAuthenticatorServerURL(serverURL) {
+		logger.log("webrtcSIPPhone: setAuthenticatorServerURL entry with arg: ",serverURL);
 		// Nothing to do here
 	},
 
 	toggleSipRegister: () => {
+		logger.log("webrtcSIPPhone: toggleSipRegister entry");
 		phone.resetRegisterAttempts();
 		phone.sipToggleRegister();
 	},
 
 	webRTCMuteUnmute: (isMuted) => {
+		logger.log("webrtcSIPPhone: webRTCMuteUnmute entry with arg: ",isMuted);
 		phone.sipToggleMic();
 	},
 
 	getMuteStatus: () => {
+		logger.log("webrtcSIPPhone: getMuteStatus entry");
 		return phone.getMicMuteStatus();
 	},
 
 	muteAction: (bMute) => {
+		logger.log("webrtcSIPPhone: muteAction entry with arg: ",bMute);
 		phone.sipMute(bMute);
 	},
 
 	holdAction: (bHold) => {
+		logger.log("webrtcSIPPhone: holdAction entry with arg: ",bHold);
 		phone.sipHold(bHold);
 	},
 
 	holdCall: () => {
+		logger.log("webrtcSIPPhone: holdCall entry");
 		phone.holdCall();
 	},
 
 	pickCall: () => {
+		logger.log("webrtcSIPPhone: pickCall entry");
 		phone.pickPhoneCall();
 
 		webrtcSIPPhoneEventDelegate.onPickCall();
 	},
 
 	rejectCall: () => {
+		logger.log("webrtcSIPPhone: rejectCall entry");
 		phone.sipHangUp();
 
 		webrtcSIPPhoneEventDelegate.onRejectCall();
 	},
 
 	reRegisterWebRTCPhone: () => {
+		logger.log("webrtcSIPPhone: reRegisterWebRTCPhone entry");
 		phone.reRegister();
 	},
 
 
 	playBeepTone: () => {
+		logger.log("webrtcSIPPhone: playBeepTone entry");
 		phone.playBeep();
 
 	},
 
 	sipUnRegisterWebRTC: () => {
+		logger.log("webrtcSIPPhone: sipUnRegisterWebRTC entry");
 		phone.sipUnRegister();
 	},
 
 	startWSNetworkTest: () => {
+		logger.log("webrtcSIPPhone: startWSNetworkTest entry");
 		this.testingMode = true;
 		phone.sipRegister();
 	},
 
 	stopWSNetworkTest: () => {
+		logger.log("webrtcSIPPhone stopWSNetworkTest entry");
 		phone.sipUnRegister();
 	},
 
 
 
 	registerPhone: (engine, delegate) => {
+		logger.log("webrtcSIPPhone: registerPhone entry with args: ",engine,delegate);
 		webrtcSIPEngine = engine;
 		switch (engine) {
 			case "sipjs":
@@ -137,29 +157,35 @@ export const webrtcSIPPhone = {
 	},
 
 	getWebRTCStatus: () => {
+		logger.log("webrtcSIPPhone: getWebRTCStatus entry");
 		var status = phone.getStatus();
 		return status;
 	},
 
 	disconnect: () => {
+		logger.log("webrtcSIPPhone: disconnect entry");
 		if (phone) {
 			phone.disconnect();
 		}
 	},
 
 	connect: () => {
+		logger.log("webrtcSIPPhone: connect entry");
 		phone.connect();
 	},
 
 	getSIPAccountInfo() {
+		logger.log("webrtcSIPPhone: getSIPAccountInfo entry");
 		return sipAccountInfoData;
 	},
 	getWebRTCSIPEngine() {
+		logger.log("webrtcSIPPhone: getWebRTCSIPEngine entry");
 		return webrtcSIPEngine;
 	},
 
 	/* NL Addition - Start */
 	getSpeakerTestTone() {
+		logger.log("webrtcSIPPhone: getSpeakerTestTone entry");
 		try {
 			return SIPJSPhone.getSpeakerTestTone()
 		} catch (e) {
@@ -168,6 +194,7 @@ export const webrtcSIPPhone = {
 	},
 
 	getWSSUrl() {
+		logger.log("webrtcSIPPhone: getWSSUrl entry");
 		try {
 			return SIPJSPhone.getWSSUrl()
 		} catch (e) {
@@ -177,6 +204,7 @@ export const webrtcSIPPhone = {
 	/* NL Addition - End */
 
 	getTransportState() {
+		logger.log("webrtcSIPPhone: getTransportState entry");
 		try {
 			return SIPJSPhone.getTransportState();
 		} catch (e) {
@@ -186,6 +214,7 @@ export const webrtcSIPPhone = {
 	},
 
 	getRegistrationState() {
+		logger.log("webrtcSIPPhone: getRegistrationState entry");
 		try {
 			return SIPJSPhone.getRegistrationState();
 		} catch (e) {
@@ -195,23 +224,24 @@ export const webrtcSIPPhone = {
 	},
 
 	changeAudioInputDevice(deviceId, onSuccess, onError) {
-		logger.log(`webrtcSIPPhone:changeAudioInputDevice  entry`);
+		logger.log("webrtcSIPPhone: changeAudioInputDevice entry with args: ", deviceId, onSuccess, onError);
 		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
 	},
 
 	changeAudioOutputDevice(deviceId, onSuccess, onError) {
-		logger.log(`webrtcSIPPhone:changeAudioOutputDevice entry`);
+		logger.log("webrtcSIPPhone: changeAudioOutputDevice entry with args: ", deviceId, onSuccess, onError);
 		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
 	},
 	setPreferredCodec(codecName) {
-		logger.log("webrtcSIPPhone:setPreferredCodec entry");
+		logger.log("webrtcSIPPhone: setPreferredCodec entry with arg: ", codecName);
 		SIPJSPhone.setPreferredCodec(codecName);
 	},
 	registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
-		logger.log(`webrtcSIPPhone:registerAudioDeviceChangeCallback  entry`);
+		logger.log("webrtcSIPPhone: registerAudioDeviceChangeCallback entry with args: ", audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
 		SIPJSPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
 	},
 	getLogger() {
+		logger.log("webrtcSIPPhone: getLogger entry");
 		return coreSDKLogger;
 	}
 

@@ -12,6 +12,7 @@ import { webrtcTroubleshooterEventBus } from "./Callback";
 
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
 import { CallDetails } from "../api/callAPI/CallDetails";
+import LogManager from '../logManager.js';
 
 var intervalId;
 var intervalIDMap = new Map();
@@ -224,6 +225,18 @@ export class ExotelWebClient {
     //this.webRTCPhones = {};
 
     sipAccountInfo = null;
+    clientSDKLoggerCallback = null;
+
+    constructor() {
+        logger.registerLoggerCallback(function (type, message, args) {
+
+            LogManager.onLog(type, message, args);
+            if (this.clientSDKLoggerCallback)
+                this.clientSDKLoggerCallback("log", arg1, args);
+    
+        });
+      }
+    
 
     initWebrtc = (sipAccountInfo_,
         RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
@@ -572,13 +585,22 @@ export class ExotelWebClient {
         webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
     }
 
+	downloadLogs() {
+        logger.log(`in downloadLogs() of ExWebClient.js`);
+        LogManager.downloadLogs();
+    }
+	clearLogs() {
+        logger.log(`in clearLogs() of ExWebClient.js`);
+        LogManager.clearLogs();
+    }
+
     setPreferredCodec(codecName) {
         logger.log("ExWebClient:setPreferredCodec entry");
         webrtcSIPPhone.setPreferredCodec(codecName);
     }
 
     registerLoggerCallback(callback) {
-        logger.registerLoggerCallback(callback);
+        this.clientSDKLoggerCallback = callback;
     }
 
     registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
