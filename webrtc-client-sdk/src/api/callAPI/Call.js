@@ -24,27 +24,34 @@ export function Call() {
         /**
          * When agent clicks on mute
          */
-        logger.log('mute toggle clicked')
-        let dummyFlag = null;
-        webrtcSIPPhone.webRTCMuteUnmute(null);
+        logger.log('Call: MuteToggle');
+        webrtcSIPPhone.webRTCMuteUnmute();
     }
 
     this.Mute = function () {
         /**
          * When agent clicks on mute
          */
-        logger.log('mute clicked')
-        let dummyFlag = true;
-        webrtcSIPPhone.webRTCMuteUnmute(dummyFlag);
+        var isMicEnabled = webrtcSIPPhone.getMuteStatus();
+        logger.log('Call: Mute: isMicEnabled: ', isMicEnabled);
+        if (isMicEnabled) {
+            webrtcSIPPhone.muteAction(true);
+        } else {
+            logger.log('Call: Mute:  Already muted');
+        }
     }
-
+    
     this.UnMute = function () {
         /**
          * When agent clicks on mute
          */
-        logger.log('unmute clicked')
-        let dummyFlag = false;
-        webrtcSIPPhone.webRTCMuteUnmute(dummyFlag);
+        var isMicEnabled = webrtcSIPPhone.getMuteStatus();
+        logger.log('Call: UnMute: isMicEnabled: ', isMicEnabled);
+        if (isMicEnabled) {
+            logger.log('Call: Unmute: Already unmuted');
+        } else {
+            webrtcSIPPhone.muteAction(false);
+        }
     }
 
     this.HoldToggle = function () {

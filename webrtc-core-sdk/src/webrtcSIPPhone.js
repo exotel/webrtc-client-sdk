@@ -12,7 +12,7 @@ let webrtcSIPEngine = null;
 const logger = coreSDKLogger;
 
 function sendWebRTCEventsToFSM(eventType, sipMethod) {
-	logger.log("webrtcSIPPhone: sendWebRTCEventsToFSM entry with args: ",eventType,sipMethod);
+	logger.log("webrtcSIPPhone: sendWebRTCEventsToFSM : ",eventType,sipMethod);
 	webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM(eventType, sipMethod);
 }
 
@@ -32,12 +32,12 @@ export const webrtcSIPPhone = {
 	},
 
 	sendDTMFWebRTC: (dtmfValue) => {
-		logger.log("webrtcSIPPhone: sendDTMFWebRTC entry with arg: ",dtmfValue);
+		logger.log("webrtcSIPPhone: sendDTMFWebRTC : ",dtmfValue);
 		phone.sipSendDTMF(dtmfValue);
 	},
 
 	registerWebRTCClient: (sipAccountInfo, handler) => {
-		logger.log("webrtcSIPPhone: registerWebRTCClient entry with args: ",sipAccountInfo,handler);
+		logger.log("webrtcSIPPhone: registerWebRTCClient : ",sipAccountInfo,handler);
 		sipAccountInfoData = sipAccountInfo;
 		phone.init(() => {
 			phone.loadCredentials(sipAccountInfo);
@@ -56,12 +56,12 @@ export const webrtcSIPPhone = {
 
 
 	configureWebRTCClientDevice: (handler) => {
-		logger.log("webrtcSIPPhone: configureWebRTCClientDevice entry with arg: ",handler);
+		logger.log("webrtcSIPPhone: configureWebRTCClientDevice : ",handler);
 		phone.registerCallBacks(handler);
 	},
 
 	setAuthenticatorServerURL(serverURL) {
-		logger.log("webrtcSIPPhone: setAuthenticatorServerURL entry with arg: ",serverURL);
+		logger.log("webrtcSIPPhone: setAuthenticatorServerURL : ",serverURL);
 		// Nothing to do here
 	},
 
@@ -71,8 +71,8 @@ export const webrtcSIPPhone = {
 		phone.sipToggleRegister();
 	},
 
-	webRTCMuteUnmute: (isMuted) => {
-		logger.log("webrtcSIPPhone: webRTCMuteUnmute entry with arg: ",isMuted);
+	webRTCMuteUnmute: () => {
+		logger.log("webrtcSIPPhone: webRTCMuteUnmute");
 		phone.sipToggleMic();
 	},
 
@@ -82,12 +82,12 @@ export const webrtcSIPPhone = {
 	},
 
 	muteAction: (bMute) => {
-		logger.log("webrtcSIPPhone: muteAction entry with arg: ",bMute);
+		logger.log("webrtcSIPPhone: muteAction: ",bMute);
 		phone.sipMute(bMute);
 	},
 
 	holdAction: (bHold) => {
-		logger.log("webrtcSIPPhone: holdAction entry with arg: ",bHold);
+		logger.log("webrtcSIPPhone: holdAction: ",bHold);
 		phone.sipHold(bHold);
 	},
 
@@ -141,7 +141,7 @@ export const webrtcSIPPhone = {
 
 
 	registerPhone: (engine, delegate) => {
-		logger.log("webrtcSIPPhone: registerPhone entry with args: ",engine,delegate);
+		logger.log("webrtcSIPPhone: registerPhone : ",engine);
 		webrtcSIPEngine = engine;
 		switch (engine) {
 			case "sipjs":
@@ -224,24 +224,23 @@ export const webrtcSIPPhone = {
 	},
 
 	changeAudioInputDevice(deviceId, onSuccess, onError) {
-		logger.log("webrtcSIPPhone: changeAudioInputDevice entry with args: ", deviceId, onSuccess, onError);
+		logger.log("webrtcSIPPhone: changeAudioInputDevice : ", deviceId, onSuccess, onError);
 		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
 	},
 
 	changeAudioOutputDevice(deviceId, onSuccess, onError) {
-		logger.log("webrtcSIPPhone: changeAudioOutputDevice entry with args: ", deviceId, onSuccess, onError);
+		logger.log("webrtcSIPPhone: changeAudioOutputDevice : ", deviceId, onSuccess, onError);
 		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
 	},
 	setPreferredCodec(codecName) {
-		logger.log("webrtcSIPPhone: setPreferredCodec entry with arg: ", codecName);
+		logger.log("webrtcSIPPhone: setPreferredCodec : ", codecName);
 		SIPJSPhone.setPreferredCodec(codecName);
 	},
 	registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
-		logger.log("webrtcSIPPhone: registerAudioDeviceChangeCallback entry with args: ", audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
+		logger.log("webrtcSIPPhone: registerAudioDeviceChangeCallback entry");
 		SIPJSPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
 	},
 	getLogger() {
-		logger.log("webrtcSIPPhone: getLogger entry");
 		return coreSDKLogger;
 	}
 

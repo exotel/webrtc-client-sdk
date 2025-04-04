@@ -19,7 +19,12 @@ const LogManager = {
     return JSON.parse(localStorage.getItem(LOG_STORAGE_KEY)) || [];
   },
 
-  downloadLogs(filename = 'webrtc_sdk_logs.txt') {
+  downloadLogs(filename) {
+    if (!filename) {
+        const now = new Date();
+        const formattedDate = now.toISOString().split('T')[0]; // Gets YYYY-MM-DD
+        filename = `webrtc_sdk_logs_${formattedDate}.txt`;
+    }
     const blob = new Blob([LogManager.getLogs().join('\n')], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
 
@@ -30,9 +35,6 @@ const LogManager = {
     URL.revokeObjectURL(url);
   },
 
-  clear() {
-    localStorage.removeItem(LOG_STORAGE_KEY);
-  }
 };
 
 export default LogManager;
