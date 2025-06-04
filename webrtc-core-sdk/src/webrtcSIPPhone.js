@@ -1,250 +1,168 @@
-/**
- * Communication from Webrtc flows and feature handling for web RTC as WebRTC Phone Interface
- * 
- */
+import coreSDKLogger from "./coreSDKLogger";
+import { SipJsPhone } from "./sipjsphone";                    // class export
+import {
+  createAudioDeviceManager,
+  audioDeviceManager as legacyADM
+} from "./audioDeviceManager";
+import webrtcSIPPhoneEventDelegate from "./webrtcSIPPhoneEventDelegate";
 
-import coreSDKLogger from './coreSDKLogger';
-import SIPJSPhone from './sipjsphone';
-import webrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
-
-var phone = null;
-let webrtcSIPEngine = null;
 const logger = coreSDKLogger;
 
-function sendWebRTCEventsToFSM(eventType, sipMethod) {
-	logger.log("webrtcSIPPhone: sendWebRTCEventsToFSM : ",eventType,sipMethod);
-	webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM(eventType, sipMethod);
+/* ── internal registry: key = "user@domain" → phone instance ── */
+const phoneRegistry = new Map();
+
+/* always keep a reference to the *last* phone for back-compat helpers */
+let   currentPhone         = null;
+let   currentSIPAccount    = null;   // the sipAccountInfo that owns currentPhone
+let   webrtcSIPEngine      = null;   // "sipjs" etc.
+
+/* helper to build unique key */
+function accountKey(info) {
+  const domain = info.domain || info.host || info.hostNameWithPort || "";
+  return `${info.userName}@${domain}`;
 }
 
-let sipAccountInfoData = {};
+/* helper to send FSM events */
+function sendWebRTCEventsToFSM(eventType, sipMethod) {
+  logger.log("webrtcSIPPhone: sendWebRTCEventsToFSM :", eventType, sipMethod);
+  webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM(eventType, sipMethod);
+}
 
+/* ────────────────────────────────────────────────────────────── */
+/*                 P U B L I C   A P I   O B J E C T             */
+/* ────────────────────────────────────────────────────────────── */
 export const webrtcSIPPhone = {
+  /* -------- registration / connection ---------------------- */
+  registerWebRTCClient(sipAccountInfo, handler = {}) {
+    logger.log("webrtcSIPPhone: registerWebRTCClient :", sipAccountInfo);
 
+    const key = accountKey(sipAccountInfo);
+    if (phoneRegistry.has(key)) {
+      logger.warn(`webrtcSIPPhone: duplicate init blocked for ${key}`);
+      handler.onFailure?.("duplicateInit");      // new error reason
+      return;
+    }
 
-	isConnected: () => {
-		logger.log("webrtcSIPPhone: isConnected entry");
-		var status = phone.getStatus();
-		if (status != "offline") {
-			return true;
-		} else {
-			return false;
-		}
-	},
+    /* create per-account AudioDeviceManager */
+    const adm   = createAudioDeviceManager();
+    const phone = new SipJsPhone({
+      callbacks         : handler,
+      audioDeviceManager: adm
+    });
 
-	sendDTMFWebRTC: (dtmfValue) => {
-		logger.log("webrtcSIPPhone: sendDTMFWebRTC : ",dtmfValue);
-		phone.sipSendDTMF(dtmfValue);
-	},
+    /* start initialisation */
+    phone.init(() => {
+      phone.loadCredentials(sipAccountInfo);
 
-	registerWebRTCClient: (sipAccountInfo, handler) => {
-		logger.log("webrtcSIPPhone: registerWebRTCClient : ",sipAccountInfo,handler);
-		sipAccountInfoData = sipAccountInfo;
-		phone.init(() => {
-			phone.loadCredentials(sipAccountInfo);
-			if (webrtcSIPPhone.getWebRTCStatus() == "offline") {
-				if (handler != null)
-					if (handler.onFailure)
-						handler.onFailure();
-			} else {
-				if (handler != null)
-					if (handler.onResponse)
-						handler.onResponse();
-			}
-		});
+      /* report success/failure just like before */
+      if (webrtcSIPPhone.getWebRTCStatus(phone) === "offline") {
+        handler.onFailure?.();
+      } else {
+        handler.onResponse?.();
+      }
+    });
 
-	},
+    /* store in registry & set as current */
+    phoneRegistry.set(key, phone);
+    currentPhone      = phone;
+    currentSIPAccount = sipAccountInfo;
+  },
 
+  configureWebRTCClientDevice(handler) {
+    logger.log("webrtcSIPPhone: configureWebRTCClientDevice :", handler);
+    currentPhone?.registerCallBacks(handler);
+  },
 
-	configureWebRTCClientDevice: (handler) => {
-		logger.log("webrtcSIPPhone: configureWebRTCClientDevice : ",handler);
-		phone.registerCallBacks(handler);
-	},
+  /* -------- engine plumbing (kept for legacy) --------------- */
+  registerPhone(engine = "sipjs", delegate) {
+    logger.log("webrtcSIPPhone: registerPhone :", engine);
+    webrtcSIPEngine = engine;
+    if (delegate) webrtcSIPPhoneEventDelegate.registerDelegate(delegate);
+    webrtcSIPPhoneEventDelegate.onRegisterWebRTCSIPEngine(engine);
+  },
 
-	setAuthenticatorServerURL(serverURL) {
-		logger.log("webrtcSIPPhone: setAuthenticatorServerURL : ",serverURL);
-		// Nothing to do here
-	},
+  /* -------- connection helpers ------------------------------ */
+  isConnected()          { return this.getWebRTCStatus() !== "offline"; },
+  toggleSipRegister()    { currentPhone?.sipToggleRegister(); },
+  connect()              { currentPhone?.connect(); },
+  disconnect()           { currentPhone?.disconnect(); },
+  reRegisterWebRTCPhone(){ currentPhone?.reRegister(); },
 
-	toggleSipRegister: () => {
-		logger.log("webrtcSIPPhone: toggleSipRegister entry");
-		phone.resetRegisterAttempts();
-		phone.sipToggleRegister();
-	},
+  /* -------- audio & call control ---------------------------- */
+  webRTCMuteUnmute() { currentPhone?.sipToggleMic(); },
+  muteAction(b)      { currentPhone?.sipMute(b); },
+  getMuteStatus()    { return currentPhone?.getMicMuteStatus(); },
+  holdAction(b)      { currentPhone?.sipHold(b); },
+  holdCall()         { currentPhone?.holdCall(); },
+  pickCall() {
+    currentPhone?.pickPhoneCall();
+    webrtcSIPPhoneEventDelegate.onPickCall();
+  },
+  rejectCall() {
+    currentPhone?.sipHangUp();
+    webrtcSIPPhoneEventDelegate.onRejectCall();
+  },
+  sendDTMFWebRTC(d) { currentPhone?.sipSendDTMF(d); },
+  playBeepTone()    { currentPhone?.playBeep(); },
 
-	webRTCMuteUnmute: () => {
-		logger.log("webrtcSIPPhone: webRTCMuteUnmute");
-		phone.sipToggleMic();
-	},
+  /* -------- codec & device APIs ----------------------------- */
+  setPreferredCodec(c) {
+    logger.log("webrtcSIPPhone: setPreferredCodec :", c);
+    currentPhone?.setPreferredCodec(c);
+  },
+  changeAudioInputDevice(id, ok, err)  {
+    currentPhone?.changeAudioInputDevice(id, ok, err);
+  },
+  changeAudioOutputDevice(id, ok, err) {
+    currentPhone?.changeAudioOutputDevice(id, ok, err);
+  },
+  registerAudioDeviceChangeCallback(inCb, outCb, onCb){
+    currentPhone?.registerAudioDeviceChangeCallback(inCb, outCb, onCb);
+  },
 
-	getMuteStatus: () => {
-		logger.log("webrtcSIPPhone: getMuteStatus entry");
-		return phone.getMicMuteStatus();
-	},
+  /* -------- diagnostics helpers ----------------------------- */
+  getSpeakerTestTone()   { return currentPhone?.getSpeakerTestTone(); },
+  getWSSUrl()            { return currentPhone?.getWSSUrl(); },
+  getTransportState()    { return currentPhone?.getTransportState() ?? "unknown"; },
+  getRegistrationState() { return currentPhone?.getRegistrationState() ?? "unknown"; },
 
-	muteAction: (bMute) => {
-		logger.log("webrtcSIPPhone: muteAction: ",bMute);
-		phone.sipMute(bMute);
-	},
+  /* -------- status & meta ----------------------------------- */
+  getWebRTCStatus(phone = currentPhone) {
+    logger.log("webrtcSIPPhone: getWebRTCStatus entry");
+    return phone?.getStatus() ?? "offline";
+  },
+  getSIPAccountInfo()   { return currentSIPAccount; },
+  getWebRTCSIPEngine()  { return webrtcSIPEngine; },
+  getLogger()           { return coreSDKLogger; },
 
-	holdAction: (bHold) => {
-		logger.log("webrtcSIPPhone: holdAction: ",bHold);
-		phone.sipHold(bHold);
-	},
+  /* -------- registry helpers (new) -------------------------- */
+  /**
+   * Returns the phone instance for a given user@domain key
+   * or `null` if not registered.
+   */
+  getPhoneByAccount(userAtDomain) {
+    return phoneRegistry.get(userAtDomain) ?? null;
+  },
 
-	holdCall: () => {
-		logger.log("webrtcSIPPhone: holdCall entry");
-		phone.holdCall();
-	},
+  /**
+   * Lists all active registrations as an array of keys "user@domain".
+   */
+  listActiveAccounts()   { return Array.from(phoneRegistry.keys()); },
 
-	pickCall: () => {
-		logger.log("webrtcSIPPhone: pickCall entry");
-		phone.pickPhoneCall();
-
-		webrtcSIPPhoneEventDelegate.onPickCall();
-	},
-
-	rejectCall: () => {
-		logger.log("webrtcSIPPhone: rejectCall entry");
-		phone.sipHangUp();
-
-		webrtcSIPPhoneEventDelegate.onRejectCall();
-	},
-
-	reRegisterWebRTCPhone: () => {
-		logger.log("webrtcSIPPhone: reRegisterWebRTCPhone entry");
-		phone.reRegister();
-	},
-
-
-	playBeepTone: () => {
-		logger.log("webrtcSIPPhone: playBeepTone entry");
-		phone.playBeep();
-
-	},
-
-	sipUnRegisterWebRTC: () => {
-		logger.log("webrtcSIPPhone: sipUnRegisterWebRTC entry");
-		phone.sipUnRegister();
-	},
-
-	startWSNetworkTest: () => {
-		logger.log("webrtcSIPPhone: startWSNetworkTest entry");
-		this.testingMode = true;
-		phone.sipRegister();
-	},
-
-	stopWSNetworkTest: () => {
-		logger.log("webrtcSIPPhone stopWSNetworkTest entry");
-		phone.sipUnRegister();
-	},
-
-
-
-	registerPhone: (engine, delegate) => {
-		logger.log("webrtcSIPPhone: registerPhone : ",engine);
-		webrtcSIPEngine = engine;
-		switch (engine) {
-			case "sipjs":
-				phone = SIPJSPhone;
-				break;
-			default:
-				break;
-		}
-		webrtcSIPPhoneEventDelegate.registerDelegate(delegate);
-		webrtcSIPPhoneEventDelegate.onRegisterWebRTCSIPEngine(engine);
-
-
-	},
-
-	getWebRTCStatus: () => {
-		logger.log("webrtcSIPPhone: getWebRTCStatus entry");
-		var status = phone.getStatus();
-		return status;
-	},
-
-	disconnect: () => {
-		logger.log("webrtcSIPPhone: disconnect entry");
-		if (phone) {
-			phone.disconnect();
-		}
-	},
-
-	connect: () => {
-		logger.log("webrtcSIPPhone: connect entry");
-		phone.connect();
-	},
-
-	getSIPAccountInfo() {
-		logger.log("webrtcSIPPhone: getSIPAccountInfo entry");
-		return sipAccountInfoData;
-	},
-	getWebRTCSIPEngine() {
-		logger.log("webrtcSIPPhone: getWebRTCSIPEngine entry");
-		return webrtcSIPEngine;
-	},
-
-	/* NL Addition - Start */
-	getSpeakerTestTone() {
-		logger.log("webrtcSIPPhone: getSpeakerTestTone entry");
-		try {
-			return SIPJSPhone.getSpeakerTestTone()
-		} catch (e) {
-			logger.log("getSpeakerTestTone: Exception ", e)
-		}
-	},
-
-	getWSSUrl() {
-		logger.log("webrtcSIPPhone: getWSSUrl entry");
-		try {
-			return SIPJSPhone.getWSSUrl()
-		} catch (e) {
-			logger.log("getWSSUrl: Exception ", e)
-		}
-	},
-	/* NL Addition - End */
-
-	getTransportState() {
-		logger.log("webrtcSIPPhone: getTransportState entry");
-		try {
-			return SIPJSPhone.getTransportState();
-		} catch (e) {
-			logger.log("getTransportState: Exception ", e);
-			return "unknown";
-		}
-	},
-
-	getRegistrationState() {
-		logger.log("webrtcSIPPhone: getRegistrationState entry");
-		try {
-			return SIPJSPhone.getRegistrationState();
-		} catch (e) {
-			logger.log("getTransportState: Exception ", e);
-			return "unknown";
-		}
-	},
-
-	changeAudioInputDevice(deviceId, onSuccess, onError) {
-		logger.log("webrtcSIPPhone: changeAudioInputDevice : ", deviceId, onSuccess, onError);
-		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
-	},
-
-	changeAudioOutputDevice(deviceId, onSuccess, onError) {
-		logger.log("webrtcSIPPhone: changeAudioOutputDevice : ", deviceId, onSuccess, onError);
-		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
-	},
-	setPreferredCodec(codecName) {
-		logger.log("webrtcSIPPhone: setPreferredCodec : ", codecName);
-		SIPJSPhone.setPreferredCodec(codecName);
-	},
-	registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
-		logger.log("webrtcSIPPhone: registerAudioDeviceChangeCallback entry");
-		SIPJSPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
-	},
-	getLogger() {
-		return coreSDKLogger;
-	}
-
+  /**
+   * Unregister & remove a specific account (used by UI logout flows)
+   */
+  unRegisterAccount(userAtDomain) {
+    const ph = phoneRegistry.get(userAtDomain);
+    if (ph) {
+      ph.sipUnRegister();
+      phoneRegistry.delete(userAtDomain);
+      if (currentPhone === ph) {
+        currentPhone      = null;
+        currentSIPAccount = null;
+      }
+    }
+  }
 };
-
 
 export default webrtcSIPPhone;

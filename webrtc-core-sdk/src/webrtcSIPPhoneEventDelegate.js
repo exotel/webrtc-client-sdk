@@ -1,177 +1,120 @@
-/*
- * delegate listener , webrtc sip phone could invoke events to delegate and it will further send event to registered delegator
- */
 let testingMode = false;
-let delegate = null;
+const delegates = new Set();
 
+/* small helper so we don’t repeat the loop everywhere */
+const forEach = fn => delegates.forEach(d => fn(d));
 
 const webrtcSIPPhoneEventDelegate = {
-		
-	registerDelegate : (webrtcDelegate) => {
-		delegate = webrtcDelegate;
-	},
+  /* ─ Register / unregister ───────────────────────────────────── */
+  registerDelegate (d) { if (d) delegates.add(d); },
+  unregisterDelegate(d) { delegates.delete(d); },
 
-	setTestingMode : (mode) => {
-		if(delegate) {
-			delegate.setTestingMode(mode);
-		}
-	}, 	
-		
-	onCallStatSipJsSessionEvent : (ev) => {
-		if(delegate) {
-			delegate.onCallStatSipJsSessionEvent(ev);
-		}
-	},
-	
-	sendWebRTCEventsToFSM : (eventType, sipMethod) => {
-		if(delegate) {
-			delegate.sendWebRTCEventsToFSM(eventType, sipMethod);
-		}
-	},
-	
-	playBeepTone : () => {
-		if(delegate) {
-			delegate.playBeepTone();
-		}
-	},
-	
-	onStatPeerConnectionIceGatheringStateChange: (iceGatheringState) => {
-		if(delegate) {
-			delegate.onStatPeerConnectionIceGatheringStateChange(iceGatheringState);
-		}
-	},
-	
-	onCallStatIceCandidate: (ev, icestate) => {
-		if(delegate) {
-			delegate.onCallStatIceCandidate(ev,icestate);
-		}
-	},
-	
-	
-	onCallStatNegoNeeded: (icestate) => {
-		if(delegate) {
-			delegate.onCallStatNegoNeeded(icestate);
-		}
-	},
+  /* ─ Testing flag ────────────────────────────────────────────── */
+  setTestingMode(mode){
+    testingMode = !!mode;
+    forEach(d => d.setTestingMode?.(testingMode));
+  },
 
-	onCallStatSignalingStateChange: (cstate) => {
-		if(delegate) {
-			delegate.onCallStatSignalingStateChange(cstate);
-		}
-	},
+  /* ─ Generic event fan-outs ──────────────────────────────────── */
+  onCallStatSipJsSessionEvent(ev){
+    forEach(d => d.onCallStatSipJsSessionEvent?.(ev));
+  },
 
-	
-	onStatPeerConnectionIceConnectionStateChange: () => {
-		if(delegate) {
-			delegate.onStatPeerConnectionIceConnectionStateChange();
-		}
-	},
-	
-	
-	onStatPeerConnectionConnectionStateChange: () => {
-		if(delegate) {
-			delegate.onStatPeerConnectionConnectionStateChange();
-		}
-	},
-	
-	onGetUserMediaSuccessCallstatCallback: () => {
-		if(delegate) {
-			delegate.onGetUserMediaSuccessCallstatCallback();
-		}
-	},
+  sendWebRTCEventsToFSM(eventType, sipMethod){
+    forEach(d => d.sendWebRTCEventsToFSM?.(eventType, sipMethod));
+  },
 
-	onGetUserMediaErrorCallstatCallback: () => {
-		if(delegate) {
-			delegate.onGetUserMediaErrorCallstatCallback();
-		}
-	},
-	
-	
-	onCallStatAddStream: () => {
-		if(delegate) {
-			delegate.onCallStatAddStream();
-		}
-	},
+  playBeepTone(){
+    forEach(d => d.playBeepTone?.());
+  },
 
-	onCallStatRemoveStream: () => {
-		if(delegate) {
-			delegate.onCallStatRemoveStream();
-		}
-	},
-	
-	setWebRTCFSMMapper : () => {
-		if(delegate) {
-			delegate.setWebRTCFSMMapper();
-		}
-	},
-	
-	onCallStatSipJsTransportEvent : () => {
-		if(delegate) {
-			delegate.onCallStatSipJsTransportEvent();
-		}
-	},
-	
-	onCallStatSipSendCallback: (tsipData, sipStack) => {
-		if(delegate) {
-			delegate.onCallStatSipSendCallback();
-		}
-	},
+  onStatPeerConnectionIceGatheringStateChange(state){
+    forEach(d => d.onStatPeerConnectionIceGatheringStateChange?.(state));
+  },
 
-	onCallStatSipRecvCallback: (tsipData, sipStack) => {
-		if(delegate) {
-			delegate.onCallStatSipRecvCallback();
-		}
-	},
+  onCallStatIceCandidate(ev, iceState){
+    forEach(d => d.onCallStatIceCandidate?.(ev, iceState));
+  },
 
-	stopCallStat: () => {
-		if(delegate) {
-			delegate.stopCallStat();
-		}
-	},
-	
-	onRecieveInvite: (incomingSession) => {
-		if(delegate) {
-			delegate.onRecieveInvite(incomingSession);
-		}
-	},
-	
-	onPickCall: () => {
-		if(delegate) {
-			delegate.onPickCall();
-		}
-	},
+  onCallStatNegoNeeded(state){
+    forEach(d => d.onCallStatNegoNeeded?.(state));
+  },
 
-	onRejectCall : () => {
-		if(delegate) {
-			delegate.onRejectCall();
-		}
-	},
-	
-	onCreaterAnswer: () => {
-		if(delegate) {
-			delegate.onCreaterAnswer();
-		}
-	},
+  onCallStatSignalingStateChange(state){
+    forEach(d => d.onCallStatSignalingStateChange?.(state));
+  },
 
-	onSettingLocalDesc: () => {
-		if(delegate) {
-			delegate.onSettingLocalDesc();
-		}
-	},
+  onStatPeerConnectionIceConnectionStateChange(){
+    forEach(d => d.onStatPeerConnectionIceConnectionStateChange?.());
+  },
 
-	initGetStats: (pc, callid, username) => {
-		if(delegate) {
-			delegate.initGetStats(pc, callid, username);
-		}
-	},
-	
-	onRegisterWebRTCSIPEngine : (engine) => {
-		if(delegate) {
-			delegate.onRegisterWebRTCSIPEngine(engine);
-		}
-	}
-	
-	
-}
+  onStatPeerConnectionConnectionStateChange(){
+    forEach(d => d.onStatPeerConnectionConnectionStateChange?.());
+  },
+
+  onGetUserMediaSuccessCallstatCallback(){
+    forEach(d => d.onGetUserMediaSuccessCallstatCallback?.());
+  },
+
+  onGetUserMediaErrorCallstatCallback(){
+    forEach(d => d.onGetUserMediaErrorCallstatCallback?.());
+  },
+
+  onCallStatAddStream(){
+    forEach(d => d.onCallStatAddStream?.());
+  },
+
+  onCallStatRemoveStream(){
+    forEach(d => d.onCallStatRemoveStream?.());
+  },
+
+  setWebRTCFSMMapper(stack){
+    forEach(d => d.setWebRTCFSMMapper?.(stack));
+  },
+
+  onCallStatSipJsTransportEvent(ev){
+    forEach(d => d.onCallStatSipJsTransportEvent?.(ev));
+  },
+
+  onCallStatSipSendCallback(tsipData, sipStack){
+    forEach(d => d.onCallStatSipSendCallback?.(tsipData, sipStack));
+  },
+
+  onCallStatSipRecvCallback(tsipData, sipStack){
+    forEach(d => d.onCallStatSipRecvCallback?.(tsipData, sipStack));
+  },
+
+  stopCallStat(){
+    forEach(d => d.stopCallStat?.());
+  },
+
+  onRecieveInvite(incomingSession){
+    forEach(d => d.onRecieveInvite?.(incomingSession));
+  },
+
+  onPickCall(){
+    forEach(d => d.onPickCall?.());
+  },
+
+  onRejectCall(){
+    forEach(d => d.onRejectCall?.());
+  },
+
+  onCreaterAnswer(){
+    forEach(d => d.onCreaterAnswer?.());
+  },
+
+  onSettingLocalDesc(){
+    forEach(d => d.onSettingLocalDesc?.());
+  },
+
+  initGetStats(pc, callid, username){
+    forEach(d => d.initGetStats?.(pc, callid, username));
+  },
+
+  onRegisterWebRTCSIPEngine(engine){
+    forEach(d => d.onRegisterWebRTCSIPEngine?.(engine));
+  }
+};
 
 export default webrtcSIPPhoneEventDelegate;
