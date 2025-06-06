@@ -21,6 +21,7 @@ import { callbacks,
          registerCallback,
          sessionCallback }              from "./Callback";
 import { webrtcTroubleshooterEventBus } from "./Callback";
+import { createCallbackBundle }        from "./Callback"; 
 
 import { webrtcSIPPhone }               from "@exotel-npm-dev/webrtc-core-sdk";
 import { CallDetails }                  from "../api/callAPI/CallDetails";
@@ -62,38 +63,51 @@ function fetchPublicIP(sipAccountInfo) {
   });
 }
 
-/* ── delegation + sync handlers (unchanged behaviour) ─────────── */
+/* ───────────────── FULL DELEGATE (no-ops removed) ─────────── */
 export function ExDelegationHandler(exClient) {
-  this.onCallStatSipJsSessionEvent = (ev) => logger.log("delegate ses-ev", ev);
-
-  this.sendWebRTCEventsToFSM = (eventType, sipMethod) => {
-    if (sipMethod === "CONNECTION") {
+  /* helper that routes every event to the SDK’s finite-state-machine
+     – ‘CONNECTION’ events go to registerEventCallback
+     – ‘CALL’       events go to callEventCallback                     */
+  this.sendWebRTCEventsToFSM = (eventType, scope /* "CONNECTION" | "CALL" */) => {
+    if (scope === "CONNECTION") {
       exClient.registerEventCallback(eventType, exClient.userName);
-    } else if (sipMethod === "CALL") {
-      exClient.callEventCallback(
-        eventType,
-        exClient.callFromNumber,
-        exClient.call
-      );
+    } else {
+      exClient.callEventCallback(eventType,
+                                 exClient.callFromNumber,
+                                 exClient.call);
     }
   };
 
-  /* the rest are kept as no-op loggers … */
-  this.onRecieveInvite = (incoming) => {
-    const hdr = incoming.incomingInviteRequest.message.headers;
-    exClient.callFromNumber = incoming.incomingInviteRequest.message.from.displayName;
-    if (hdr["X-Exotel-Callsid"]) CallDetails.callSid = hdr["X-Exotel-Callsid"][0].raw;
-    if (hdr["Call-ID"])          CallDetails.callId  = hdr["Call-ID"][0].raw;
-    if (hdr["LegSid"])           CallDetails.legSid  = hdr["LegSid"][0].raw;
-    const flat = {};
-    Object.keys(hdr).forEach(k => {
-      flat[k] = hdr[k].length === 1 ? hdr[k][0].raw
-                                    : hdr[k].map(i => i.raw);
-    });
-    CallDetails.sipHeaders = flat;
+  /* ----------  CONNECTION-level life-cycle ------------------ */
+  this.onStart           = () => this.sendWebRTCEventsToFSM("starting",         "CONNECTION");
+  this.onConnected       = () => this.sendWebRTCEventsToFSM("connected",        "CONNECTION");
+  this.onFailedToStart   = () => this.sendWebRTCEventsToFSM("failed_to_start",  "CONNECTION");
+  this.onTransportError  = () => this.sendWebRTCEventsToFSM("transport_error",  "CONNECTION");
+  this.onDisconnected    = () => this.sendWebRTCEventsToFSM("disconnected",     "CONNECTION");
+
+  this.onIncomingCall = (session /* SIP.Invitation */) => {
+    /* expose the session so demo.js can wrap it with Answer / Hangup … */
+    exClient.call = session;
+    this.onRecieveInvite(session);               // reuse header extraction
+    this.sendWebRTCEventsToFSM("i_new_call", "CALL");
   };
 
-  /* ... (all other delegate methods kept unchanged but trimmed here for brevity) */
+  this.onRinging       = (session) => { exClient.call = session;
+                                        this.sendWebRTCEventsToFSM("ringing", "CALL"); };
+  this.onAccepted      = (session) => { exClient.call = session;
+                                        this.sendWebRTCEventsToFSM("connected", "CALL"); };
+  this.onTerminated    = ()            => { this.sendWebRTCEventsToFSM("terminated","CALL");
+                                            exClient.call = null; };
+
+  /* ----------  Media helpers (optional for the UI) ---------- */
+  this.onHold          = () => this.sendWebRTCEventsToFSM("hold",   "CALL");
+  this.onUnHold        = () => this.sendWebRTCEventsToFSM("unhold", "CALL");
+  this.onMute          = () => this.sendWebRTCEventsToFSM("mute",   "CALL");
+  this.onUnMute        = () => this.sendWebRTCEventsToFSM("unmute", "CALL");
+
+  /* ----------  SIP-JS session event logger ------------------ */
+  this.onCallStatSipJsSessionEvent = (ev) =>
+    webrtcSIPPhone.getLogger().log("delegate ses-ev", ev);
 }
 
 export function ExSynchronousHandler() {
@@ -106,6 +120,9 @@ export function ExSynchronousHandler() {
  * ─────────────────────────────────────────────────────────────── */
 export class ExotelWebClient {
   /* instance fields (each ExotelWebClient handles ONE account) */
+
+  #cb = createCallbackBundle(); 
+
   ctrlr            = null;
   call             = null;
   eventListener    = null;
@@ -123,7 +140,6 @@ export class ExotelWebClient {
   clientSDKLoggerCallback = null;
 
   constructor() {
-    /* pipe core logger into LogManager */
     logger.registerLoggerCallback((type, msg, args) => {
       LogManager.onLog(type, msg, args);
       this.clientSDKLoggerCallback?.("log", msg, args);
@@ -153,9 +169,9 @@ export class ExotelWebClient {
     this.sipAccountInfo.sipUri =
       `wss://${sipAccountInfo_.userName}@${sipAccountInfo_.sipdomain}:${sipAccountInfo_.port}`;
 
-    callbacks.initializeCallback(CallListenerCallback);
-    registerCallback.initializeRegisterCallback(RegisterEventCallBack);
-    sessionCallback.initializeSessionCallback(SessionCallback);
+    this.#cb.callbacks.initializeCallback       (CallListenerCallback);
+    this.#cb.registerCallback.initializeRegisterCallback(RegisterEventCallBack);
+    this.#cb.sessionCallback.initializeSessionCallback  (SessionCallback);
     this.setEventListener(this.eventListener);
     return true;
   };
@@ -210,12 +226,14 @@ export class ExotelWebClient {
     if (event === "connected") {
       this.eventListener.onInitializationSuccess(phone);
       this.registrationInProgress = false;
+      this.#cb.registerCallback.fire(event, phone);
       if (this.unregisterInitiated) {
         this.unregisterInitiated = false;
         this.UnRegister();
       }
     } else if (event === "failed_to_start" || event === "transport_error") {
       this.eventListener.onInitializationFailure(phone);
+      this.#cb.registerCallback.fire(event, phone);
       if (this.unregisterInitiated) {
         this.shouldAutoRetry       = false;
         this.unregisterInitiated   = false;
@@ -227,11 +245,13 @@ export class ExotelWebClient {
       }
     } else if (event === "sent_request") {
       this.eventListener.onInitializationWaiting(phone);
+      this.#cb.registerCallback.fire(event, phone);
     }
   };
 
   callEventCallback = (event, phone, param) => {
     logger.log("callEventCallback", event, phone);
+    this.#cb.callbacks.fire(event, phone, param);
     if (event === "i_new_call")        this.callListener.onIncomingCall(param, phone);
     else if (event === "connected")    this.callListener.onCallEstablished(param, phone);
     else if (event === "terminated")   this.callListener.onCallEnded(param, phone);
@@ -239,6 +259,7 @@ export class ExotelWebClient {
 
   diagnosticEventCallback = (event, phone, param) => {
     webrtcTroubleshooterEventBus.sendDiagnosticEvent(event, phone, param);
+    this.#cb.sessionCallback.fire(event, phone, param);
   };
 
   /* -------- unregister flow -------------------------------- */

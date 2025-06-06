@@ -174,3 +174,36 @@ export var timerSession = {
         window.localStorage.setItem('callTimer', callTimer)
     }
 }
+
+/**
+ * Produce an isolated set of three callback holders.
+ * Each ExotelWebClient gets its own copy so there is zero state sharing.
+ */
+export function createCallbackBundle() {
+    const stub = () => {};
+  
+    let callCb      = stub;
+    let registerCb  = stub;
+    let sessionCb   = stub;
+  
+    return {
+      /* ---------- Call events ---------- */
+      callbacks : {
+        initializeCallback(cb) { callCb = cb || stub; },
+        fire(event, ...args)   { callCb(event, ...args); }
+      },
+  
+      /* ---------- Register events ------ */
+      registerCallback : {
+        initializeRegisterCallback(cb) { registerCb = cb || stub; },
+        fire(event, ...args)           { registerCb(event, ...args); }
+      },
+  
+      /* ---------- Session events ------- */
+      sessionCallback : {
+        initializeSessionCallback(cb) { sessionCb = cb || stub; },
+        fire(event, ...args)          { sessionCb(event, ...args); }
+      }
+    };
+  }
+  
