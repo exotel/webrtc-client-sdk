@@ -7,7 +7,7 @@ import { CallController } from "./CallCtrlerDummy";
 
 import { closeDiagnostics as closeDiagnosticsDL, initDiagnostics as initDiagnosticsDL, startMicDiagnosticsTest as startMicDiagnosticsTestDL, startNetworkDiagnostics as startNetworkDiagnosticsDL, startSpeakerDiagnosticsTest as startSpeakerDiagnosticsTestDL, stopMicDiagnosticsTest as stopMicDiagnosticsTestDL, stopNetworkDiagnostics as stopNetworkDiagnosticsDL, stopSpeakerDiagnosticsTest as stopSpeakerDiagnosticsTestDL } from '../api/omAPI/DiagnosticsListener';
 
-import { callbacks, registerCallback, sessionCallback } from '../listeners/Callback';
+import { Callback, callbacks, RegisterCallback, registerCallback, SessionCallback, sessionCallback } from '../listeners/Callback';
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
@@ -226,7 +226,10 @@ export class ExotelWebClient {
 
     sipAccountInfo = null;
     clientSDKLoggerCallback = null;
-
+    callbacks  = null;
+    registerCallback = null;
+    sessionCallback = null;
+        
     constructor() {
         /* 
         Register the logger callback and emit the onLog event
@@ -238,6 +241,10 @@ export class ExotelWebClient {
                 this.clientSDKLoggerCallback("log", arg1, args);
     
         });
+
+        this.callbacks = new Callback();
+        this.registerCallback = new RegisterCallback();
+        this.sessionCallback = new SessionCallback();
       }
     
 
@@ -266,11 +273,10 @@ export class ExotelWebClient {
             return false;
         }
         this.sipAccountInfo["sipUri"] = "wss://" + this.sipAccountInfo["userName"] + "@" + this.sipAccountInfo["sipdomain"] + ":" + this.sipAccountInfo["port"];
-
-        callbacks.initializeCallback(CallListenerCallback);
-        registerCallback.initializeRegisterCallback(RegisterEventCallBack);
+        this.callbacks.initializeCallback(CallListenerCallback);
+        this.registerCallback.initializeRegisterCallback(RegisterEventCallBack);
         logger.log("ExWebClient: initWebrtc: Initializing session callback")
-        sessionCallback.initializeSessionCallback(SessionCallback);
+        this.sessionCallback.initializeSessionCallback(SessionCallback);
         this.setEventListener(this.eventListener);
         return true;
     };
