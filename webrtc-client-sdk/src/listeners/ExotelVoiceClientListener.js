@@ -1,16 +1,21 @@
-import { registerCallback } from "./Callback";
 import { diagnosticsCallback } from "./Callback";
 
 export class ExotelVoiceClientListener {
+
+    registerCallback  = null;
+    constructor(registerCallback) {
+        this.registerCallback = registerCallback;
+
+    }
     onInitializationSuccess(phone) {
         /**
          * Abstract class for Initialization Success
          */
-        registerCallback.initializeRegister("registered", phone);
+        this.registerCallback.initializeRegister("registered", phone);
         /**
          * Triggers UI callback to indicate the status of the registered phone
          */
-        registerCallback.triggerRegisterCallback();
+        this.registerCallback.triggerRegisterCallback();
         diagnosticsCallback.triggerKeyValueSetCallback("userReg", "registered", phone);
     }
 
@@ -18,8 +23,8 @@ export class ExotelVoiceClientListener {
         /**
          * If register fails send error message to Callback function 
          */
-        registerCallback.initializeRegister("unregistered", phone);
-        registerCallback.triggerRegisterCallback();
+        this.registerCallback.initializeRegister("unregistered", phone);
+        this.registerCallback.triggerRegisterCallback();
         diagnosticsCallback.triggerKeyValueSetCallback("userReg", "unregistered", phone);
     }
 
@@ -27,8 +32,8 @@ export class ExotelVoiceClientListener {
         /**
          * If register fails send error message to Callback function 
          */
-        registerCallback.initializeRegister("sent_request", phone);
-        registerCallback.triggerRegisterCallback();
+        this.registerCallback.initializeRegister("sent_request", phone);
+        this.registerCallback.triggerRegisterCallback();
         diagnosticsCallback.triggerKeyValueSetCallback("userReg", "sent_request", phone);
     }
 

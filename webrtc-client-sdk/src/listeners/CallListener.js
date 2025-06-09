@@ -1,38 +1,43 @@
-import { callbacks } from "./Callback";
 import { webrtcSIPPhone } from "@exotel-npm-dev/webrtc-core-sdk";
 
 var logger = webrtcSIPPhone.getLogger();
 
-export function CallListener() {
-    this.onIncomingCall = function (call, phone) {
+export class CallListener {
+
+    callbacks = null;
+    constructor(callbacks) {
+        this.callbacks = callbacks;
+    }
+
+    onIncomingCall = function (call, phone) {
         /**
          * When there is an incoming call, [INVITE is received on SIP] send a call back to the 
          */
         logger.log("CallListener:Initialise call")
-        callbacks.initializeCall(call, phone)
+        this.callbacks.initializeCall(call, phone)
 
         /** Triggers the callback on the UI end with message indicating it to be an incoming call */
         logger.log("CallListener:Trigger Incoming")
-        callbacks.triggerCallback("incoming");
+        this.callbacks.triggerCallback("incoming");
     }
-    this.onCallEstablished = function (call, phone) {
+    onCallEstablished = function (call, phone) {
         /**
          * When connection is established [ACK is sent by other party on SIP]
          */
         logger.log("CallListener:Initialise call")
-        callbacks.initializeCall(call, phone)
+        this.callbacks.initializeCall(call, phone)
         /** Triggers the callback on the UI end with message indicating call has been established*/
         logger.log("CallListener:Trigger Connected")
-        callbacks.triggerCallback("connected")
+        this.callbacks.triggerCallback("connected")
     }
-    this.onCallEnded = function (call, phone) {
+    onCallEnded = function (call, phone) {
         /**
          * When other party ends the call [BYE is received and sent by SIP]
          */
         logger.log("CallListener:Initialise call")
-        callbacks.initializeCall(call, phone)
+        this.callbacks.initializeCall(call, phone)
         /** Triggers the callback on the UI end with message indicating call has ended */
         logger.log("CallListener:Trigger Call Ended")
-        callbacks.triggerCallback("callEnded")
+        this.callbacks.triggerCallback("callEnded")
     }
 }

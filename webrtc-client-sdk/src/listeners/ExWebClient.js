@@ -2,12 +2,12 @@ import { Call } from "../api/callAPI/Call";
 import { DoRegister as DoRegisterRL, UnRegister as UnRegisterRL } from '../api/registerAPI/RegisterListener';
 import { CallListener } from '../listeners/CallListener';
 import { ExotelVoiceClientListener } from '../listeners/ExotelVoiceClientListener';
-import { SessionListener as SessionListenerSL } from '../listeners/SessionListeners';
+import { SessionListener } from '../listeners/SessionListeners';
 import { CallController } from "./CallCtrlerDummy";
 
 import { closeDiagnostics as closeDiagnosticsDL, initDiagnostics as initDiagnosticsDL, startMicDiagnosticsTest as startMicDiagnosticsTestDL, startNetworkDiagnostics as startNetworkDiagnosticsDL, startSpeakerDiagnosticsTest as startSpeakerDiagnosticsTestDL, stopMicDiagnosticsTest as stopMicDiagnosticsTestDL, stopNetworkDiagnostics as stopNetworkDiagnosticsDL, stopSpeakerDiagnosticsTest as stopSpeakerDiagnosticsTestDL } from '../api/omAPI/DiagnosticsListener';
 
-import { Callback, callbacks, RegisterCallback, registerCallback, SessionCallback, sessionCallback } from '../listeners/Callback';
+import { Callback, RegisterCallback, SessionCallback } from '../listeners/Callback';
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
@@ -252,11 +252,15 @@ export class ExotelWebClient {
         RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
 
         if (!this.eventListener) {
-            this.eventListener = new ExotelVoiceClientListener();
+            this.eventListener = new ExotelVoiceClientListener(RegisterEventCallBack);
         }
 
         if (!this.callListener) {
-            this.callListener = new CallListener();
+            this.callListener = new CallListener(this.callbacks);
+        }
+
+        if (!this.sessionListener) {
+            this.sessionListener = new SessionListener(SessionCallback);
         }
 
         if (!this.ctrlr) {
@@ -329,8 +333,9 @@ export class ExotelWebClient {
         stopNetworkDiagnosticsDL()
     };
 
-    SessionListener = () => {
-        SessionListenerSL()
+    SessionListenerMethod = () => {
+       // SessionListenerSL() 
+       //  TBC
     };
 
     /**

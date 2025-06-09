@@ -1,6 +1,4 @@
-import { sessionCallback } from './Callback';
 import { v4 as uuidv4 } from 'uuid';
-import { FetchTabInfo } from '../constants/common';
 import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
 
 var logger = webrtcSIPPhone.getLogger();
@@ -8,8 +6,21 @@ var logger = webrtcSIPPhone.getLogger();
  * Session listeners is invoked when user opens two tabs, the data in tab 1 is
  * copied into tab 2
  */
-export function SessionListener() {
+export class SessionListener {
+  sessionCallback = null;
+  constructor(sessionCallback) {
+    this.sessionCallback = sessionCallback;
 
+  }
+
+
+  onSessionEvent(event) {
+    this.sessionCallback.triggerSessionCallback(event);
+  }
+
+
+
+  onTBD() {
   const channel = new BroadcastChannel('app-data');
   channel.addEventListener('message', (event) => {
     if (event.data.message == "re-register-needed") {
@@ -120,4 +131,5 @@ export function SessionListener() {
       window.sessionStorage.removeItem('activeSession');
     }
   });
+}
 };
