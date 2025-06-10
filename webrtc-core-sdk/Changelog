@@ -1,5 +1,8 @@
 Change Log
 
+## v1.0.20 10 June, 2025
+-[VST-1011] Increasing Registration Expiry from 60s to 300s
+
 ## v1.0.19 04 April, 2025
 -[VST-973] logs refactoring mute functionality enhancements
 

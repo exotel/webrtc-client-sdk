@@ -521,7 +521,7 @@ function sipRegister() {
 			},
 			stunServers: ["stun:stun.l.google.com:19302"],
 			registerOptions: {
-				expires: 60
+				expires: 300
 			}
 
 		};
@@ -612,7 +612,7 @@ function registerPhoneEventListeners() {
 
 	ctxSip.phone.transport.stateChange.addListener(transportStateChangeListener);
 
-	registerer = new SIP.Registerer(ctxSip.phone, { expires: 60, refreshFrequency: 80 });
+	registerer = new SIP.Registerer(ctxSip.phone, { expires: 300, refreshFrequency: 80 });
 
 
 	ctxSip.phone.delegate.onInvite = (incomingSession) => {
