@@ -252,7 +252,7 @@ export class ExotelWebClient {
         RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
 
         if (!this.eventListener) {
-            this.eventListener = new ExotelVoiceClientListener(RegisterEventCallBack);
+            this.eventListener = new ExotelVoiceClientListener(this.registerCallback);
         }
 
         if (!this.callListener) {
@@ -260,7 +260,7 @@ export class ExotelWebClient {
         }
 
         if (!this.sessionListener) {
-            this.sessionListener = new SessionListener(SessionCallback);
+            this.sessionListener = new SessionListener(this.sessionCallback);
         }
 
         if (!this.ctrlr) {

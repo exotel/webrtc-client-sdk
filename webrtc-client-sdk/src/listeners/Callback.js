@@ -36,16 +36,16 @@ export class RegisterCallback  {
     registerState= null;
     phone= '';
     initializeRegisterCallback= function (RegisterEventCallBack) {
-        registerCallback.registerCallbackHandler = RegisterEventCallBack;
+        this.registerCallbackHandler = RegisterEventCallBack;
     };
     initializeRegister= function (state, phone) {
-        registerCallback.registerState = state;
-        registerCallback.phone = phone;
+        this.registerState = state;
+        this.phone = phone;
     };
     triggerRegisterCallback= function () {
-        const callbackFunc = registerCallback.registerCallbackHandler;
-        const state = registerCallback.registerState
-        return callbackFunc(state, registerCallback.phone);
+        const callbackFunc = this.registerCallbackHandler;
+        const state = this.registerState
+        return callbackFunc(state, this.phone);
     };
 }
 /**
