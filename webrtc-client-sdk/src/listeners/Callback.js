@@ -1,6 +1,6 @@
-import { webrtcSIPPhone } from "@exotel-npm-dev/webrtc-core-sdk";
+import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 
-var logger = webrtcSIPPhone.getLogger();
+const logger = getLogger();
 
 /**
  * The call backs are called through this function. First initiates the call object and then
@@ -11,22 +11,23 @@ var logger = webrtcSIPPhone.getLogger();
  * Initializes call event callbacks and also sends to which phone callback was received
  */
 export class Callback {
-    callback= null;
-    call= null;
-    phone= '';
-    initializeCallback = function (CallListenerCallback) {
-        this.callback = CallListenerCallback;
-    };
-    initializeCall= function (call, phone) {
-        this.call = call;
-        this.phone = phone;
-    };
-    triggerCallback= function (eventType) {
-        const callbackFunc = this.callback;
-        const call = this.call;
-        return callbackFunc(call, eventType, this.phone);
-    };
+    constructor() {
+        this.callbacks = {};
+    }
+
+    registerCallback(event, callback) {
+        this.callbacks[event] = callback;
+    }
+
+    triggerCallback(event, data) {
+        if (this.callbacks[event]) {
+            this.callbacks[event](data);
+        } else {
+            logger.log("No callback registered for event:", event);
+        }
+    }
 }
+
 /**
  * Initializes register callback and also sets to which phone registration was renewed
  */

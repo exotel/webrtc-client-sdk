@@ -1,6 +1,6 @@
-import { webrtcSIPPhone } from "@exotel-npm-dev/webrtc-core-sdk";
+import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 
-var logger = webrtcSIPPhone.getLogger();
+const logger = getLogger();
 
 /**
  * Function to register the phone onto a webRTC client

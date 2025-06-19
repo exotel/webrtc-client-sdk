@@ -10,14 +10,13 @@ import { closeDiagnostics as closeDiagnosticsDL, initDiagnostics as initDiagnost
 import { Callback, RegisterCallback, SessionCallback } from '../listeners/Callback';
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
-import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
+import { WebrtcSIPPhone, getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 import { CallDetails } from "../api/callAPI/CallDetails";
 import LogManager from '../api/LogManager.js';
-
+const phonePool = new Map();
 var intervalId;
 var intervalIDMap = new Map();
-
-var logger = webrtcSIPPhone.getLogger();
+const logger = getLogger();   
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -209,7 +208,9 @@ export function ExSynchronousHandler() {
 }
 
 export class ExotelWebClient {
-
+  /**
+   * @param {Object} sipAccntInfo 
+   */
 
 
     ctrlr = null;
@@ -221,31 +222,41 @@ export class ExotelWebClient {
     unregisterInitiated = false;
     registrationInProgress = false;
     isReadyToRegister = true;
-    /* OLD-Way to be revisited for multile phone support */
-    //this.webRTCPhones = {};
+
 
     sipAccountInfo = null;
     clientSDKLoggerCallback = null;
     callbacks  = null;
     registerCallback = null;
     sessionCallback = null;
+    logger = getLogger();
         
     constructor() {
-        /* 
-        Register the logger callback and emit the onLog event
-        */
-        logger.registerLoggerCallback(function (type, message, args) {
-
-            LogManager.onLog(type, message, args);
-            if (this.clientSDKLoggerCallback)
-                this.clientSDKLoggerCallback("log", arg1, args);
-    
-        });
-
+        // Initialize properties
+        this.ctrlr = null;
+        this.call = null;
+        this.eventListener = null;
+        this.callListener = null;
+        this.callFromNumber = null;
+        this.shouldAutoRetry = false;
+        this.unregisterInitiated = false;
+        this.registrationInProgress = false;
+        this.isReadyToRegister = true;
+        this.sipAccountInfo = null;
+        this.clientSDKLoggerCallback = null;
         this.callbacks = new Callback();
         this.registerCallback = new RegisterCallback();
         this.sessionCallback = new SessionCallback();
-      }
+        this.logger = getLogger();
+
+        // Register logger callback
+        this.logger.registerLoggerCallback((type, message, args) => {
+            LogManager.onLog(type, message, args);
+            if (this.clientSDKLoggerCallback) {
+                this.clientSDKLoggerCallback("log", message, args);
+            }
+        });
+    }
     
 
     initWebrtc = (sipAccountInfo_,
@@ -267,21 +278,40 @@ export class ExotelWebClient {
             this.ctrlr = new CallController();
         }
 
-        if (!this.call) {
-            this.call = new Call();
-        }
-
         logger.log("ExWebClient: initWebrtc: Exotel Client Initialised with " + JSON.stringify(sipAccountInfo_))
         this.sipAccountInfo = sipAccountInfo_;
         if (!this.sipAccountInfo["userName"] || !this.sipAccountInfo["sipdomain"] || !this.sipAccountInfo["port"]) {
             return false;
         }
         this.sipAccountInfo["sipUri"] = "wss://" + this.sipAccountInfo["userName"] + "@" + this.sipAccountInfo["sipdomain"] + ":" + this.sipAccountInfo["port"];
-        this.callbacks.initializeCallback(CallListenerCallback);
+        
+        // Register callbacks using the correct methods
+        this.callbacks.registerCallback('call', CallListenerCallback);
         this.registerCallback.initializeRegisterCallback(RegisterEventCallBack);
         logger.log("ExWebClient: initWebrtc: Initializing session callback")
         this.sessionCallback.initializeSessionCallback(SessionCallback);
         this.setEventListener(this.eventListener);
+
+        // Create phone instance if it wasn't created in constructor
+        if (!this.webrtcSIPPhone) {
+            this.userName = this.sipAccountInfo.userName;
+            let phone = phonePool.get(this.userName);
+            if (!phone) {
+                phone = new WebrtcSIPPhone(this.userName);
+                phonePool.set(this.userName, phone);
+            }
+            this.phone = phone;
+            this.webrtcSIPPhone = phone;
+        }
+
+        // Initialize the phone with SIP engine
+        this.webrtcSIPPhone.registerPhone("sipjs", new ExDelegationHandler(this));
+
+        // Create call instance after phone is initialized
+        if (!this.call) {
+            this.call = new Call(this.webrtcSIPPhone);
+        }
+
         return true;
     };
 
@@ -334,13 +364,8 @@ export class ExotelWebClient {
     };
 
     SessionListenerMethod = () => {
-       // SessionListenerSL() 
-       //  TBC
     };
 
-    /**
-     * function that returns the instance of the call controller object object
-     */
 
     getCallController = () => {
         return this.ctrlr;
@@ -348,14 +373,12 @@ export class ExotelWebClient {
 
     getCall = () => {
         if (!this.call) {
-            this.call = call = new Call();
+            this.call = new Call(this.webrtcSIPPhone);
         }
         return this.call;
     };
 
-    /**
-     * Dummy function to set the event listener object
-     */
+   
     setEventListener = (eventListener) => {
         this.eventListener = eventListener;
     };
@@ -371,10 +394,8 @@ export class ExotelWebClient {
     registerEventCallback = (event, phone, param) => {
 
         logger.log("ExWebClient: registerEventCallback: Received ---> " + event + 'phone....', phone + 'param....', param)
-        if (event === "connected") {
-            /**
-             * When registration is successful then send the phone number of the same to UI
-             */
+        if (event === "connected" || event === "registered" || event === "started") {
+          
             this.eventListener.onInitializationSuccess(phone);
             this.registrationInProgress = false;
             if (this.unregisterInitiated) {
@@ -383,9 +404,7 @@ export class ExotelWebClient {
                 this.unregister();
             }
         } else if (event === "failed_to_start" || event === "transport_error") {
-            /**
-             * If registration fails
-             */
+           
             this.eventListener.onInitializationFailure(phone);
             if (this.unregisterInitiated) {
                 this.shouldAutoRetry = false;
@@ -401,7 +420,13 @@ export class ExotelWebClient {
              * If registration request waiting...
              */
             this.eventListener.onInitializationWaiting(phone);
-        }
+             } else if (event === "terminated" || event === "unregistered") {
+                     this.eventListener.onUnregistrationSuccess?.(phone);   
+                
+                     this.shouldAutoRetry   = false;
+                     this.unregisterInitiated = false;
+                     this.isReadyToRegister = true;
+                 }
     };
     /**
      * Event listener for calls, any change in sipjsphone will trigger the callback here
@@ -439,20 +464,22 @@ export class ExotelWebClient {
         this.shouldAutoRetry = false;
         this.unregisterInitiated = true;
         if (!this.registrationInProgress) {
-            setTimeout(function () {
-                webrtcSIPPhone.sipUnRegisterWebRTC();
-            }, 500);
+            setTimeout(() => {
+                const phone = phonePool[this.userName] || this.webrtcSIPPhone;
+                if (phone) {
+                  phone.sipUnRegisterWebRTC(); 
+                  phone.disconnect?.();
+                }
+              }, 500);
         }
-    };
-
+      };
+      
 
     webRTCStatusCallbackHandler = (msg1, arg1) => {
         logger.log("ExWebClient: webRTCStatusCallbackHandler: " + msg1 + " " + arg1)
     };
 
-    /**
-     * initialize function called when user wants to register client
-     */
+
     initialize = (uiContext, hostName, subscriberName,
         displayName, accountSid, subscriberToken,
         sipAccountInfo) => {
@@ -480,7 +507,6 @@ export class ExotelWebClient {
 
         fetchPublicIP(sipAccountInfo);
 
-        /* Temporary till we figure out the arguments - Start */
         this.domain = hostName = sipAccountInfo.domain;
         this.sipdomain = sipAccountInfo.sipdomain;
         this.accountName = this.userName = sipAccountInfo.userName;
@@ -496,9 +522,7 @@ export class ExotelWebClient {
         this.sipWsPort = 5061;
         this.sipPort = 5061;
         this.sipSecurePort = 5062;
-        /* Temporary till we figure out the arguments - End */
 
-        /* This is permanent -Start */
         let webrtcPort = wssPort;
 
         if (this.security === 'ws') {
@@ -519,38 +543,28 @@ export class ExotelWebClient {
         this.sipAccntInfo['port'] = webrtcPort;
         this.sipAccntInfo['contactHost'] = this.contactHost;
         localStorage.setItem('contactHost', this.contactHost);
-        /* This is permanent -End */
 
-        /**
-         * Call the webclient function inside this and pass register and call callbacks as arg
-         */
+        
         var synchronousHandler = new ExSynchronousHandler(this);
         var delegationHandler = new ExDelegationHandler(this);
 
         var userName = this.userName;
-        /* OLD-Way to be revisited for multile phone support */
-        //webRTCPhones[userName] = webRTC;
 
-        /* New-Way  */
-        webrtcSIPPhone.registerPhone("sipjs", delegationHandler);
-        webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler);
 
-        /**
-         * Store the intervalID against a map
-         */
+        this.webrtcSIPPhone.registerPhone("sipjs", delegationHandler);
+        this.webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler);
+        phonePool[this.userName] = this.webrtcSIPPhone;     
+
+        
         intervalIDMap.set(userName, intervalId);
     };
 
     checkClientStatus = (callback) => {
-        // using this function , first it will check mic permission is given or not
-        // then it will check if transport is intialize or not
-        // then it will check if user is registered or not
-        // based on this we can evaludate SDK is ready for call
         var constraints = { audio: true, video: false };
         navigator.mediaDevices
             .getUserMedia(constraints)
             .then(function (mediaStream) {
-                var transportState = webrtcSIPPhone.getTransportState();
+                var transportState = this.webrtcSIPPhone.getTransportState();
                 transportState = transportState.toLowerCase();
                 switch (transportState) {
                     case "":
@@ -562,7 +576,7 @@ export class ExotelWebClient {
                         break;
 
                     default:
-                        var registerationState = webrtcSIPPhone.getRegistrationState();
+                        var registerationState = this.webrtcSIPPhone.getRegistrationState();
                         registerationState = registerationState.toLowerCase();
                         switch (registerationState) {
                             case "":
@@ -591,12 +605,12 @@ export class ExotelWebClient {
 
     changeAudioInputDevice(deviceId, onSuccess, onError) {
         logger.log(`ExWebClient: changeAudioInputDevice: Entry`);
-        webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
+        this.webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
     }
 
     changeAudioOutputDevice(deviceId, onSuccess, onError) {
         logger.log(`ExWebClient: changeAudioOutputDevice: Entry`);
-        webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
+        this.webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
     }
 
 	downloadLogs() {
@@ -606,7 +620,11 @@ export class ExotelWebClient {
 
     setPreferredCodec(codecName) {
         logger.log("ExWebClient: setPreferredCodec: Entry");
-        webrtcSIPPhone.setPreferredCodec(codecName);
+        if (!this.webrtcSIPPhone || !this.webrtcSIPPhone.phone) {
+            logger.warn("ExWebClient: setPreferredCodec: Phone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.setPreferredCodec(codecName);
     }
 
     registerLoggerCallback(callback) {
@@ -614,7 +632,12 @@ export class ExotelWebClient {
     }
 
     registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
-        webrtcSIPPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
+        logger.log("ExWebClient: registerAudioDeviceChangeCallback: Entry");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: registerAudioDeviceChangeCallback: webrtcSIPPhone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
     }
 }
 

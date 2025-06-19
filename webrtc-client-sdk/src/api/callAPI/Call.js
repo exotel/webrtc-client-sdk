@@ -1,9 +1,13 @@
 import { CallDetails } from "./CallDetails";
+import { getLogger } from '@exotel-npm-dev/webrtc-core-sdk';
 
-import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
-var logger = webrtcSIPPhone.getLogger();
+const logger = getLogger();
 
-export function Call() {
+export function Call(webrtcSIPPhone) {
+    if (!webrtcSIPPhone) {
+        throw new Error("webrtcSIPPhone is required for Call");
+    }
+
     this.Answer = function () {
         /**
          * When agent accepts phone, add appropriate msg to be sent to webclient

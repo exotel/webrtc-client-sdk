@@ -1,7 +1,8 @@
+import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 import { diagnosticsCallback } from "../../listeners/Callback";
 
-import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
-var logger = webrtcSIPPhone.getLogger();
+const logger = getLogger();
+
 var speakerNode;
 var micNode;
 var audioTrack;
@@ -23,6 +24,21 @@ eventMapper.sipml5.connected_REGISTER = "USER_REG_TEST_PASS";
 eventMapper.sipml5.terminated_REGISTER = "USER_REG_TEST_FAIL";
 
 var candidateProcessData = {};
+
+export class Diagnostics {
+    constructor() {
+        this.report = {};
+    }
+
+    setReport(key, value) {
+        this.report[key] = value;
+        logger.log("Diagnostics: setReport", key, value);
+    }
+
+    getReport() {
+        return this.report;
+    }
+}
 
 export var ameyoWebRTCTroubleshooter = {
   js_yyyy_mm_dd_hh_mm_ss: function () {

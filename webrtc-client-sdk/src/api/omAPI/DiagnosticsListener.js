@@ -1,9 +1,9 @@
+import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 import { diagnosticsCallback } from '../../listeners/Callback';
 import { ameyoWebRTCTroubleshooter } from './Diagnostics';
-import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
 
+const logger = getLogger();
 
-var logger = webrtcSIPPhone.getLogger();
 
 export function initDiagnostics(setDiagnosticsReportCallback, keyValueSetCallback) {
     if (!keyValueSetCallback || !setDiagnosticsReportCallback) {
@@ -93,4 +93,15 @@ export function stopNetworkDiagnostics() {
      */
     logger.log("Request to stop network diagnostics:\n");
     return;
+}
+
+export class DiagnosticsListener {
+    constructor(diagnosticsCallback) {
+        this.diagnosticsCallback = diagnosticsCallback;
+    }
+
+    onDiagnosticsEvent(event) {
+        logger.log("DiagnosticsListener: onDiagnosticsEvent", event);
+        this.diagnosticsCallback.triggerCallback(event);
+    }
 }
