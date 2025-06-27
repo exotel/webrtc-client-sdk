@@ -13,15 +13,22 @@ const logger = getLogger();
 export class Callback {
     constructor() {
         this.callbacks = {};
+        this.call = null;
+        this.phone = '';
     }
 
     registerCallback(event, callback) {
         this.callbacks[event] = callback;
     }
 
-    triggerCallback(event, data) {
+    initializeCall(call, phone) {
+        this.call = call;
+        this.phone = phone;
+    }
+
+    triggerCallback(event, ...args) {
         if (this.callbacks[event]) {
-            this.callbacks[event](data);
+            this.callbacks[event](...args);
         } else {
             logger.log("No callback registered for event:", event);
         }

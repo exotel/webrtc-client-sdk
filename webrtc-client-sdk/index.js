@@ -1,1 +1,2 @@
-export * from './src/listeners/ExWebClient';
+import { ExotelWebClient } from './src/listeners/ExWebClient';
+export { ExotelWebClient };
