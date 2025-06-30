@@ -642,15 +642,12 @@ class SIPJSPhone {
 						if (this.ctxSip.callActiveID == null) {
 							// Tell the PSTN/SIP proxy we are ringing so it doesn't CANCEL
 							incomingSession.progress({ statusCode: 180, reasonPhrase: "Ringing" });
+							incomingSession.direction = "incoming";
 							this.ctxSip.newSession(incomingSession);
 							this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL", incomingSession);
 						} else {
 							incomingSession.reject({ statusCode: 486 });
-							return;
 						}
-						incomingSession.progress();
-						this.ctxSip.newSession(incomingSession);
-						this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL", incomingSession);
 					}
 				}
 			};
