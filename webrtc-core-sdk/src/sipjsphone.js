@@ -704,7 +704,7 @@ class SIPJSPhone {
 				}
 				
 				if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM === 'function') {
-					this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("terminated", "CONNECTION");
+					this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("unregistered", "CONNECTION");
 				}
 				break;
 			case "Terminated":
@@ -736,34 +736,29 @@ class SIPJSPhone {
 	
 	transportStateChangeListener(newState) {
 		logger.log("sipjsphone: transportStateChangeListener: Transport state changed to:", [newState]);
-		
-		switch (newState) {
-			case "Connecting":
-				logger.log("sipjsphone: transportStateChangeListener: WebSocket connecting");
-				if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent === 'function') {
-					this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent('connecting');
-				}
-				if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM === 'function') {
-					this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("starting", "CONNECTION");
-				}
-				this.uiOnConnectionEvent(false, true);
-				break;
-			case "Connected":
-				logger.log("sipjsphone: transportStateChangeListener: WebSocket connected");
-				if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent === 'function') {
-					this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent('connected');
-				}
-				this.onUserAgentTransportConnected();
-				break;
-			case "Disconnected":
-				logger.log("sipjsphone: transportStateChangeListener: WebSocket disconnected");
-				if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent === 'function') {
-					this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent('disconnected');
-				}
-				this.onUserAgentTransportDisconnected();
-				break;
-		}
 		this.lastTransportState = newState;
+
+		if (newState === "Connected") {
+			logger.log("sipjsphone: transportStateChangeListener: WebSocket connected");
+			this.onUserAgentTransportConnected();
+		}
+
+		if (newState === "Disconnected") {
+			logger.log("sipjsphone: transportStateChangeListener: WebSocket disconnected");
+
+			if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent === 'function') {
+				this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent("disconnected");
+			}
+
+			// PATCH: Surface this as an 'unregistered' terminal state
+			this.registererStateEventListner("Unregistered");
+
+			this.onUserAgentTransportDisconnected();
+		}
+
+		if (this.webrtcSIPPhoneEventDelegate && this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent) {
+			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent(newState);
+		}
 	}
 	
 	/**
@@ -854,6 +849,7 @@ destroySocketConnection() {
 
 		}
 			this.registerer = null;
+			
 		}
 	}
 	

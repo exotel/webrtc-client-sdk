@@ -33,7 +33,6 @@ function fetchPublicIP(sipAccountInfo) {
         pc.createOffer().then(offer => pc.setLocalDescription(offer))
         pc.onicecandidate = (ice) => {
             if (!ice || !ice.candidate || !ice.candidate.candidate) {
-                logger.log("all done.");
                 pc.close();
                 resolve();
                 return;
@@ -355,10 +354,7 @@ export class ExotelWebClient {
     };
 
     getCall = () => {
-        if (!this.call) {
-            this.call = new Call(this.webrtcSIPPhone);
-        }
-        return this.call;
+        return new Call(this.call);
     };
 
    
@@ -375,41 +371,20 @@ export class ExotelWebClient {
      */
 
     registerEventCallback = (event, phone, param) => {
+        logger.log("ExWebClient: registerEventCallback: Received ---> " +
+            event, [phone, param]);
 
-        logger.log("ExWebClient: registerEventCallback: Received ---> " + event + 'phone....', phone + 'param....', param)
-        if (event === "connected" || event === "registered" || event === "started") {
-          
-            this.eventListener.onInitializationSuccess(phone);
+        const lowerCaseEvent = event.toLowerCase();
+
+        if (lowerCaseEvent === "registered") {
             this.registrationInProgress = false;
-            if (this.unregisterInitiated) {
-                logger.log("ExWebClient: registerEventCallback: unregistering due to unregisterInitiated");
-                this.unregisterInitiated = false;
-                this.unregister();
-            }
-        } else if (event === "failed_to_start" || event === "transport_error") {
-           
-            this.eventListener.onInitializationFailure(phone);
-            if (this.unregisterInitiated) {
-                this.shouldAutoRetry = false;
-                this.unregisterInitiated = false;
-                this.isReadyToRegister = true;
-            }
-            if (this.shouldAutoRetry) {
-                logger.log("ExWebClient: registerEventCallback: Autoretrying");
-                DoRegisterRL(this.sipAccountInfo, this, 5000);
-            }
-        } else if (event === "sent_request") {
-            /**
-             * If registration request waiting...
-             */
-            this.eventListener.onInitializationWaiting(phone);
-             } else if (event === "terminated" || event === "unregistered") {
-                     this.eventListener.onUnregistrationSuccess?.(phone);   
-                
-                     this.shouldAutoRetry   = false;
-                     this.unregisterInitiated = false;
-                     this.isReadyToRegister = true;
-                 }
+            this.unregisterInitiated = false;
+            this.eventListener.onRegistrationStateChanged("registered", phone);
+        } else if (lowerCaseEvent === "unregistered" || lowerCaseEvent === "terminated") {
+            this.registrationInProgress = false;
+            this.unregisterInitiated = false;
+            this.eventListener.onRegistrationStateChanged("unregistered", phone);
+        }
     };
     /**
      * Event listener for calls, any change in sipjsphone will trigger the callback here

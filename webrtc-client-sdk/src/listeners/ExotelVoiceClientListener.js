@@ -37,6 +37,12 @@ export class ExotelVoiceClientListener {
         diagnosticsCallback.triggerKeyValueSetCallback("userReg", "sent_request", phone);
     }
 
+    onRegistrationStateChanged(state, phone) {
+        this.registerCallback.initializeRegister(state, phone);
+        this.registerCallback.triggerRegisterCallback();
+        diagnosticsCallback.triggerKeyValueSetCallback("userReg", state, phone);
+    }
+
     onLog(LogLevel, tag, message) {
         /**
          * To get SDK logs
