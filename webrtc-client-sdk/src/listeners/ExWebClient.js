@@ -76,6 +76,7 @@ class ExDelegationHandler {
         logger.log("delegationHandler: sendWebRTCEventsToFSM\n");
         logger.log("delegationHandler: eventType\n", eventType);
         logger.log("delegationHandler: sipMethod\n", sipMethod);
+
         if (sipMethod == "CONNECTION") {
             this.exClient.registerEventCallback(eventType, this.exClient.userName);
         } else if (sipMethod == "CALL") {
@@ -354,7 +355,10 @@ export class ExotelWebClient {
     };
 
     getCall = () => {
-        return new Call(this.call);
+        if (!this.call) {
+            this.call = new Call(this.webrtcSIPPhone);
+        }
+        return this.call;
     };
 
    
@@ -379,10 +383,12 @@ export class ExotelWebClient {
         if (lowerCaseEvent === "registered") {
             this.registrationInProgress = false;
             this.unregisterInitiated = false;
+            this.isReadyToRegister = false;
             this.eventListener.onRegistrationStateChanged("registered", phone);
         } else if (lowerCaseEvent === "unregistered" || lowerCaseEvent === "terminated") {
             this.registrationInProgress = false;
             this.unregisterInitiated = false;
+            this.isReadyToRegister = true;
             this.eventListener.onRegistrationStateChanged("unregistered", phone);
         }
     };
