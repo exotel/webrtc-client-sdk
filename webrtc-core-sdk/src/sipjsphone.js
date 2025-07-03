@@ -408,14 +408,14 @@ class SIPJSPhone {
 		},
 
 			setError: (err, title, msg, closable) => { },
-	
-	
-	
-	
+
+
+
+
 			phoneMuteButtonPressed: (sessionid) => {
 				logger.log(" sipjsphone: phoneMuteButtonPressed: bMicEnable, sessionid", this.bMicEnable, sessionid);
 				var s = this.ctxSip.Sessions[sessionid];
-	
+
 				if (this.bMicEnable) {
 					this.toggleMute(s, true);
 					this.bMicEnable = false;
@@ -583,7 +583,7 @@ class SIPJSPhone {
 
 		return Promise.resolve(description);
 	}
-	
+
 	sipRegister() {
 		logger.log("sipjsphone: sipRegister: Starting registration with config:", [{
 			authorizationUsername: this.txtPrivateIdentity,
@@ -674,7 +674,7 @@ class SIPJSPhone {
 			logger.error("sipjsphone: sipRegister: Error during registration setup:", error);
 		}
 	}
-	
+
 	registererStateEventListner(newState) {
 		logger.log("sipjsphone: registererStateEventListner: Registration state changed to:", [newState]);
 
@@ -683,12 +683,12 @@ class SIPJSPhone {
 				logger.log("sipjsphone: registererStateEventListner: Registration successful");
 				this.webRTCStatus = "ready";
 				this.isRegistered = true;
-				
+
 				// Update UI state
 				if (this.callBackHandler && typeof this.callBackHandler.onResponse === 'function') {
 					this.callBackHandler.onResponse("ready");
 				}
-				
+
 				if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM === 'function') {
 					this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("registered", "CONNECTION");
 				}
@@ -697,12 +697,12 @@ class SIPJSPhone {
 				logger.error("sipjsphone: registererStateEventListner: Registration failed");
 				this.webRTCStatus = "offline";
 				this.isRegistered = false;
-				
+
 				// Update UI state
 				if (this.callBackHandler && typeof this.callBackHandler.onResponse === 'function') {
 					this.callBackHandler.onResponse("error");
 				}
-				
+
 				if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM === 'function') {
 					this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("unregistered", "CONNECTION");
 				}
@@ -711,12 +711,12 @@ class SIPJSPhone {
 				logger.log("sipjsphone: registererStateEventListner: Registration terminated");
 				this.webRTCStatus = "offline";
 				this.isRegistered = false;
-				
+
 				// Update UI state
 				if (this.callBackHandler && typeof this.callBackHandler.onResponse === 'function') {
 					this.callBackHandler.onResponse("error");
 				}
-				
+
 				if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM === 'function') {
 					this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("terminated", "CONNECTION");
 				}
@@ -724,16 +724,16 @@ class SIPJSPhone {
 		}
 		this.lastRegistererState = newState;
 	}
-	
-	
-	
+
+
+
 	registererWaitingChangeListener(b) {
 		if (this.registerer && this.registerer.state == SIP.RegistererState.Registered) {
 			this.registererStateEventListner("Registered");
 		}
-	
+
 	}
-	
+
 	transportStateChangeListener(newState) {
 		logger.log("sipjsphone: transportStateChangeListener: Transport state changed to:", [newState]);
 		this.lastTransportState = newState;
@@ -760,7 +760,7 @@ class SIPJSPhone {
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent(newState);
 		}
 	}
-	
+
 	/**
  * Closes the underlying WebSocket transport and removes listeners so
  * that SIP.js can GC everything cleanly.
@@ -773,13 +773,13 @@ destroySocketConnection() {
 	  if (!transport) {
 		return;                       // nothing to do
 	  }
-  
+
 	  // SIP.js 0.20 ⇢ state-driven API; older builds still expose isConnected()
 	  const connected =
 		typeof transport.isConnected === "function"
 		  ? transport.isConnected()
 		  : transport.state === 2;    // TransportState.Connected === 2
-  
+
 	  if (connected) {
 		// 0.20 has async disconnect; earlier versions are sync – await is OK for both
 		transport.disconnect();
@@ -788,11 +788,11 @@ destroySocketConnection() {
 	  logger.error("destroySocketConnection: cleanup failed", e);
 	}
   }
-  
-	
+
+
 	uiOnConnectionEvent(b_connected, b_connecting) {
 		logger.log("sipjsphone: uiOnConnectionEvent: Connection state changed:", [b_connected, b_connecting]);
-		
+
 		if (b_connecting) {
 			this.webRTCStatus = "connecting";
 		} else if (b_connected) {
@@ -814,13 +814,13 @@ destroySocketConnection() {
 
 	onUserAgentTransportConnected() {
 		logger.log("sipjsphone: onUserAgentTransportConnected: Transport connected");
-		
+
 		if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent === 'function') {
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent('connected');
 		}
-		
+
 		this.webRTCStatus = "ready";
-		
+
 		if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM === 'function') {
 			this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("started", "CONNECTION");
 		}
@@ -834,10 +834,10 @@ destroySocketConnection() {
 			this.ctxSip.registerer.register();
 		}
 	}
-	
+
 	cleanupRegistererTimer() {
 		if (this.registerer) {
-	
+
 			try {
 				this.registerer.clearTimers();
 				this.registerer.stateChange.removeListener(this.registererStateEventListner);
@@ -849,17 +849,17 @@ destroySocketConnection() {
 
 		}
 			this.registerer = null;
-			
+
 		}
 	}
-	
+
 	onUserAgentTransportDisconnected() {
-	
+
 		this.webRTCStatus = "offline";
 		this.setRegisterFlag(false);
-	
+
 		this.cleanupRegistererTimer();
-	
+
 		this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent('disconnected');
 		this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("failed_to_start", "CONNECTION");
 		if (this.callBackHandler != null) {
@@ -867,13 +867,13 @@ destroySocketConnection() {
 				this.callBackHandler.onResponse("error");
 			}
 		}
-	
-	
-	
-	
+
+
+
+
 	}
-	
-	
+
+
 	parseSipMessage(message) {
 	var lines = message.split("\n");
 	var firstLine = lines[0];
@@ -989,7 +989,7 @@ destroySocketConnection() {
 		this.enableReceiverTracks(s, !s.held);
 		//this.ctxSip.setCallSessionStatus("Hold");
 	}
-	
+
 	 onUnhold(s) {
 	//webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('unhold');
 	logger.warn(`[${s.id}] re-invite request was rejected`);
@@ -1111,7 +1111,7 @@ destroySocketConnection() {
 		this.txtHostName = this.txtHostNameWithPort.split(":")[0];
 		this.txtWebSocketPort = this.txtHostNameWithPort.split(":")[1];
 		this.txtAccountName = sipAccountInfo['accountName'];
-		
+
 		// Use sipdomain for public identity if available, otherwise use hostname
 		if (sipAccountInfo['sipdomain']) {
 			this.txtSipDomain = sipAccountInfo["sipdomain"];
@@ -1120,7 +1120,7 @@ destroySocketConnection() {
 			this.txtSipDomain = this.txtHostName;
 			this.txtPublicIdentity = "sip:" + this.txtPrivateIdentity + "@" + this.txtHostNameWithPort;
 		}
-		
+
 		this.txtPassword = sipAccountInfo["secret"];
 		this.txtRealm = this.txtSipDomain; // Use sipdomain as realm
 		this.txtTurnServer = "drishti@" + this.txtRealm + ":3478";
@@ -1154,10 +1154,10 @@ destroySocketConnection() {
 		}
 
 		this.txtSipPort = sipAccountInfo['sipPort'] ? sipAccountInfo["sipPort"] : default_values["sipPort"];
-		
+
 		// Fix: Handle endpoint value to avoid double 'wss' path
 		this.endpoint = sipAccountInfo['endpoint'] ? sipAccountInfo['endpoint'] : default_values['endpoint'];
-		
+
 		// Construct WebSocket URL
 		this.txtWebsocketURL = this.txtSecurity + "://" + this.txtHostName + ":" + this.txtWSPort;
 		// Always append endpoint if it exists, regardless of its value
