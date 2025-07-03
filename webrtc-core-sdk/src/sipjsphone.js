@@ -1616,7 +1616,7 @@ destroySocketConnection() {
 		this.ctxSip.phone.start();
 		this.ctxSip.phone.transport.stateChange.addListener((s) => {
 			if (s === SIP.TransportState.Connected && !this.registerer) {
-				this.registerer = new SIP.Registerer(this.ctxSip.phone, {expires:60});
+				this.registerer = new SIP.Registerer(this.ctxSip.phone, {expires:300, refreshFrequency: 80 });
 				this.registerer.register();
 			}
 		});
