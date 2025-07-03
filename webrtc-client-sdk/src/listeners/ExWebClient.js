@@ -322,11 +322,11 @@ export class ExotelWebClient {
     };
 
     startSpeakerDiagnosticsTest = () => {
-        startSpeakerDiagnosticsTestDL()
+        startSpeakerDiagnosticsTestDL(this.webrtcSIPPhone);
     };
 
     stopSpeakerDiagnosticsTest = (speakerTestResponse = 'none') => {
-        stopSpeakerDiagnosticsTestDL(speakerTestResponse)
+        stopSpeakerDiagnosticsTestDL(speakerTestResponse, this.webrtcSIPPhone);
     };
 
     startMicDiagnosticsTest = () => {

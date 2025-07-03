@@ -23,27 +23,27 @@ export function closeDiagnostics() {
     return;
 }
 
-export function startSpeakerDiagnosticsTest() {
+export function startSpeakerDiagnosticsTest(webrtcSIPPhone) {
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
     logger.log("Request to startSpeakerTest:\n");
-    ameyoWebRTCTroubleshooter.startSpeakerTest()
+    ameyoWebRTCTroubleshooter.startSpeakerTest(webrtcSIPPhone)
     return;
 }
 
-export function stopSpeakerDiagnosticsTest(speakerTestResponse) {
+export function stopSpeakerDiagnosticsTest(speakerTestResponse, webrtcSIPPhone) {
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
 
     logger.log("Request to stopSpeakerTest - Suuccessful Test:\n");
     if (speakerTestResponse == 'yes') {
-        ameyoWebRTCTroubleshooter.stopSpeakerTesttoneWithSuccess()
+        ameyoWebRTCTroubleshooter.stopSpeakerTesttoneWithSuccess(webrtcSIPPhone)
     } else if (speakerTestResponse == 'no') {
-        ameyoWebRTCTroubleshooter.stopSpeakerTesttoneWithFailure()
+        ameyoWebRTCTroubleshooter.stopSpeakerTesttoneWithFailure(webrtcSIPPhone)
     } else {
-        ameyoWebRTCTroubleshooter.stopSpeakerTest()
+        ameyoWebRTCTroubleshooter.stopSpeakerTest(webrtcSIPPhone)
     }
     return;
 }

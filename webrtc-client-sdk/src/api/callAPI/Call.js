@@ -36,25 +36,25 @@ export function Call(webrtcSIPPhone) {
         /**
          * When agent clicks on mute
          */
-        var isMicEnabled = webrtcSIPPhone.getMuteStatus();
-        logger.log('Call: Mute: isMicEnabled: ', isMicEnabled);
-        if (isMicEnabled) {
+        var isMuted = webrtcSIPPhone.getMuteStatus();
+        logger.log('Call: Mute: isMuted: ', isMuted);
+        if (!isMuted) {
             webrtcSIPPhone.muteAction(true);
         } else {
-            logger.log('Call: Mute:  Already muted');
+            logger.log('Call: Mute: Already muted');
         }
     }
     
     this.UnMute = function () {
         /**
-         * When agent clicks on mute
+         * When agent clicks on unmute
          */
-        var isMicEnabled = webrtcSIPPhone.getMuteStatus();
-        logger.log('Call: UnMute: isMicEnabled: ', isMicEnabled);
-        if (isMicEnabled) {
-            logger.log('Call: Unmute: Already unmuted');
-        } else {
+        var isMuted = webrtcSIPPhone.getMuteStatus();
+        logger.log('Call: UnMute: isMuted: ', isMuted);
+        if (isMuted) {
             webrtcSIPPhone.muteAction(false);
+        } else {
+            logger.log('Call: UnMute: Already unmuted');
         }
     }
 

@@ -964,16 +964,22 @@ destroySocketConnection() {
 
 
 	onMuted(s) {
+		logger.log(`[onMuted] Before: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
 		this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('muted');
-	s.isMuted = true;
+		if (s) s.isMuted = true;
+		this.isMuted = true;
+		logger.log(`[onMuted] After: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
 		this.ctxSip.setCallSessionStatus("Muted");
-}
+	}
 
 	onUnmuted(s) {
+		logger.log(`[onUnmuted] Before: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
 		this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('unmuted');
-	s.isMuted = false;
+		if (s) s.isMuted = false;
+		this.isMuted = false;
+		logger.log(`[onUnmuted] After: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
 		this.ctxSip.setCallSessionStatus("Answered");
-}
+	}
 
 	onHold(s) {
 	//webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('hold');
@@ -1227,6 +1233,14 @@ destroySocketConnection() {
 	}
 
 	getMicMuteStatus() {
+		// Prefer session mute state if available
+		let sessionMuted = undefined;
+		if (this.ctxSip && this.ctxSip.callActiveID && this.ctxSip.Sessions && this.ctxSip.Sessions[this.ctxSip.callActiveID]) {
+			sessionMuted = !!this.ctxSip.Sessions[this.ctxSip.callActiveID].isMuted;
+			logger.log(`[getMicMuteStatus] sessionMuted: ${sessionMuted}, global isMuted: ${this.isMuted}`);
+			return sessionMuted;
+		}
+		logger.log(`[getMicMuteStatus] No active session, global isMuted: ${this.isMuted}`);
 		return this.isMuted;
 	}
 
@@ -1339,19 +1353,52 @@ destroySocketConnection() {
 	}
 
 	changeAudioInputDevice(deviceId, onSuccess, onError) {
+		logger.log("sipjsphone: changeAudioInputDevice : ", deviceId, onSuccess, onError);
 		audioDeviceManager.changeAudioInputDevice(deviceId, (stream) => {
 			const trackChanged = this.replaceSenderTrack(stream, deviceId);
 			if (trackChanged) {
 				audioDeviceManager.currentAudioInputDeviceId = deviceId;
 				logger.log(`sipjsphone: changeAudioInputDevice: Input device changed to: ${deviceId}`);
-
-				onSuccess();
+				if (onSuccess) onSuccess();
 			} else {
 				logger.error("sipjsphone: changeAudioInputDevice: failed");
-				onError("replaceSenderTrack failed for webrtc");
+				if (onError) onError("replaceSenderTrack failed for webrtc");
 			}
-		}, onError);
+		}, (err) => {
+			logger.error("sipjsphone: changeAudioInputDevice error:", err);
+			if (onError) onError(err);
+		});
 	}
+
+	async changeAudioOutputDevice(deviceId, onSuccess, onError) {
+		try {
+			// Ensure device list is up-to-date
+			await audioDeviceManager.enumerateDevices();
+			if (!this.audioRemote) {
+				const errorMsg = 'SIPJSPhone:changeAudioOutputDevice audioRemote element is not set.';
+				logger.error(errorMsg);
+				if (onError) onError(errorMsg);
+				return;
+			}
+			if (typeof this.audioRemote.sinkId === 'undefined') {
+				const errorMsg = 'SIPJSPhone:changeAudioOutputDevice Browser does not support output device selection.';
+				logger.error(errorMsg);
+				if (onError) onError(errorMsg);
+				return;
+			}
+			audioDeviceManager.changeAudioOutputDevice(this.audioRemote, deviceId, () => {
+				this.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
+				if (onSuccess) onSuccess();
+			}, (err) => {
+				logger.error('SIPJSPhone:changeAudioOutputDevice error:', err);
+				if (onError) onError(err);
+			});
+		} catch (e) {
+			logger.error('SIPJSPhone:changeAudioOutputDevice unexpected error:', e);
+			if (onError) onError(e);
+		}
+	}
+
 	changeAudioOutputDeviceForAdditionalAudioElement(deviceId) {
 		const additionalAudioElements = [this.ringtone, this.beeptone, this.ringbacktone, this.dtmftone];
 		let i = 0;
@@ -1365,12 +1412,6 @@ destroySocketConnection() {
 		} catch (e) {
 			logger.error("sipjsphone:changeAudioOutputDeviceForAdditionalAudioElement failed to setSink for additonal AudioElements", e);
 		}
-		}
-	changeAudioOutputDevice(deviceId, onSuccess, onError) {
-		audioDeviceManager.changeAudioOutputDevice(this.audioRemote, deviceId, () => {
-			this.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
-			onSuccess();
-		}, onError);
 	}
 
 	stopStreamTracks(stream) {
@@ -1441,8 +1482,17 @@ destroySocketConnection() {
 	}
 
 	onInvitationSessionAccepted(newSess) {
+		// Reset mute state at the start of every call
+		logger.log(`[onInvitationSessionAccepted] Resetting mute state. Before: newSess.isMuted=${newSess && newSess.isMuted}, global isMuted=${this.isMuted}`);
+		this.isMuted = false;
+		if (newSess && newSess.isMuted !== undefined) {
+			newSess.isMuted = false;
+		}
+		logger.log(`[onInvitationSessionAccepted] After reset: newSess.isMuted=${newSess && newSess.isMuted}, global isMuted=${this.isMuted}`);
 		this.ctxSip.Stream = newSess.sessionDescriptionHandler.localMediaStream;
+		logger.log('onInvitationSessionAccepted: assigning remote stream to audioRemote');
 		this.assignStream(newSess.sessionDescriptionHandler.remoteMediaStream, this.audioRemote);
+		logger.log('onInvitationSessionAccepted: assignStream called');
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('accepted');
 			this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("connected", "CALL");
@@ -1578,6 +1628,16 @@ destroySocketConnection() {
 			this.setPreferredCodec(sipAccountInfo.preferredCodec);
 			this.registerPhoneEventListeners(this.ctxSip);
 		});
+	}
+
+	muteAction(bMute) {
+		logger.log("webrtcSIPPhone: muteAction: ", [bMute]);
+		// Always operate on the current session
+		if (this.ctxSip && this.ctxSip.callActiveID && this.ctxSip.Sessions && this.ctxSip.Sessions[this.ctxSip.callActiveID]) {
+			this.phone.sipMute(bMute);
+		} else {
+			logger.warn("webrtcSIPPhone: muteAction: No active session to mute/unmute");
+		}
 	}
 
 }
