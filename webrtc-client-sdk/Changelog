@@ -1,5 +1,11 @@
 Change Log
 
+## v2.0.1 19 June, 2025
+-[VST-1031] Maintaining v1.0.23
+
+## v1.0.24 19 June, 2025
+-[VST-1031] Deprecated, v1.0.21 for customers using CRM SDK with old SDK
+
 ## v1.0.23 10 June, 2025
 -[VST-1011] Increasing Registration Expiry from 60s to 300s
 
