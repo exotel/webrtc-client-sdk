@@ -1,7 +1,8 @@
+import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 import { diagnosticsCallback } from "../../listeners/Callback";
 
-import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
-var logger = webrtcSIPPhone.getLogger();
+const logger = getLogger();
+
 var speakerNode;
 var micNode;
 var audioTrack;
@@ -23,6 +24,21 @@ eventMapper.sipml5.connected_REGISTER = "USER_REG_TEST_PASS";
 eventMapper.sipml5.terminated_REGISTER = "USER_REG_TEST_FAIL";
 
 var candidateProcessData = {};
+
+export class Diagnostics {
+    constructor() {
+        this.report = {};
+    }
+
+    setReport(key, value) {
+        this.report[key] = value;
+        logger.log("Diagnostics: setReport", key, value);
+    }
+
+    getReport() {
+        return this.report;
+    }
+}
 
 export var ameyoWebRTCTroubleshooter = {
   js_yyyy_mm_dd_hh_mm_ss: function () {
@@ -139,35 +155,45 @@ export var ameyoWebRTCTroubleshooter = {
     return browserName + "/" + version;
   },
 
-  stopSpeakerTesttone: function () {
+  stopSpeakerTesttone: function (webrtcSIPPhone) {
+    if (!webrtcSIPPhone) {
+      logger.log("stopSpeakerTesttone: webrtcSIPPhone not provided");
+      return;
+    }
     speakerTestTone = webrtcSIPPhone.getSpeakerTestTone();
     speakerTestTone.pause();
   },
 
-  stopSpeakerTesttoneWithSuccess: function () {
-    this.stopSpeakerTest();
+  stopSpeakerTesttoneWithSuccess: function (webrtcSIPPhone) {
+    this.stopSpeakerTest(webrtcSIPPhone);
     this.sendDeviceTestingEvent("SPEAKER_TEST_PASS");
     this.addToTrobuleshootReport("INFO", "Speaker device testing is successfull");
     this.addToTrobuleshootReport("INFO", "Speaker device testing is completed");
   },
 
-  stopSpeakerTesttoneWithFailure: function () {
-    this.stopSpeakerTest();
+  stopSpeakerTesttoneWithFailure: function (webrtcSIPPhone) {
+    this.stopSpeakerTest(webrtcSIPPhone);
     this.sendDeviceTestingEvent("SPEAKER_TEST_FAIL");
     this.addToTrobuleshootReport("INFO", "Speaker device testing is failed");
     this.addToTrobuleshootReport("INFO", "Speaker device testing is completed");
   },
 
-  startSpeakerTest: function () {
+  startSpeakerTest: function (webrtcSIPPhone) {
     var parent = this;
-
+    if (!webrtcSIPPhone) {
+      logger.log("startSpeakerTest: webrtcSIPPhone not provided");
+      return;
+    }
+    if (intervalID) {
+      logger.log("startSpeakerTest: already running");
+      return;
+    }
     try {
       intervalID = setInterval(function () {
 
         try {
           speakerTestTone = webrtcSIPPhone.getSpeakerTestTone();
-          /* Close last pending tracks.. */
-          logger.log("close last track")
+          logger.log("close last track");
           speakerTestTone.pause();
           parent.closeAudioTrack();
 
@@ -223,14 +249,18 @@ export var ameyoWebRTCTroubleshooter = {
 
   },
 
-  stopSpeakerTest: function () {
+  stopSpeakerTest: function (webrtcSIPPhone) {
     var parent = this;
+    if (!webrtcSIPPhone) {
+      logger.log("stopSpeakerTest: webrtcSIPPhone not provided");
+      return;
+    }
     speakerTestTone = webrtcSIPPhone.getSpeakerTestTone();
-    //Enable this for tone loop - Start
     try {
-      clearInterval(intervalID)
-      intervalID = 0
-      //Enable this for tone loop - End
+      if (intervalID) {
+        clearInterval(intervalID);
+        intervalID = 0;
+      }
       speakerTestTone.pause();
       parent.closeAudioTrack();
       parent.addToTrobuleshootReport("INFO", "Speaker device testing is stopped");
@@ -437,9 +467,8 @@ export var ameyoWebRTCTroubleshooter = {
     logger.log("No explicit registration sent during testing...")
   },
 
-  setWSTroubleshootData: function (txtWsStatus) {
-    //Already done during init, no need to do again. 
-    let txtWSSUrl = webrtcSIPPhone.getWSSUrl();
+  setWSTroubleshootData: function (txtWsStatus, webrtcSIPPhone) {
+    let txtWSSUrl = webrtcSIPPhone && webrtcSIPPhone.getWSSUrl ? webrtcSIPPhone.getWSSUrl() : '';
     diagnosticsCallback.triggerKeyValueSetCallback("wss", txtWsStatus, txtWSSUrl)
   },
 

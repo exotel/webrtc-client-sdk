@@ -1,6 +1,6 @@
-import { webrtcSIPPhone } from "@exotel-npm-dev/webrtc-core-sdk";
+import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 
-var logger = webrtcSIPPhone.getLogger();
+const logger = getLogger();
 
 /**
  * The call backs are called through this function. First initiates the call object and then
@@ -10,43 +10,52 @@ var logger = webrtcSIPPhone.getLogger();
 /**
  * Initializes call event callbacks and also sends to which phone callback was received
  */
-export var callbacks = {
-    callback: null,
-    call: null,
-    phone: '',
-    initializeCallback: function (CallListenerCallback) {
-        this.callback = CallListenerCallback;
-    },
-    initializeCall: function (call, phone) {
+export class Callback {
+    constructor() {
+        this.callbacks = {};
+        this.call = null;
+        this.phone = '';
+    }
+
+    registerCallback(event, callback) {
+        this.callbacks[event] = callback;
+    }
+
+    initializeCall(call, phone) {
         this.call = call;
         this.phone = phone;
-    },
-    triggerCallback: function (eventType) {
-        const callbackFunc = this.callback;
-        const call = this.call;
-        return callbackFunc(call, eventType, this.phone);
     }
-};
+
+    triggerCallback(event, ...args) {
+        if (this.callbacks[event]) {
+            this.callbacks[event](...args);
+        } else {
+            logger.log("No callback registered for event:", event);
+        }
+    }
+}
+
 /**
  * Initializes register callback and also sets to which phone registration was renewed
  */
-export var registerCallback = {
-    registerCallbackHandler: null,
-    registerState: null,
-    phone: '',
-    initializeRegisterCallback: function (RegisterEventCallBack) {
-        registerCallback.registerCallbackHandler = RegisterEventCallBack;
-    },
-    initializeRegister: function (state, phone) {
-        registerCallback.registerState = state;
-        registerCallback.phone = phone;
-    },
-    triggerRegisterCallback: function () {
-        const callbackFunc = registerCallback.registerCallbackHandler;
-        const state = registerCallback.registerState
-        return callbackFunc(state, registerCallback.phone);
-    }
-};
+
+export class RegisterCallback  {
+    registerCallbackHandler = null;
+    registerState= null;
+    phone= '';
+    initializeRegisterCallback= function (RegisterEventCallBack) {
+        this.registerCallbackHandler = RegisterEventCallBack;
+    };
+    initializeRegister= function (state, phone) {
+        this.registerState = state;
+        this.phone = phone;
+    };
+    triggerRegisterCallback= function () {
+        const callbackFunc = this.registerCallbackHandler;
+        const state = this.registerState
+        return callbackFunc(state, this.phone);
+    };
+}
 /**
  * Sets all the phone instances
  */
@@ -79,30 +88,30 @@ export var phoneInstance = {
     }
 };
 
-export var sessionCallback = {
-    sessioncallback: null,
-    callState: null,
-    document: null,
-    documentCallback: null,
-    phone: '',
-    initializeSessionCallback: function (SessionCallback) {
+export class SessionCallback  {
+    sessioncallback = null;
+    callState= null;
+    document= null;
+    documentCallback= null;
+    phone= '';
+    initializeSessionCallback= function (SessionCallback) {
         this.sessioncallback = SessionCallback;
-    },
-    intializeDocumentCallback: function (DocumentCallback) {
+    };
+    intializeDocumentCallback= function (DocumentCallback) {
         this.documentCallback = DocumentCallback;
-    },
-    initializeSession: function (state, phone) {
+    };
+    initializeSession= function (state, phone) {
         this.callState = state;
         this.phone = phone;
-    },
-    initializeDocument: function (calldocument) {
+    };
+    initializeDocument= function (calldocument) {
         this.document = calldocument;
-    },
-    triggerDocumentCallback: function () {
+    };
+    triggerDocumentCallback= function () {
         const documentCallbackFunc = this.documentCallback;
         return documentCallbackFunc(this.document);
-    },
-    triggerSessionCallback: function () {
+    };
+    triggerSessionCallback= function () {
         const sessionCallBackFunc = this.sessioncallback;
         if (sessionCallBackFunc) {
             return sessionCallBackFunc(this.callState, this.phone);

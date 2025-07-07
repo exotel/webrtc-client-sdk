@@ -1,38 +1,35 @@
-import { callbacks } from "./Callback";
-import { webrtcSIPPhone } from "@exotel-npm-dev/webrtc-core-sdk";
+import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 
-var logger = webrtcSIPPhone.getLogger();
+const logger = getLogger();
 
-export function CallListener() {
-    this.onIncomingCall = function (call, phone) {
-        /**
-         * When there is an incoming call, [INVITE is received on SIP] send a call back to the 
-         */
-        logger.log("CallListener:Initialise call")
-        callbacks.initializeCall(call, phone)
-
-        /** Triggers the callback on the UI end with message indicating it to be an incoming call */
-        logger.log("CallListener:Trigger Incoming")
-        callbacks.triggerCallback("incoming");
+export class CallListener {
+    constructor(callCallback) {
+        this.callCallback = callCallback;
     }
-    this.onCallEstablished = function (call, phone) {
-        /**
-         * When connection is established [ACK is sent by other party on SIP]
-         */
-        logger.log("CallListener:Initialise call")
-        callbacks.initializeCall(call, phone)
-        /** Triggers the callback on the UI end with message indicating call has been established*/
-        logger.log("CallListener:Trigger Connected")
-        callbacks.triggerCallback("connected")
+
+    onIncomingCall(call, phone) {
+        logger.log("CallListener: onIncomingCall", call, phone);
+        this.callCallback.initializeCall(call, phone);
+        this.callCallback.triggerCallback("call", call, "incoming", phone);
     }
-    this.onCallEnded = function (call, phone) {
-        /**
-         * When other party ends the call [BYE is received and sent by SIP]
-         */
-        logger.log("CallListener:Initialise call")
-        callbacks.initializeCall(call, phone)
-        /** Triggers the callback on the UI end with message indicating call has ended */
-        logger.log("CallListener:Trigger Call Ended")
-        callbacks.triggerCallback("callEnded")
+
+    onCallEstablished(call, phone) {
+        logger.log("CallListener: onCallEstablished", call, phone);
+        this.callCallback.triggerCallback("call", call, "connected", phone);
+    }
+
+    onCallEnded(call, phone) {
+        logger.log("CallListener: onCallEnded", call, phone);
+        this.callCallback.triggerCallback("call", call, "callEnded", phone);
+    }
+
+    onCallEvent(event) {
+        logger.log("CallListener: onCallEvent", event);
+        this.callCallback.triggerCallback(event);
+    }
+
+    onRinging(call, phone) {
+        logger.log("CallListener: onRinging", call, phone);
+        this.callCallback.triggerCallback("call", call, "ringing", phone);
     }
 }

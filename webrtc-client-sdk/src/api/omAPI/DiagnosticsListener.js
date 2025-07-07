@@ -1,9 +1,9 @@
+import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 import { diagnosticsCallback } from '../../listeners/Callback';
 import { ameyoWebRTCTroubleshooter } from './Diagnostics';
-import { webrtcSIPPhone } from '@exotel-npm-dev/webrtc-core-sdk';
 
+const logger = getLogger();
 
-var logger = webrtcSIPPhone.getLogger();
 
 export function initDiagnostics(setDiagnosticsReportCallback, keyValueSetCallback) {
     if (!keyValueSetCallback || !setDiagnosticsReportCallback) {
@@ -23,27 +23,27 @@ export function closeDiagnostics() {
     return;
 }
 
-export function startSpeakerDiagnosticsTest() {
+export function startSpeakerDiagnosticsTest(webrtcSIPPhone) {
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
     logger.log("Request to startSpeakerTest:\n");
-    ameyoWebRTCTroubleshooter.startSpeakerTest()
+    ameyoWebRTCTroubleshooter.startSpeakerTest(webrtcSIPPhone)
     return;
 }
 
-export function stopSpeakerDiagnosticsTest(speakerTestResponse) {
+export function stopSpeakerDiagnosticsTest(speakerTestResponse, webrtcSIPPhone) {
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
 
     logger.log("Request to stopSpeakerTest - Suuccessful Test:\n");
     if (speakerTestResponse == 'yes') {
-        ameyoWebRTCTroubleshooter.stopSpeakerTesttoneWithSuccess()
+        ameyoWebRTCTroubleshooter.stopSpeakerTesttoneWithSuccess(webrtcSIPPhone)
     } else if (speakerTestResponse == 'no') {
-        ameyoWebRTCTroubleshooter.stopSpeakerTesttoneWithFailure()
+        ameyoWebRTCTroubleshooter.stopSpeakerTesttoneWithFailure(webrtcSIPPhone)
     } else {
-        ameyoWebRTCTroubleshooter.stopSpeakerTest()
+        ameyoWebRTCTroubleshooter.stopSpeakerTest(webrtcSIPPhone)
     }
     return;
 }
@@ -93,4 +93,15 @@ export function stopNetworkDiagnostics() {
      */
     logger.log("Request to stop network diagnostics:\n");
     return;
+}
+
+export class DiagnosticsListener {
+    constructor(diagnosticsCallback) {
+        this.diagnosticsCallback = diagnosticsCallback;
+    }
+
+    onDiagnosticsEvent(event) {
+        logger.log("DiagnosticsListener: onDiagnosticsEvent", event);
+        this.diagnosticsCallback.triggerCallback(event);
+    }
 }

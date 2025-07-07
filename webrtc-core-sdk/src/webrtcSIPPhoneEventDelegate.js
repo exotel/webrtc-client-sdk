@@ -1,177 +1,250 @@
-/*
- * delegate listener , webrtc sip phone could invoke events to delegate and it will further send event to registered delegator
- */
-let testingMode = false;
-let delegate = null;
+import coreSDKLogger from './coreSDKLogger';
 
+const logger = coreSDKLogger;
 
-const webrtcSIPPhoneEventDelegate = {
-		
-	registerDelegate : (webrtcDelegate) => {
-		delegate = webrtcDelegate;
-	},
+class WebrtcSIPPhoneEventDelegate {
 
-	setTestingMode : (mode) => {
-		if(delegate) {
-			delegate.setTestingMode(mode);
-		}
-	}, 	
-		
-	onCallStatSipJsSessionEvent : (ev) => {
-		if(delegate) {
-			delegate.onCallStatSipJsSessionEvent(ev);
-		}
-	},
-	
-	sendWebRTCEventsToFSM : (eventType, sipMethod) => {
-		if(delegate) {
-			delegate.sendWebRTCEventsToFSM(eventType, sipMethod);
-		}
-	},
-	
-	playBeepTone : () => {
-		if(delegate) {
-			delegate.playBeepTone();
-		}
-	},
-	
-	onStatPeerConnectionIceGatheringStateChange: (iceGatheringState) => {
-		if(delegate) {
-			delegate.onStatPeerConnectionIceGatheringStateChange(iceGatheringState);
-		}
-	},
-	
-	onCallStatIceCandidate: (ev, icestate) => {
-		if(delegate) {
-			delegate.onCallStatIceCandidate(ev,icestate);
-		}
-	},
-	
-	
-	onCallStatNegoNeeded: (icestate) => {
-		if(delegate) {
-			delegate.onCallStatNegoNeeded(icestate);
-		}
-	},
-
-	onCallStatSignalingStateChange: (cstate) => {
-		if(delegate) {
-			delegate.onCallStatSignalingStateChange(cstate);
-		}
-	},
-
-	
-	onStatPeerConnectionIceConnectionStateChange: () => {
-		if(delegate) {
-			delegate.onStatPeerConnectionIceConnectionStateChange();
-		}
-	},
-	
-	
-	onStatPeerConnectionConnectionStateChange: () => {
-		if(delegate) {
-			delegate.onStatPeerConnectionConnectionStateChange();
-		}
-	},
-	
-	onGetUserMediaSuccessCallstatCallback: () => {
-		if(delegate) {
-			delegate.onGetUserMediaSuccessCallstatCallback();
-		}
-	},
-
-	onGetUserMediaErrorCallstatCallback: () => {
-		if(delegate) {
-			delegate.onGetUserMediaErrorCallstatCallback();
-		}
-	},
-	
-	
-	onCallStatAddStream: () => {
-		if(delegate) {
-			delegate.onCallStatAddStream();
-		}
-	},
-
-	onCallStatRemoveStream: () => {
-		if(delegate) {
-			delegate.onCallStatRemoveStream();
-		}
-	},
-	
-	setWebRTCFSMMapper : () => {
-		if(delegate) {
-			delegate.setWebRTCFSMMapper();
-		}
-	},
-	
-	onCallStatSipJsTransportEvent : () => {
-		if(delegate) {
-			delegate.onCallStatSipJsTransportEvent();
-		}
-	},
-	
-	onCallStatSipSendCallback: (tsipData, sipStack) => {
-		if(delegate) {
-			delegate.onCallStatSipSendCallback();
-		}
-	},
-
-	onCallStatSipRecvCallback: (tsipData, sipStack) => {
-		if(delegate) {
-			delegate.onCallStatSipRecvCallback();
-		}
-	},
-
-	stopCallStat: () => {
-		if(delegate) {
-			delegate.stopCallStat();
-		}
-	},
-	
-	onRecieveInvite: (incomingSession) => {
-		if(delegate) {
-			delegate.onRecieveInvite(incomingSession);
-		}
-	},
-	
-	onPickCall: () => {
-		if(delegate) {
-			delegate.onPickCall();
-		}
-	},
-
-	onRejectCall : () => {
-		if(delegate) {
-			delegate.onRejectCall();
-		}
-	},
-	
-	onCreaterAnswer: () => {
-		if(delegate) {
-			delegate.onCreaterAnswer();
-		}
-	},
-
-	onSettingLocalDesc: () => {
-		if(delegate) {
-			delegate.onSettingLocalDesc();
-		}
-	},
-
-	initGetStats: (pc, callid, username) => {
-		if(delegate) {
-			delegate.initGetStats(pc, callid, username);
-		}
-	},
-	
-	onRegisterWebRTCSIPEngine : (engine) => {
-		if(delegate) {
-			delegate.onRegisterWebRTCSIPEngine(engine);
-		}
+	constructor(username) {
+		this.username = username;
+		this._listeners = new Map();
+		this.delegates = new Set();
 	}
-	
-	
+
+	/**
+	 * @param {string}   event  
+	 * @param {Function} handler  
+	 * @returns {Function}       
+	 */
+
+	attach(event, handler) {
+		if (!this._listeners.has(event)) {
+			this._listeners.set(event, new Set());
+		}
+		this._listeners.get(event).add(handler);
+
+		return () => this._listeners.get(event)?.delete(handler);
+	}
+
+	emit(event, ...args) {
+		this._listeners.get(event)?.forEach((h) => {
+			try {
+				h(...args);
+			} catch (e) {
+				console.error(`[Delegate:${this.username}]`, e);
+			}
+		});
+	}
+
+	registerDelegate(webrtcDelegate) {
+		this.delegates.add(webrtcDelegate);
+	}
+
+	unregisterDelegate(webrtcDelegate) {
+		this.delegates.delete(webrtcDelegate);
+	}
+
+	setTestingMode(mode) {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.setTestingMode === 'function') {
+				delegate.setTestingMode(mode);
+			}
+		});
+	}
+
+	onCallStatSipJsSessionEvent(ev) {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onCallStatSipJsSessionEvent === 'function') {
+				delegate.onCallStatSipJsSessionEvent(ev);
+			}
+		});
+	}
+
+	sendWebRTCEventsToFSM(eventType, sipMethod) {
+		logger.log("delegationHandler: sendWebRTCEventsToFSM");
+		logger.log("delegationHandler: eventType", [eventType]);
+		logger.log("delegationHandler: sipMethod", [sipMethod]);
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.sendWebRTCEventsToFSM === 'function') {
+				delegate.sendWebRTCEventsToFSM(eventType, sipMethod);
+			}
+		});
+	}
+
+	playBeepTone() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.playBeepTone === 'function') {
+				delegate.playBeepTone();
+			}
+		});
+	}
+
+	onStatPeerConnectionIceGatheringStateChange(iceGatheringState) {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onStatPeerConnectionIceGatheringStateChange === 'function') {
+				delegate.onStatPeerConnectionIceGatheringStateChange(iceGatheringState);
+			}
+		});
+	}
+
+	onCallStatIceCandidate(ev, icestate) {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onCallStatIceCandidate === 'function') {
+				delegate.onCallStatIceCandidate(ev, icestate);
+			}
+		});
+	}
+
+	onCallStatNegoNeeded(icestate) {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onCallStatNegoNeeded === 'function') {
+				delegate.onCallStatNegoNeeded(icestate);
+			}
+		});
+	}
+
+	onCallStatSignalingStateChange(cstate) {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onCallStatSignalingStateChange === 'function') {
+				delegate.onCallStatSignalingStateChange(cstate);
+			}
+		});
+	}
+
+	onStatPeerConnectionIceConnectionStateChange() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onStatPeerConnectionIceConnectionStateChange === 'function') {
+				delegate.onStatPeerConnectionIceConnectionStateChange();
+			}
+		});
+	}
+
+	onStatPeerConnectionConnectionStateChange() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onStatPeerConnectionConnectionStateChange === 'function') {
+				delegate.onStatPeerConnectionConnectionStateChange();
+			}
+		});
+	}
+
+	onGetUserMediaSuccessCallstatCallback() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onGetUserMediaSuccessCallstatCallback === 'function') {
+				delegate.onGetUserMediaSuccessCallstatCallback();
+			}
+		});
+	}
+
+	onGetUserMediaErrorCallstatCallback() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onGetUserMediaErrorCallstatCallback === 'function') {
+				delegate.onGetUserMediaErrorCallstatCallback();
+			}
+		});
+	}
+
+	onCallStatAddStream() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onCallStatAddStream === 'function') {
+				delegate.onCallStatAddStream();
+			}
+		});
+	}
+
+	onCallStatRemoveStream() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onCallStatRemoveStream === 'function') {
+				delegate.onCallStatRemoveStream();
+			}
+		});
+	}
+
+	setWebRTCFSMMapper(stack) {
+		logger.log("webrtcSIPPhoneEventDelegate: setWebRTCFSMMapper: Initialisation complete");
+	}
+
+	onCallStatSipJsTransportEvent(ev) {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onCallStatSipJsTransportEvent === 'function') {
+				delegate.onCallStatSipJsTransportEvent(ev);
+			}
+		});
+	}
+
+	onCallStatSipSendCallback(tsipData, sipStack) {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onCallStatSipSendCallback === 'function') {
+				delegate.onCallStatSipSendCallback(tsipData, sipStack);
+			}
+		});
+	}
+
+	onCallStatSipRecvCallback(tsipData, sipStack) {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onCallStatSipRecvCallback === 'function') {
+				delegate.onCallStatSipRecvCallback(tsipData, sipStack);
+			}
+		});
+	}
+
+	stopCallStat() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.stopCallStat === 'function') {
+				delegate.stopCallStat();
+			}
+		});
+	}
+
+	onRecieveInvite(incomingSession) {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onRecieveInvite === 'function') {
+				delegate.onRecieveInvite(incomingSession);
+			}
+		});
+	}
+
+	onPickCall() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onPickCall === 'function') {
+				delegate.onPickCall();
+			}
+		});
+	}
+
+	onRejectCall() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onRejectCall === 'function') {
+				delegate.onRejectCall();
+			}
+		});
+	}
+
+	onCreaterAnswer() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onCreaterAnswer === 'function') {
+				delegate.onCreaterAnswer();
+			}
+		});
+	}
+
+	onSettingLocalDesc() {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onSettingLocalDesc === 'function') {
+				delegate.onSettingLocalDesc();
+			}
+		});
+	}
+
+	initGetStats(pc, callid, username) {
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.initGetStats === 'function') {
+				delegate.initGetStats(pc, callid, username);
+			}
+		});
+	}
+
+	onRegisterWebRTCSIPEngine(engine) {
+		this.emit("engine-selected", engine);
+	}
 }
 
-export default webrtcSIPPhoneEventDelegate;
+export default WebrtcSIPPhoneEventDelegate;
