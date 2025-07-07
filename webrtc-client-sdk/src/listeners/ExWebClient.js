@@ -242,19 +242,25 @@ export class ExotelWebClient {
 
     initWebrtc = async (sipAccountInfo_,
         RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
-        // Username validation: prevent duplicate registration (atomic check and reserve)
-        const userName = sipAccountInfo_ && sipAccountInfo_.userName;
-        if (!userName) {
-            logger.error("ExWebClient: initWebrtc: No username provided.");
-            return false;
+        const userName = sipAccountInfo_?.userName;
+        if (!userName) return false;          // basic check
+
+        /* ───── duplicate‑registration guard ───── */
+        if (phonePool.has(userName)) {        // someone already reserved/created this user
+            if (this.currentSIPUserName === "") {
+                // this instance is brand‑new → reject outright
+                logger.warn(`[Dup‑Reg] ${userName} already in use – new instance rejected`);
+                return false;
+            } else if (this.currentSIPUserName !== userName) {
+                // this instance is already bound to a different user → reject
+                logger.warn(`[Dup‑Reg] ${userName} differs from current ${this.currentSIPUserName} – rejected`);
+                return false;
+            }
         }
-        // ---------- duplicate / in‑progress guard ----------
-        if (phonePool.has(userName)) {               // null OR phone means "busy"
-            logger.warn(`[Dup Reg] ${userName} already initialising/registered`);
-            return false;
-        }
+
+        // bind the user to this instance for future checks
+        this.currentSIPUserName = userName;
         phonePool.set(userName, null);               // reserve immediately
-        try {
 
         if (!this.eventListener) {
             this.eventListener = new ExotelVoiceClientListener(this.registerCallback);
@@ -275,7 +281,6 @@ export class ExotelWebClient {
         logger.log("ExWebClient: initWebrtc: Exotel Client Initialised with " + JSON.stringify(sipAccountInfo_))
         this.sipAccountInfo = sipAccountInfo_;
         if (!this.sipAccountInfo["userName"] || !this.sipAccountInfo["sipdomain"] || !this.sipAccountInfo["port"]) {
-            phonePool.delete(user);
             return false;
         }
         this.sipAccountInfo["sipUri"] = "wss://" + this.sipAccountInfo["userName"] + "@" + this.sipAccountInfo["sipdomain"] + ":" + this.sipAccountInfo["port"];
@@ -290,23 +295,27 @@ export class ExotelWebClient {
         // Wait for public IP before registering
         await fetchPublicIP(this.sipAccountInfo);
 
-            const phone = new WebrtcSIPPhone(userName);
-            phonePool.set(userName, phone);            // replace placeholder
-            this.phone = this.webrtcSIPPhone = phone;
-            this.currentSIPUserName = userName;
+        // Create phone instance if it wasn't created in constructor
+        if (!this.phone) {
+            this.userName = this.sipAccountInfo.userName;
+            let phone = phonePool.get(this.userName);
+            if (!phone) {
+                phone = new WebrtcSIPPhone(this.userName);
+                phonePool.set(this.userName, phone);
+            }
+            this.phone = phone;
+            this.webrtcSIPPhone = this.phone;
+        }
+
+        // Initialize the phone with SIP engine
+        this.webrtcSIPPhone.registerPhone("sipjs", new ExDelegationHandler(this));
 
         // Create call instance after phone is initialized
         if (!this.call) {
             this.call = new Call(this.webrtcSIPPhone);
         }
 
-            this.webrtcSIPPhone.registerPhone("sipjs", new ExDelegationHandler(this));
-
         return true;
-        } catch (err) {
-            phonePool.delete(userName);                // clean up on failure
-            throw err;
-        }
     };
 
     DoRegister = () => {
