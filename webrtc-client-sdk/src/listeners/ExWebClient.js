@@ -241,6 +241,18 @@ export class ExotelWebClient {
 
     initWebrtc = async (sipAccountInfo_,
         RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
+        // Username validation: prevent duplicate registration (atomic check and reserve)
+        const userName = sipAccountInfo_ && sipAccountInfo_.userName;
+        if (!userName) {
+            logger.error("ExWebClient: initWebrtc: No username provided.");
+            return false;
+        }
+        if (phonePool.has(userName)) {
+            logger.error(`ExWebClient: initWebrtc: Registration attempt with duplicate username '${userName}'. Registration aborted.`);
+            return false;
+        }
+        // Reserve the username immediately to prevent race conditions
+        phonePool.set(userName, null); // placeholder until phone is created
 
         if (!this.eventListener) {
             this.eventListener = new ExotelVoiceClientListener(this.registerCallback);
@@ -389,6 +401,11 @@ export class ExotelWebClient {
             this.registrationInProgress = false;
             this.unregisterInitiated = false;
             this.isReadyToRegister = true;
+            // Remove from phonePool on unregistration
+            if (this.userName && phonePool.has(this.userName)) {
+                phonePool.delete(this.userName);
+                logger.log(`ExWebClient: registerEventCallback: Removed '${this.userName}' from phonePool after unregistration.`);
+            }
             this.eventListener.onRegistrationStateChanged("unregistered", phone);
         }
     };
