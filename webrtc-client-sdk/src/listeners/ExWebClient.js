@@ -243,24 +243,17 @@ export class ExotelWebClient {
     initWebrtc = async (sipAccountInfo_,
         RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
         const userName = sipAccountInfo_?.userName;
-        if (!userName) return false;          // basic check
+        if (!userName) return false;
 
-        /* ───── duplicate‑registration guard ───── */
-        if (phonePool.has(userName)) {        // someone already reserved/created this user
-            if (this.currentSIPUserName === "") {
-                // this instance is brand‑new → reject outright
-                logger.warn(`[Dup‑Reg] ${userName} already in use – new instance rejected`);
-                return false;
-            } else if (this.currentSIPUserName !== userName) {
-                // this instance is already bound to a different user → reject
-                logger.warn(`[Dup‑Reg] ${userName} differs from current ${this.currentSIPUserName} – rejected`);
+        // --- Duplicate registration guard ---
+        if (phonePool.has(userName)) {
+            if (!this.currentSIPUserName || this.currentSIPUserName !== userName) {
+                logger.warn(`ExWebClient: initWebrtc: [Dup‑Reg] ${userName} already in use – init rejected`);
                 return false;
             }
         }
-
-        // bind the user to this instance for future checks
         this.currentSIPUserName = userName;
-        phonePool.set(userName, null);               // reserve immediately
+        phonePool.set(userName, null); 
 
         if (!this.eventListener) {
             this.eventListener = new ExotelVoiceClientListener(this.registerCallback);
