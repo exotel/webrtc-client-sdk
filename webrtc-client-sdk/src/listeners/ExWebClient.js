@@ -247,7 +247,7 @@ export class ExotelWebClient {
 
         // --- Duplicate registration guard ---
         if (phonePool.has(userName)) {
-            if (!this.currentSIPUserName || this.currentSIPUserName !== userName) {
+            if (this.currentSIPUserName == "" || this.currentSIPUserName !== userName) {
                 logger.warn(`ExWebClient: initWebrtc: [Dup‑Reg] ${userName} already in use – init rejected`);
                 return false;
             }
