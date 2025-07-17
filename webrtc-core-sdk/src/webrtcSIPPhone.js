@@ -37,13 +37,11 @@ export const webrtcSIPPhone = {
 	},
 
 	registerWebRTCClient: (sipAccountInfo, handler, enableAutoAudioDeviceChangeHandling = true) => {
-		logger.log("[registerWebRTCClient] enableAutoAudioDeviceChangeHandling:", enableAutoAudioDeviceChangeHandling);
 		logger.log("webrtcSIPPhone: registerWebRTCClient : ",sipAccountInfo,handler);
 		sipAccountInfoData = sipAccountInfo;
 		phone.init(() => {
 			phone.loadCredentials(sipAccountInfo);
 			if (enableAutoAudioDeviceChangeHandling) {
-				logger.log("[registerWebRTCClient] Setting up auto device change handler");
 				if (typeof phone.setupOnDeviceChangeHandler === 'function') {
 					phone.setupOnDeviceChangeHandler();
 				}
@@ -147,8 +145,8 @@ export const webrtcSIPPhone = {
 
 
 
-	registerPhone: (engine, delegate) => {
-		logger.log("webrtcSIPPhone: registerPhone : ",engine);
+	registerPhone: (engine, delegate, enableAutoAudioDeviceChangeHandling = true) => {
+		logger.log("webrtcSIPPhone: registerPhone : ",engine, "enableAutoAudioDeviceChangeHandling:", enableAutoAudioDeviceChangeHandling);
 		webrtcSIPEngine = engine;
 		switch (engine) {
 			case "sipjs":
@@ -159,6 +157,7 @@ export const webrtcSIPPhone = {
 		}
 		webrtcSIPPhoneEventDelegate.registerDelegate(delegate);
 		webrtcSIPPhoneEventDelegate.onRegisterWebRTCSIPEngine(engine);
+		phone.setEnableAutoAudioDeviceChangeHandling(enableAutoAudioDeviceChangeHandling);
 
 
 	},
@@ -231,12 +230,12 @@ export const webrtcSIPPhone = {
 	},
 
 	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
-		logger.log(`[webrtcSIPPhone.changeAudioInputDevice] deviceId: ${deviceId}, forceDeviceChange: ${forceDeviceChange}`);
+		logger.log("webrtcSIPPhone: changeAudioInputDevice : ", deviceId, onSuccess, onError);
 		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	},
 
 	changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
-		logger.log(`[webrtcSIPPhone.changeAudioOutputDevice] deviceId: ${deviceId}, forceDeviceChange: ${forceDeviceChange}`);
+		logger.log("webrtcSIPPhone: changeAudioOutputDevice : ", deviceId, onSuccess, onError);
 		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	},
 	setPreferredCodec(codecName) {
@@ -250,6 +249,7 @@ export const webrtcSIPPhone = {
 	getLogger() {
 		return coreSDKLogger;
 	}
+
 
 };
 
