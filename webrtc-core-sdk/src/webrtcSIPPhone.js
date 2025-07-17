@@ -36,11 +36,18 @@ export const webrtcSIPPhone = {
 		phone.sipSendDTMF(dtmfValue);
 	},
 
-	registerWebRTCClient: (sipAccountInfo, handler) => {
+	registerWebRTCClient: (sipAccountInfo, handler, enableAutoAudioDeviceChangeHandling = true) => {
+		logger.log("[registerWebRTCClient] enableAutoAudioDeviceChangeHandling:", enableAutoAudioDeviceChangeHandling);
 		logger.log("webrtcSIPPhone: registerWebRTCClient : ",sipAccountInfo,handler);
 		sipAccountInfoData = sipAccountInfo;
 		phone.init(() => {
 			phone.loadCredentials(sipAccountInfo);
+			if (enableAutoAudioDeviceChangeHandling) {
+				logger.log("[registerWebRTCClient] Setting up auto device change handler");
+				if (typeof phone.setupOnDeviceChangeHandler === 'function') {
+					phone.setupOnDeviceChangeHandler();
+				}
+			}
 			if (webrtcSIPPhone.getWebRTCStatus() == "offline") {
 				if (handler != null)
 					if (handler.onFailure)
@@ -223,14 +230,14 @@ export const webrtcSIPPhone = {
 		}
 	},
 
-	changeAudioInputDevice(deviceId, onSuccess, onError) {
-		logger.log("webrtcSIPPhone: changeAudioInputDevice : ", deviceId, onSuccess, onError);
-		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
+	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
+		logger.log(`[webrtcSIPPhone.changeAudioInputDevice] deviceId: ${deviceId}, forceDeviceChange: ${forceDeviceChange}`);
+		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	},
 
-	changeAudioOutputDevice(deviceId, onSuccess, onError) {
-		logger.log("webrtcSIPPhone: changeAudioOutputDevice : ", deviceId, onSuccess, onError);
-		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
+	changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
+		logger.log(`[webrtcSIPPhone.changeAudioOutputDevice] deviceId: ${deviceId}, forceDeviceChange: ${forceDeviceChange}`);
+		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	},
 	setPreferredCodec(codecName) {
 		logger.log("webrtcSIPPhone: setPreferredCodec : ", codecName);

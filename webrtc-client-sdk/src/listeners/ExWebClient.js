@@ -226,6 +226,7 @@ export class ExotelWebClient {
 
     sipAccountInfo = null;
     clientSDKLoggerCallback = null;
+    enableAutoAudioDeviceChangeHandling = true;
 
     constructor() {
         /* 
@@ -241,8 +242,9 @@ export class ExotelWebClient {
       }
     
 
-    initWebrtc = (sipAccountInfo_,
-        RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
+    initWebrtc = (sipAccountInfo_, RegisterEventCallBack, CallListenerCallback, SessionCallback, enableAutoAudioDeviceChangeHandling = true) => {
+        this.enableAutoAudioDeviceChangeHandling = enableAutoAudioDeviceChangeHandling;
+        logger.log("[initWebrtc] enableAutoAudioDeviceChangeHandling:", enableAutoAudioDeviceChangeHandling);
 
         if (!this.eventListener) {
             this.eventListener = new ExotelVoiceClientListener();
@@ -445,6 +447,7 @@ export class ExotelWebClient {
     initialize = (uiContext, hostName, subscriberName,
         displayName, accountSid, subscriberToken,
         sipAccountInfo) => {
+        logger.log("[initialize] enableAutoAudioDeviceChangeHandling:", this.enableAutoAudioDeviceChangeHandling);
         let wssPort = sipAccountInfo.port;
         let wsPort = 4442;
         this.isReadyToRegister = false;
@@ -462,7 +465,8 @@ export class ExotelWebClient {
             'security': '',
             'endpoint': '',
             'port': '',
-            'contactHost': ''
+            'contactHost': '',
+            'enableAutoAudioDeviceChangeHandling': this.enableAutoAudioDeviceChangeHandling
         }
 
         logger.log('ExWebClient: initialize: Sending register for the number..', subscriberName);
@@ -507,6 +511,7 @@ export class ExotelWebClient {
         this.sipAccntInfo['endpoint'] = this.endpoint;
         this.sipAccntInfo['port'] = webrtcPort;
         this.sipAccntInfo['contactHost'] = this.contactHost;
+        this.sipAccntInfo['enableAutoAudioDeviceChangeHandling'] = this.enableAutoAudioDeviceChangeHandling;
         localStorage.setItem('contactHost', this.contactHost);
         /* This is permanent -End */
 
@@ -522,7 +527,7 @@ export class ExotelWebClient {
 
         /* New-Way  */
         webrtcSIPPhone.registerPhone("sipjs", delegationHandler);
-        webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler);
+        webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler, this.enableAutoAudioDeviceChangeHandling);
 
         /**
          * Store the intervalID against a map
@@ -578,14 +583,14 @@ export class ExotelWebClient {
             });
     };
 
-    changeAudioInputDevice(deviceId, onSuccess, onError) {
-        logger.log(`ExWebClient: changeAudioInputDevice: Entry`);
-        webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
+    changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
+        logger.log(`[changeAudioInputDevice] deviceId: ${deviceId}, forceDeviceChange: ${forceDeviceChange}, enableAutoAudioDeviceChangeHandling: ${this.enableAutoAudioDeviceChangeHandling}`);
+        webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange);
     }
 
-    changeAudioOutputDevice(deviceId, onSuccess, onError) {
-        logger.log(`ExWebClient: changeAudioOutputDevice: Entry`);
-        webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
+    changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
+        logger.log(`[changeAudioOutputDevice] deviceId: ${deviceId}, forceDeviceChange: ${forceDeviceChange}, enableAutoAudioDeviceChangeHandling: ${this.enableAutoAudioDeviceChangeHandling}`);
+        webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange);
     }
 
 	downloadLogs() {

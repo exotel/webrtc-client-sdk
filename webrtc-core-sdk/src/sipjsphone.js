@@ -1315,19 +1315,57 @@ const SIPJSPhone = {
 		return lastRegistererState;
 	},
 
-	changeAudioInputDevice(deviceId, onSuccess, onError) {
+	setupOnDeviceChangeHandler: function () {
+		if (this._deviceChangeHandlerAttached) return;
+		this._deviceChangeHandlerAttached = true;
+		logger.log("[setupOnDeviceChangeHandler] Attaching devicechange event listener for auto device change handling");
+		navigator.mediaDevices.addEventListener('devicechange', (event) => {
+			logger.log("[setupOnDeviceChangeHandler] devicechange event received");
+			try {
+				if (!ctxSip.callActiveID) {
+					audioRemote = document.createElement("audio");
+				}
+				if (SIPJSPhone.onDeviceChangeCallback) {
+					logger.log("SIPJSPhone:ondevicechange relaying event to callback");
+					SIPJSPhone.onDeviceChangeCallback(event);
+				}
+				audioDeviceManager.enumerateDevices(() => {
+					audioDeviceManager.onAudioDeviceChange(audioRemote,
+						function (stream, deviceId) {
+							const trackChanged = SIPJSPhone.replaceSenderTrack(stream, deviceId);
+							if (trackChanged) {
+								audioDeviceManager.currentAudioInputDeviceId = deviceId;
+								if (SIPJSPhone.audioInputDeviceChangeCallback) {
+									SIPJSPhone.audioInputDeviceChangeCallback(deviceId);
+								}
+							}
+						},
+						function (deviceId) {
+							SIPJSPhone.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
+							audioDeviceManager.currentAudioOutputDeviceId = deviceId;
+							if (SIPJSPhone.audioOutputDeviceChangeCallback) {
+								SIPJSPhone.audioOutputDeviceChangeCallback(deviceId);
+							}
+						}
+					);
+				});
+			} catch (e) {
+				logger.error("SIPJSPhone:ondevicechange something went wrong during device change", e);
+			}
+		});
+	},
+	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
 		audioDeviceManager.changeAudioInputDevice(deviceId, function (stream) {
 			const trackChanged = SIPJSPhone.replaceSenderTrack(stream, deviceId);
 			if (trackChanged) {
 				audioDeviceManager.currentAudioInputDeviceId = deviceId;
 				logger.log(`sipjsphone: changeAudioInputDevice: Input device changed to: ${deviceId}`);
-
-				onSuccess();
+				if (onSuccess) onSuccess();
 			} else {
 				logger.error("sipjsphone: changeAudioInputDevice: failed");
-				onError("replaceSenderTrack failed for webrtc");
+				if (onError) onError("replaceSenderTrack failed for webrtc");
 			}
-		}, onError);
+		}, onError, forceDeviceChange);
 	},
 	changeAudioOutputDeviceForAdditionalAudioElement(deviceId) {
 		const additionalAudioElements = [ringtone, beeptone, ringbacktone, dtmftone];
@@ -1343,14 +1381,15 @@ const SIPJSPhone = {
 			logger.error("sipjsphone:changeAudioOutputDeviceForAdditionalAudioElement failed to setSink for additonal AudioElements", e);
 		}
 	},
-	changeAudioOutputDevice(deviceId, onSuccess, onError) {
+	changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
 		if (!ctxSip.callActiveID) {
 			audioRemote = document.createElement("audio");
 		}
 		audioDeviceManager.changeAudioOutputDevice(audioRemote, deviceId, function () {
-			SIPJSPhone.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
-			onSuccess();
-		}, onError);
+			audioDeviceManager.currentAudioOutputDeviceId = deviceId;
+			logger.log(`sipjsphone: changeAudioOutputDevice: Output device changed to: ${deviceId}`);
+			if (onSuccess) onSuccess();
+		}, onError, forceDeviceChange);
 	},
 
 	stopStreamTracks(stream) {
@@ -1403,9 +1442,9 @@ const SIPJSPhone = {
 	onDeviceChangeCallback: null,
 	registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
 		logger.log(`sipjsphone: registerAudioDeviceChangeCallback: entry`);
-		SIPJSPhone.audioInputDeviceChangeCallback = audioInputDeviceChangeCallback;
-		SIPJSPhone.audioOutputDeviceChangeCallback = audioOutputDeviceChangeCallback;
-		SIPJSPhone.onDeviceChangeCallback = onDeviceChangeCallback;
+		SIPJSPhone.audioInputDeviceChangeCallback = audioInputDeviceChangeCallback || (() => {});
+		SIPJSPhone.audioOutputDeviceChangeCallback = audioOutputDeviceChangeCallback || (() => {});
+		SIPJSPhone.onDeviceChangeCallback = onDeviceChangeCallback || (() => {});
 	}
 
 };
