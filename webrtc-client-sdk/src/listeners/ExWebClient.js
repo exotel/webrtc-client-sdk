@@ -242,7 +242,7 @@ export class ExotelWebClient {
     
 
     initWebrtc = (sipAccountInfo_,
-        RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
+        RegisterEventCallBack, CallListenerCallback, SessionCallback, enableAutoAudioDeviceChangeHandling=false) => {
 
         if (!this.eventListener) {
             this.eventListener = new ExotelVoiceClientListener();
@@ -260,6 +260,7 @@ export class ExotelWebClient {
             this.call = new Call();
         }
 
+        sipAccountInfo_.enableAutoAudioDeviceChangeHandling = enableAutoAudioDeviceChangeHandling;
         logger.log("ExWebClient: initWebrtc: Exotel Client Initialised with " + JSON.stringify(sipAccountInfo_))
         this.sipAccountInfo = sipAccountInfo_;
         if (!this.sipAccountInfo["userName"] || !this.sipAccountInfo["sipdomain"] || !this.sipAccountInfo["port"]) {
@@ -450,10 +451,6 @@ export class ExotelWebClient {
         this.isReadyToRegister = false;
         this.registrationInProgress = true;
         this.shouldAutoRetry = true;
-        const enableAutoAudioDeviceChangeHandling =
-            (typeof sipAccountInfo.enableAutoAudioDeviceChangeHandling !== "undefined"
-                ? sipAccountInfo.enableAutoAudioDeviceChangeHandling
-                : true);
         this.sipAccntInfo = {
             'userName': '',
             'authUser': '',
@@ -467,7 +464,7 @@ export class ExotelWebClient {
             'endpoint': '',
             'port': '',
             'contactHost': '',
-            'enableAutoAudioDeviceChangeHandling': enableAutoAudioDeviceChangeHandling
+            'enableAutoAudioDeviceChangeHandling': false
         }
 
         logger.log('ExWebClient: initialize: Sending register for the number..', subscriberName);
@@ -490,6 +487,7 @@ export class ExotelWebClient {
         this.sipWsPort = 5061;
         this.sipPort = 5061;
         this.sipSecurePort = 5062;
+        this.enableAutoAudioDeviceChangeHandling = sipAccountInfo.enableAutoAudioDeviceChangeHandling;
         /* Temporary till we figure out the arguments - End */
 
         /* This is permanent -Start */
@@ -512,7 +510,7 @@ export class ExotelWebClient {
         this.sipAccntInfo['endpoint'] = this.endpoint;
         this.sipAccntInfo['port'] = webrtcPort;
         this.sipAccntInfo['contactHost'] = this.contactHost;
-        this.sipAccntInfo['enableAutoAudioDeviceChangeHandling'] = enableAutoAudioDeviceChangeHandling;
+        this.sipAccntInfo['enableAutoAudioDeviceChangeHandling'] = this.enableAutoAudioDeviceChangeHandling;
         localStorage.setItem('contactHost', this.contactHost);
         /* This is permanent -End */
 
