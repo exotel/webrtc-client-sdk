@@ -463,8 +463,7 @@ export class ExotelWebClient {
             'security': '',
             'endpoint': '',
             'port': '',
-            'contactHost': '',
-            'enableAutoAudioDeviceChangeHandling': false
+            'contactHost': ''
         }
 
         logger.log('ExWebClient: initialize: Sending register for the number..', subscriberName);
@@ -487,7 +486,6 @@ export class ExotelWebClient {
         this.sipWsPort = 5061;
         this.sipPort = 5061;
         this.sipSecurePort = 5062;
-        this.enableAutoAudioDeviceChangeHandling = sipAccountInfo.enableAutoAudioDeviceChangeHandling;
         /* Temporary till we figure out the arguments - End */
 
         /* This is permanent -Start */
@@ -510,7 +508,6 @@ export class ExotelWebClient {
         this.sipAccntInfo['endpoint'] = this.endpoint;
         this.sipAccntInfo['port'] = webrtcPort;
         this.sipAccntInfo['contactHost'] = this.contactHost;
-        this.sipAccntInfo['enableAutoAudioDeviceChangeHandling'] = this.enableAutoAudioDeviceChangeHandling;
         localStorage.setItem('contactHost', this.contactHost);
         /* This is permanent -End */
 
@@ -525,7 +522,7 @@ export class ExotelWebClient {
         //webRTCPhones[userName] = webRTC;
 
         /* New-Way  */
-        webrtcSIPPhone.registerPhone("sipjs", delegationHandler, this.sipAccntInfo.enableAutoAudioDeviceChangeHandling);
+        webrtcSIPPhone.registerPhone("sipjs", delegationHandler,  sipAccountInfo.enableAutoAudioDeviceChangeHandling);
         webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler);
 
         /**
