@@ -34,8 +34,8 @@ export const audioDeviceManager = {
                     if (onError) onError("deviceIdNotFound");
                     return;
                 }
-                logger.log(`SIPJSPhone:changeAudioInputDevice acquiring input device ${deviceId} : ${inputDevice.label}`);
             }
+            logger.log(`SIPJSPhone:changeAudioInputDevice acquiring input device ${deviceId} : ${inputDevice.label}`);
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: { deviceId: { exact: deviceId } }
             });

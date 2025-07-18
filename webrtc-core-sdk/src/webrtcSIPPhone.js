@@ -6,7 +6,6 @@
 import coreSDKLogger from './coreSDKLogger';
 import SIPJSPhone from './sipjsphone';
 import webrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
-import audioDeviceManager from './audioDeviceManager';
 var phone = null;
 let webrtcSIPEngine = null;
 const logger = coreSDKLogger;
@@ -156,7 +155,6 @@ export const webrtcSIPPhone = {
 		if (enableAutoAudioDeviceChangeHandling) {
 			phone.attachGlobalDeviceChangeListener();
 		}
-		audioDeviceManager.setEnableAutoAudioDeviceChangeHandling(enableAutoAudioDeviceChangeHandling);
 	},
 
 	getWebRTCStatus: () => {

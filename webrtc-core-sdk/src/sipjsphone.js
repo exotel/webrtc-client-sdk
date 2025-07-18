@@ -1448,7 +1448,9 @@ const SIPJSPhone = {
 		});
 	},
     setEnableAutoAudioDeviceChangeHandling(flag) {
+		logger.log(`sipjsphone: setEnableAutoAudioDeviceChangeHandling: entry`);
         enableAutoAudioDeviceChangeHandling = flag;
+		audioDeviceManager.setEnableAutoAudioDeviceChangeHandling(flag);
     }
 };
 
