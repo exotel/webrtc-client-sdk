@@ -889,8 +889,8 @@ function handleWebSocketMessageContent(content, direction) {
 	switch (direction) {
 		case "sent":
 
-			if (sipMessage.method == "CONNECTION")
-				webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("sent_request", sipMessage.method);
+			if (sipMessage.method == "REGISTER")
+				webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("sent_request", "CONNECTION");
 
 			webrtcSIPPhoneEventDelegate.onCallStatSipSendCallback(newtext, "sipjs");
 
@@ -1448,7 +1448,7 @@ const SIPJSPhone = {
 		});
 	},
     setEnableAutoAudioDeviceChangeHandling(flag) {
-		logger.log(`sipjsphone: setEnableAutoAudioDeviceChangeHandling: entry`);
+		logger.log("sipjsphone: setEnableAutoAudioDeviceChangeHandling: entry, enableAutoAudioDeviceChangeHandling = ",flag);
         enableAutoAudioDeviceChangeHandling = flag;
 		audioDeviceManager.setEnableAutoAudioDeviceChangeHandling(flag);
     }

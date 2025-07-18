@@ -139,7 +139,7 @@ export const webrtcSIPPhone = {
 
 
 
-	registerPhone: (engine, delegate, enableAutoAudioDeviceChangeHandling) => {
+	registerPhone: (engine, delegate, enableAutoAudioDeviceChangeHandling = false) => {
 		logger.log("webrtcSIPPhone: registerPhone : ",engine, "enableAutoAudioDeviceChangeHandling:", enableAutoAudioDeviceChangeHandling);
 		webrtcSIPEngine = engine;
 		switch (engine) {
@@ -224,12 +224,12 @@ export const webrtcSIPPhone = {
 		}
 	},
 
-	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
+	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange=false) {
 		logger.log("webrtcSIPPhone: changeAudioInputDevice : ", deviceId, onSuccess, onError);
 		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	},
 
-	changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
+	changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange=false) {
 		logger.log("webrtcSIPPhone: changeAudioOutputDevice : ", deviceId, onSuccess, onError);
 		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	},
