@@ -6,7 +6,7 @@
 import coreSDKLogger from './coreSDKLogger';
 import SIPJSPhone from './sipjsphone';
 import webrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
-
+import audioDeviceManager from './audioDeviceManager';
 var phone = null;
 let webrtcSIPEngine = null;
 const logger = coreSDKLogger;
@@ -36,16 +36,11 @@ export const webrtcSIPPhone = {
 		phone.sipSendDTMF(dtmfValue);
 	},
 
-	registerWebRTCClient: (sipAccountInfo, handler, enableAutoAudioDeviceChangeHandling = true) => {
+	registerWebRTCClient: (sipAccountInfo, handler) => {
 		logger.log("webrtcSIPPhone: registerWebRTCClient : ",sipAccountInfo,handler);
 		sipAccountInfoData = sipAccountInfo;
 		phone.init(() => {
 			phone.loadCredentials(sipAccountInfo);
-			if (enableAutoAudioDeviceChangeHandling) {
-				if (typeof phone.setupOnDeviceChangeHandler === 'function') {
-					phone.setupOnDeviceChangeHandler();
-				}
-			}
 			if (webrtcSIPPhone.getWebRTCStatus() == "offline") {
 				if (handler != null)
 					if (handler.onFailure)
@@ -145,7 +140,7 @@ export const webrtcSIPPhone = {
 
 
 
-	registerPhone: (engine, delegate, enableAutoAudioDeviceChangeHandling = true) => {
+	registerPhone: (engine, delegate, enableAutoAudioDeviceChangeHandling) => {
 		logger.log("webrtcSIPPhone: registerPhone : ",engine, "enableAutoAudioDeviceChangeHandling:", enableAutoAudioDeviceChangeHandling);
 		webrtcSIPEngine = engine;
 		switch (engine) {
@@ -158,8 +153,10 @@ export const webrtcSIPPhone = {
 		webrtcSIPPhoneEventDelegate.registerDelegate(delegate);
 		webrtcSIPPhoneEventDelegate.onRegisterWebRTCSIPEngine(engine);
 		phone.setEnableAutoAudioDeviceChangeHandling(enableAutoAudioDeviceChangeHandling);
-
-
+		if (enableAutoAudioDeviceChangeHandling) {
+			phone.attachGlobalDeviceChangeListener();
+		}
+		audioDeviceManager.setEnableAutoAudioDeviceChangeHandling(enableAutoAudioDeviceChangeHandling);
 	},
 
 	getWebRTCStatus: () => {
@@ -229,12 +226,12 @@ export const webrtcSIPPhone = {
 		}
 	},
 
-	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
+	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
 		logger.log("webrtcSIPPhone: changeAudioInputDevice : ", deviceId, onSuccess, onError);
 		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	},
 
-	changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
+	changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
 		logger.log("webrtcSIPPhone: changeAudioOutputDevice : ", deviceId, onSuccess, onError);
 		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	},
@@ -249,7 +246,6 @@ export const webrtcSIPPhone = {
 	getLogger() {
 		return coreSDKLogger;
 	}
-
 
 };
 

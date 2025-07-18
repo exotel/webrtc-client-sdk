@@ -522,7 +522,7 @@ export class ExotelWebClient {
         //webRTCPhones[userName] = webRTC;
 
         /* New-Way  */
-        webrtcSIPPhone.registerPhone("sipjs", delegationHandler,  sipAccountInfo.enableAutoAudioDeviceChangeHandling);
+        webrtcSIPPhone.registerPhone("sipjs", delegationHandler, sipAccountInfo.enableAutoAudioDeviceChangeHandling);
         webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler);
 
         /**

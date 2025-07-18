@@ -1,6 +1,7 @@
 import coreSDKLogger from "./coreSDKLogger";
 
 const logger = coreSDKLogger;
+let enableAutoAudioDeviceChangeHandling = false;
 export const audioDeviceManager = {
     resetInputDevice: false,
     resetOutputDevice: false,
@@ -18,15 +19,15 @@ export const audioDeviceManager = {
         this.resetOutputDevice = value;
     },
 
-    async changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange = false, enableAutoAudioDeviceChangeHandling = true) {
+    async changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
         logger.log(`SIPJSPhone:changeAudioInputDevice entry`);
         try {
-            if (!forceDeviceChange && deviceId == audioDeviceManager.currentAudioInputDeviceId) {
-                logger.log(`SIPJSPhone:changeAudioInputDevice current input device is same as ${deviceId} hence not changing`);
-                if (onError) onError("current input device is same as " + deviceId + " hence not changing");
-                return;
-            }
-            if (enableAutoAudioDeviceChangeHandling) {
+            if (enableAutoAudioDeviceChangeHandling && !forceDeviceChange) {
+                if (deviceId == audioDeviceManager.currentAudioInputDeviceId) {
+                    logger.log(`SIPJSPhone:changeAudioInputDevice current input device is same as ${deviceId} hence not changing`);
+                    if (onError) onError("current input device is same as " + deviceId + " hence not changing");
+                    return;
+                }
                 const inputDevice = audioDeviceManager.mediaDevices.find(device => device.deviceId === deviceId && device.kind === 'audioinput');
                 if (!inputDevice) {
                     logger.error("input device id " + deviceId + "not found");
@@ -45,20 +46,20 @@ export const audioDeviceManager = {
         }
     },
 
-    async changeAudioOutputDevice(audioRemote, deviceId, onSuccess, onError, forceDeviceChange = false, enableAutoAudioDeviceChangeHandling = true) {
-        logger.log(`audioDeviceManager:changeAudioOutputDevice : entry`);
-        if (!forceDeviceChange && deviceId == audioDeviceManager.currentAudioOutputDeviceId) {
-            logger.log(`SIPJSPhone:changeAudioOutputDevice current output device is same as ${deviceId}`);
-            if (onError) onError("current output device is same as " + deviceId);
-            return;
-        }
+    async changeAudioOutputDevice(audioRemote, deviceId, onSuccess, onError, forceDeviceChange) {
+        logger.log(`audioDeviceManager:changeAudioOutputDevice : entry`);        
         const audioElement = audioRemote;
         if (typeof audioElement.sinkId !== 'undefined') {
             try {
-                if (enableAutoAudioDeviceChangeHandling) {
+                if (enableAutoAudioDeviceChangeHandling && !forceDeviceChange) {
+                    if (deviceId == audioDeviceManager.currentAudioOutputDeviceId) {
+                        logger.log(`SIPJSPhone:changeAudioOutputDevice current output device is same as ${deviceId}`);
+                        if (onError) onError("current output device is same as " + deviceId);
+                        return;
+                    }
                     if (!audioDeviceManager.mediaDevices || audioDeviceManager.mediaDevices.length == 0) {
                         logger.error("audioDeviceManager:changeAudioOutputDevice mediaDeviceList is empty ");
-                        if (onError) onError("mediaDeviceListEmpty");
+                        if (onError) onError(deviceId + "not found in mediaDeviceList in audioManager");
                         return;
                     }
                     const outputDevice = audioDeviceManager.mediaDevices.find(device => device.deviceId === deviceId && device.kind === 'audiooutput');
@@ -68,11 +69,14 @@ export const audioDeviceManager = {
                         return;
                     }
                     logger.log(`audioDeviceManager:changeAudioOutputDevice acquiring output device ${deviceId} : ${outputDevice.label}`);
+                    // audioElement.load();
                 }
                 await audioElement.setSinkId(deviceId);
                 audioDeviceManager.currentAudioOutputDeviceId = deviceId;
                 logger.log(`audioDeviceManager:changeAudioOutputDevice Output device changed to: ${deviceId}`);
                 if (onSuccess) onSuccess();
+
+
             } catch (error) {
                 logger.error('audioDeviceManager:changeAudioOutputDevice Error changing output device:', error);
                 if (onError) onError(error);
@@ -129,6 +133,10 @@ export const audioDeviceManager = {
             logger.log("audioDeviceManager:enumerateDevices device enumeration failed", e);
         }
         if (callback) callback();
+    },
+
+    setEnableAutoAudioDeviceChangeHandling(flag) {
+        enableAutoAudioDeviceChangeHandling = flag;
     },
 
 };
