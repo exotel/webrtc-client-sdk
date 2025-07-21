@@ -7,6 +7,7 @@ import { audioDeviceManager } from './audioDeviceManager.js';
 import coreSDKLogger from './coreSDKLogger.js';
 import webrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 
+let enableAutoAudioDeviceChangeHandling = false;
 var lastTransportState = "";
 var lastRegistererState = "";
 var initializeComplete = false;
@@ -888,8 +889,8 @@ function handleWebSocketMessageContent(content, direction) {
 	switch (direction) {
 		case "sent":
 
-			if (sipMessage.method == "CONNECTION")
-				webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("sent_request", sipMessage.method);
+			if (sipMessage.method == "REGISTER")
+				webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("sent_request", "CONNECTION");
 
 			webrtcSIPPhoneEventDelegate.onCallStatSipSendCallback(newtext, "sipjs");
 
@@ -1315,7 +1316,8 @@ const SIPJSPhone = {
 		return lastRegistererState;
 	},
 
-	changeAudioInputDevice(deviceId, onSuccess, onError) {
+	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
+		logger.log(`SIPJSPhone: changeAudioInputDevice called with deviceId=${deviceId}, forceDeviceChange=${forceDeviceChange}, enableAutoAudioDeviceChangeHandling=${enableAutoAudioDeviceChangeHandling}`);
 		audioDeviceManager.changeAudioInputDevice(deviceId, function (stream) {
 			const trackChanged = SIPJSPhone.replaceSenderTrack(stream, deviceId);
 			if (trackChanged) {
@@ -1327,7 +1329,7 @@ const SIPJSPhone = {
 				logger.error("sipjsphone: changeAudioInputDevice: failed");
 				onError("replaceSenderTrack failed for webrtc");
 			}
-		}, onError);
+		}, onError, forceDeviceChange);
 	},
 	changeAudioOutputDeviceForAdditionalAudioElement(deviceId) {
 		const additionalAudioElements = [ringtone, beeptone, ringbacktone, dtmftone];
@@ -1343,14 +1345,15 @@ const SIPJSPhone = {
 			logger.error("sipjsphone:changeAudioOutputDeviceForAdditionalAudioElement failed to setSink for additonal AudioElements", e);
 		}
 	},
-	changeAudioOutputDevice(deviceId, onSuccess, onError) {
+	changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
+		logger.log(`SIPJSPhone: changeAudioOutputDevice called with deviceId=${deviceId}, forceDeviceChange=${forceDeviceChange}, enableAutoAudioDeviceChangeHandling=${enableAutoAudioDeviceChangeHandling}`);
 		if (!ctxSip.callActiveID) {
 			audioRemote = document.createElement("audio");
 		}
 		audioDeviceManager.changeAudioOutputDevice(audioRemote, deviceId, function () {
 			SIPJSPhone.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
 			onSuccess();
-		}, onError);
+		}, onError, forceDeviceChange);
 	},
 
 	stopStreamTracks(stream) {
@@ -1406,44 +1409,51 @@ const SIPJSPhone = {
 		SIPJSPhone.audioInputDeviceChangeCallback = audioInputDeviceChangeCallback;
 		SIPJSPhone.audioOutputDeviceChangeCallback = audioOutputDeviceChangeCallback;
 		SIPJSPhone.onDeviceChangeCallback = onDeviceChangeCallback;
-	}
-
+	},
+	attachGlobalDeviceChangeListener() {
+		logger.log("SIPJSPhone: Attaching global devicechange event listener (enableAutoAudioDeviceChangeHandling is true)");
+		navigator.mediaDevices.addEventListener('devicechange', (event) => {
+			try {
+				if (!ctxSip.callActiveID) {
+					audioRemote = document.createElement("audio");
+				}
+				audioDeviceManager.enumerateDevices(() => {
+					if (SIPJSPhone.onDeviceChangeCallback) {
+						logger.info("SIPJSPhone:ondevicechange relaying event to callback");
+						SIPJSPhone.onDeviceChangeCallback(event);
+					}
+					audioDeviceManager.onAudioDeviceChange(
+						audioRemote,
+						(stream, deviceId) => {
+							const trackChanged = SIPJSPhone.replaceSenderTrack(stream, deviceId);
+							if (trackChanged) {
+								audioDeviceManager.currentAudioInputDeviceId = deviceId;
+								if (SIPJSPhone.audioInputDeviceChangeCallback) {
+									SIPJSPhone.audioInputDeviceChangeCallback(deviceId);
+								}
+							}
+						},
+						(deviceId) => {
+							SIPJSPhone.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
+							audioDeviceManager.currentAudioOutputDeviceId = deviceId;
+							if (SIPJSPhone.audioOutputDeviceChangeCallback) {
+								SIPJSPhone.audioOutputDeviceChangeCallback(deviceId);
+							}
+						}
+					);
+				});
+			} catch (e) {
+				logger.error("SIPJSPhone:ondevicechange something went wrong during device change", e);
+			}
+		});
+	},
+    setEnableAutoAudioDeviceChangeHandling(flag) {
+		logger.log("sipjsphone: setEnableAutoAudioDeviceChangeHandling: entry, enableAutoAudioDeviceChangeHandling = ",flag);
+        enableAutoAudioDeviceChangeHandling = flag;
+		audioDeviceManager.setEnableAutoAudioDeviceChangeHandling(flag);
+    }
 };
 
 
-navigator.mediaDevices.addEventListener('devicechange', function (event) {
-	try {
-		if (!ctxSip.callActiveID) {
-			audioRemote = document.createElement("audio");
-		}
-		audioDeviceManager.enumerateDevices(function () {
-
-			if (SIPJSPhone.onDeviceChangeCallback) {
-				logger.info("SIPJSPhone:ondevicechange relaying event to callback");
-				SIPJSPhone.onDeviceChangeCallback(event);
-				return;
-			}
-			audioDeviceManager.onAudioDeviceChange(audioRemote,
-				function (stream, deviceId) {
-					const trackChanged = SIPJSPhone.replaceSenderTrack(stream, deviceId);
-					if (trackChanged) {
-						audioDeviceManager.currentAudioInputDeviceId = deviceId;
-						if (SIPJSPhone.audioInputDeviceChangeCallback) {
-							SIPJSPhone.audioInputDeviceChangeCallback(deviceId);
-						}
-					}
-				}, function (deviceId) {
-					SIPJSPhone.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
-					audioDeviceManager.currentAudioOutputDeviceId = deviceId;
-					if (SIPJSPhone.audioOutputDeviceChangeCallback) {
-						SIPJSPhone.audioOutputDeviceChangeCallback(deviceId);
-					}
-				});
-		});
-
-	} catch (e) {
-		logger.error("SIPJSPhone:ondevicechange something went wrong during device change", e);
-	}
-});
 
 export default SIPJSPhone;

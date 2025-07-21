@@ -6,7 +6,6 @@
 import coreSDKLogger from './coreSDKLogger';
 import SIPJSPhone from './sipjsphone';
 import webrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
-
 var phone = null;
 let webrtcSIPEngine = null;
 const logger = coreSDKLogger;
@@ -140,8 +139,8 @@ export const webrtcSIPPhone = {
 
 
 
-	registerPhone: (engine, delegate) => {
-		logger.log("webrtcSIPPhone: registerPhone : ",engine);
+	registerPhone: (engine, delegate, enableAutoAudioDeviceChangeHandling = false) => {
+		logger.log("webrtcSIPPhone: registerPhone : ",engine, "enableAutoAudioDeviceChangeHandling:", enableAutoAudioDeviceChangeHandling);
 		webrtcSIPEngine = engine;
 		switch (engine) {
 			case "sipjs":
@@ -152,8 +151,10 @@ export const webrtcSIPPhone = {
 		}
 		webrtcSIPPhoneEventDelegate.registerDelegate(delegate);
 		webrtcSIPPhoneEventDelegate.onRegisterWebRTCSIPEngine(engine);
-
-
+		phone.setEnableAutoAudioDeviceChangeHandling(enableAutoAudioDeviceChangeHandling);
+		if (enableAutoAudioDeviceChangeHandling) {
+			phone.attachGlobalDeviceChangeListener();
+		}
 	},
 
 	getWebRTCStatus: () => {
@@ -223,14 +224,14 @@ export const webrtcSIPPhone = {
 		}
 	},
 
-	changeAudioInputDevice(deviceId, onSuccess, onError) {
+	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange=false) {
 		logger.log("webrtcSIPPhone: changeAudioInputDevice : ", deviceId, onSuccess, onError);
-		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
+		SIPJSPhone.changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	},
 
-	changeAudioOutputDevice(deviceId, onSuccess, onError) {
+	changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange=false) {
 		logger.log("webrtcSIPPhone: changeAudioOutputDevice : ", deviceId, onSuccess, onError);
-		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
+		SIPJSPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	},
 	setPreferredCodec(codecName) {
 		logger.log("webrtcSIPPhone: setPreferredCodec : ", codecName);

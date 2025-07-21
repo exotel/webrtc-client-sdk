@@ -242,7 +242,7 @@ export class ExotelWebClient {
     
 
     initWebrtc = (sipAccountInfo_,
-        RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
+        RegisterEventCallBack, CallListenerCallback, SessionCallback, enableAutoAudioDeviceChangeHandling=false) => {
 
         if (!this.eventListener) {
             this.eventListener = new ExotelVoiceClientListener();
@@ -260,6 +260,7 @@ export class ExotelWebClient {
             this.call = new Call();
         }
 
+        sipAccountInfo_.enableAutoAudioDeviceChangeHandling = enableAutoAudioDeviceChangeHandling;
         logger.log("ExWebClient: initWebrtc: Exotel Client Initialised with " + JSON.stringify(sipAccountInfo_))
         this.sipAccountInfo = sipAccountInfo_;
         if (!this.sipAccountInfo["userName"] || !this.sipAccountInfo["sipdomain"] || !this.sipAccountInfo["port"]) {
@@ -521,7 +522,7 @@ export class ExotelWebClient {
         //webRTCPhones[userName] = webRTC;
 
         /* New-Way  */
-        webrtcSIPPhone.registerPhone("sipjs", delegationHandler);
+        webrtcSIPPhone.registerPhone("sipjs", delegationHandler, sipAccountInfo.enableAutoAudioDeviceChangeHandling);
         webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler);
 
         /**
@@ -578,14 +579,14 @@ export class ExotelWebClient {
             });
     };
 
-    changeAudioInputDevice(deviceId, onSuccess, onError) {
+    changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
         logger.log(`ExWebClient: changeAudioInputDevice: Entry`);
-        webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
+        webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange);
     }
 
-    changeAudioOutputDevice(deviceId, onSuccess, onError) {
+    changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
         logger.log(`ExWebClient: changeAudioOutputDevice: Entry`);
-        webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
+        webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange);
     }
 
 	downloadLogs() {
