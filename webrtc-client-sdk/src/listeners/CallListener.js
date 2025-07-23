@@ -35,4 +35,14 @@ export function CallListener() {
         logger.log("CallListener:Trigger Call Ended")
         callbacks.triggerCallback("callEnded")
     }
+    this.onIceConnectionStateChange = function (call, phone) {
+        /**
+         * When there is a change in ice connection state
+         */
+        logger.log("CallListener:Initialise call")
+        callbacks.initializeCall(call, phone)
+        /** Triggers the callback on the UI end with message indicating call has ended */
+        logger.log("CallListener:Trigger Ice Connection State Change")
+        callbacks.triggerCallback("iceconnectionstatechange")
+    }
 }

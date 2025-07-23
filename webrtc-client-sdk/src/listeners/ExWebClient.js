@@ -102,8 +102,9 @@ export function ExDelegationHandler(exClient_) {
         logger.log("delegationHandler: onCallStatSignalingStateChange\n");
     }
 
-    this.onStatPeerConnectionIceConnectionStateChange = function () {
-        logger.log("delegationHandler: onStatPeerConnectionIceConnectionStateChange\n");
+    this.onStatPeerConnectionIceConnectionStateChange = function (iceConnectionState) {
+        logger.log("delegationHandler: onStatPeerConnectionIceConnectionStateChange", iceConnectionState);
+        exClient.callEventCallback('iceconnectionstatechange', exClient.callFromNumber, iceConnectionState);
     }
 
     this.onStatPeerConnectionConnectionStateChange = function () {
@@ -407,6 +408,8 @@ export class ExotelWebClient {
             this.callListener.onCallEstablished(param, phone);
         } else if (event === "terminated") {
             this.callListener.onCallEnded(param, phone);
+        } else if (event === 'iceconnectionstatechange') {
+            this.callListener.onIceConnectionStateChange(param, phone);
         }
     };
 
@@ -605,6 +608,11 @@ export class ExotelWebClient {
 
     registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
         webrtcSIPPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
+    }
+
+    setLogging(enable) {
+        logger.log(`ExWebClient: setLogging: ${enable}`);
+        logger.setLogging(enable);
     }
 }
 
