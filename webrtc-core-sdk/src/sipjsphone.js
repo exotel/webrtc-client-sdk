@@ -1382,9 +1382,12 @@ const SIPJSPhone = {
 						sender.track.stop();
 						sender.replaceTrack(audioTrack);
 					} catch (e) {
-						SIPJSPhone.stopStreamTracks(stream);
 						logger.error(`sipjsphone:replaceSenderTrack: unable to replace track for stream for device id ${deviceId} `, e);
+						SIPJSPhone.stopStreamTracks(stream);
 					}
+				} else {
+					logger.error("sipjsphone:replaceSenderTrack: no sender found");
+					SIPJSPhone.stopStreamTracks(stream);
 				}
 			} else {
 				logger.log("sipjsphone:replaceSenderTrack: no call active, stopping stream tracks");
@@ -1392,6 +1395,7 @@ const SIPJSPhone = {
 			}
 			return true;
 		} catch (e) {
+			SIPJSPhone.stopStreamTracks(stream);
 			logger.error("sipjsphone:replaceSenderTrack: failed to replace track", e);
 			return false;
 		}
