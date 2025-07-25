@@ -1369,12 +1369,8 @@ const SIPJSPhone = {
 		}
 	},
 	replaceSenderTrack(stream, deviceId) {
+		logger.log(`sipjsphone:replaceSenderTrack: entry, deviceId=${deviceId}`);
 		try {
-
-			if (audioDeviceManager.currentAudioInputDeviceId == deviceId) {
-				SIPJSPhone.stopStreamTracks(stream);
-				return false;
-			}
 			if (ctxSip.callActiveID) {
 				ctxSip.Stream = stream;
 				const s = ctxSip.Sessions[ctxSip.callActiveID];
@@ -1386,14 +1382,17 @@ const SIPJSPhone = {
 						sender.track.stop();
 						sender.replaceTrack(audioTrack);
 					} catch (e) {
-						logger.error(`replaceSenderTrack unable to replace track for stream for device id ${deviceId} `, stream);
+						SIPJSPhone.stopStreamTracks(stream);
+						logger.error(`sipjsphone:replaceSenderTrack: unable to replace track for stream for device id ${deviceId} `, e);
 					}
 				}
 			} else {
+				logger.log("sipjsphone:replaceSenderTrack: no call active, stopping stream tracks");
 				SIPJSPhone.stopStreamTracks(stream);
 			}
 			return true;
 		} catch (e) {
+			logger.error("sipjsphone:replaceSenderTrack: failed to replace track", e);
 			return false;
 		}
 
