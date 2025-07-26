@@ -12,7 +12,7 @@ build-local:
 
 dep:
 	npm uninstall @exotel-npm-dev/webrtc-core-sdk
-	npm install @exotel-npm-dev/webrtc-core-sdk@latest
+	npm install @exotel-npm-dev/webrtc-core-sdk@1.0.23
 
 publish: build
-	npm publish
+	npm publish --tag legacy

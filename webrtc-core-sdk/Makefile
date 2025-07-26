@@ -3,4 +3,4 @@ build:
 	cp -r src/static/* dist/
 
 publish: build
-	npm publish
+	npm publish --tag legacy
