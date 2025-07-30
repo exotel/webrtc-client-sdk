@@ -1319,16 +1319,7 @@ const SIPJSPhone = {
 	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
 		logger.log(`SIPJSPhone: changeAudioInputDevice called with deviceId=${deviceId}, forceDeviceChange=${forceDeviceChange}, enableAutoAudioDeviceChangeHandling=${enableAutoAudioDeviceChangeHandling}`);
 		audioDeviceManager.changeAudioInputDevice(deviceId, function (stream) {
-			const trackChanged = SIPJSPhone.replaceSenderTrack(stream, deviceId);
-			if (trackChanged) {
-				audioDeviceManager.currentAudioInputDeviceId = deviceId;
-				logger.log(`sipjsphone: changeAudioInputDevice: Input device changed to: ${deviceId}`);
-
-				onSuccess();
-			} else {
-				logger.error("sipjsphone: changeAudioInputDevice: failed");
-				onError("replaceSenderTrack failed for webrtc");
-			}
+			SIPJSPhone.replaceSenderTrack(stream, deviceId, onSuccess, onError);
 		}, onError, forceDeviceChange);
 	},
 	changeAudioOutputDeviceForAdditionalAudioElement(deviceId) {
@@ -1368,33 +1359,41 @@ const SIPJSPhone = {
 			logger.error("sipjsphone:stopStreamTracks failed to stop tracks");
 		}
 	},
-	replaceSenderTrack(stream, deviceId) {
+	replaceSenderTrack(stream, deviceId, onSuccessCallback, onErrorCallback) {
+		logger.log(`sipjsphone:replaceSenderTrack: entry, deviceId=${deviceId}`);
+		let trackChanged = false;
+		let errorMessage = "";
 		try {
-
-			if (audioDeviceManager.currentAudioInputDeviceId == deviceId) {
-				SIPJSPhone.stopStreamTracks(stream);
-				return false;
-			}
 			if (ctxSip.callActiveID) {
 				ctxSip.Stream = stream;
 				const s = ctxSip.Sessions[ctxSip.callActiveID];
 				const pc = s.sessionDescriptionHandler.peerConnection;
 				if (pc.getSenders) {
-					try {
 						const [audioTrack] = stream.getAudioTracks();
 						const sender = pc.getSenders().find((s) => s.track.kind === audioTrack.kind);
 						sender.track.stop();
 						sender.replaceTrack(audioTrack);
-					} catch (e) {
-						logger.error(`replaceSenderTrack unable to replace track for stream for device id ${deviceId} `, stream);
-					}
+						trackChanged = true;
+				} else {
+					logger.error("sipjsphone:replaceSenderTrack: no sender found");
+					errorMessage = "no sender found";
 				}
 			} else {
-				SIPJSPhone.stopStreamTracks(stream);
+				logger.log("sipjsphone:replaceSenderTrack: no call active, stopping stream tracks");
+				errorMessage = "no call active";
 			}
-			return true;
 		} catch (e) {
-			return false;
+			logger.error("sipjsphone:replaceSenderTrack: failed to replace track", e);
+			errorMessage = "failed to replace track";
+		}
+
+		if(trackChanged) {
+			audioDeviceManager.currentAudioInputDeviceId = deviceId;
+			logger.info("sipjsphone:replaceSenderTrack: track replaced");
+			onSuccessCallback();
+		} else {
+			SIPJSPhone.stopStreamTracks(stream);
+			onErrorCallback(errorMessage);
 		}
 
 	},
@@ -1425,13 +1424,15 @@ const SIPJSPhone = {
 					audioDeviceManager.onAudioDeviceChange(
 						audioRemote,
 						(stream, deviceId) => {
-							const trackChanged = SIPJSPhone.replaceSenderTrack(stream, deviceId);
-							if (trackChanged) {
-								audioDeviceManager.currentAudioInputDeviceId = deviceId;
+							SIPJSPhone.replaceSenderTrack(stream, deviceId, function (){
 								if (SIPJSPhone.audioInputDeviceChangeCallback) {
 									SIPJSPhone.audioInputDeviceChangeCallback(deviceId);
-								}
-							}
+								}	
+							}, function(errorMessage) {
+								logger.error("sipjsphone:ondevicechange: failed to replace track", errorMessage);
+							});
+							
+							
 						},
 						(deviceId) => {
 							SIPJSPhone.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
