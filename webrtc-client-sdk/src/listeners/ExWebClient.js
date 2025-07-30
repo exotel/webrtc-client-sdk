@@ -88,6 +88,8 @@ export function ExDelegationHandler(exClient_) {
 
     this.onStatPeerConnectionIceGatheringStateChange = function (iceGatheringState) {
         logger.log("delegationHandler: onStatPeerConnectionIceGatheringStateChange\n");
+        sessionCallback.initializeSession(`ice_connection_state_change ${iceGatheringState}`, exClient.callFromNumber);
+        sessionCallback.triggerSessionCallback();
     }
 
     this.onCallStatIceCandidate = function (ev, icestate) {
@@ -103,8 +105,9 @@ export function ExDelegationHandler(exClient_) {
     }
 
     this.onStatPeerConnectionIceConnectionStateChange = function (iceConnectionState) {
-        logger.log("delegationHandler: onStatPeerConnectionIceConnectionStateChange", iceConnectionState);
-        exClient.callEventCallback('iceconnectionstatechange', exClient.callFromNumber, iceConnectionState);
+        logger.log("delegationHandler: onStatPeerConnectionIceConnectionStateChange\n");
+        sessionCallback.initializeSession(`ice_connection_state_change ${iceConnectionState}`, exClient.callFromNumber);
+        sessionCallback.triggerSessionCallback();
     }
 
     this.onStatPeerConnectionConnectionStateChange = function () {
@@ -117,6 +120,9 @@ export function ExDelegationHandler(exClient_) {
 
     this.onGetUserMediaErrorCallstatCallback = function () {
         logger.log("delegationHandler: onGetUserMediaErrorCallstatCallback\n");
+        sessionCallback.initializeSession(`media_permission_denied`, exClient.callFromNumber);
+        sessionCallback.triggerSessionCallback();
+
     }
 
     this.onCallStatAddStream = function () {
@@ -408,9 +414,7 @@ export class ExotelWebClient {
             this.callListener.onCallEstablished(param, phone);
         } else if (event === "terminated") {
             this.callListener.onCallEnded(param, phone);
-        } else if (event === 'iceconnectionstatechange') {
-            this.callListener.onIceConnectionStateChange(param, phone);
-        }
+        } 
     };
 
     /**
@@ -610,9 +614,9 @@ export class ExotelWebClient {
         webrtcSIPPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
     }
 
-    setLogging(enable) {
-        logger.log(`ExWebClient: setLogging: ${enable}`);
-        logger.setLogging(enable);
+    setEnableConsoleLogging(enable) {
+        logger.log(`ExWebClient: setEnableConsoleLogging: ${enable}`);
+        logger.setEnableConsoleLogging(enable);
     }
 }
 

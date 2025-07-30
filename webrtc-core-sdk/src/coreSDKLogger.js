@@ -4,7 +4,7 @@ const coreSDKLogger = {
     loggingEnabled: true,
     loggerCallback: null,
 
-    setLogging(enable) {
+    setEnableConsoleLogging(enable) {
         coreSDKLogger.loggingEnabled = enable;
     },
 
