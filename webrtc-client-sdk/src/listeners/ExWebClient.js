@@ -238,11 +238,13 @@ export class ExotelWebClient {
         /* 
         Register the logger callback and emit the onLog event
         */
+
+        let exwebClientOb = this;
         logger.registerLoggerCallback(function (type, message, args) {
 
             LogManager.onLog(type, message, args);
-            if (this.clientSDKLoggerCallback)
-                this.clientSDKLoggerCallback("log", arg1, args);
+            if (exwebClientOb.clientSDKLoggerCallback)
+                exwebClientOb.clientSDKLoggerCallback("log", message, args);
     
         });
       }

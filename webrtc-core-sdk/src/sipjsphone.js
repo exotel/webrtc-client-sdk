@@ -510,9 +510,9 @@ function sipRegister() {
 				reconnectionAttempts: 0
 
 			},
-			logBuiltinEnabled: logger.loggingEnabled,
+			logBuiltinEnabled: false,
 			logConnector: sipPhoneLogger,
-			logLevel: logger.loggingEnabled ? "log" : "error",
+			logLevel: "log",
 			sessionDescriptionHandlerFactoryOptions: {
 				constraints: {
 					audio: true,
@@ -693,10 +693,6 @@ function sipCall() {
 
 function sipPhoneLogger(level, category, label, content) {
 	try {
-		if (!logger.loggingEnabled) {
-			return; // Skip logging if disabled
-		}
-		
 		if (content) {
 			if (content.startsWith("Sending WebSocket")) {
 				handleWebSocketMessageContent(content, "sent");
