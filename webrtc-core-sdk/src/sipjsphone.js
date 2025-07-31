@@ -40,7 +40,9 @@ var registerer = null;
 
 
 let logger = coreSDKLogger;
+if (logger.loggingEnabled) {
 logger.log(SIP);
+}
 /* NL Additions - Start */
 
 export function getLogger() {
@@ -511,9 +513,9 @@ function sipRegister() {
 				reconnectionAttempts: 0
 
 			},
-			logBuiltinEnabled: true,
+			logBuiltinEnabled: logger.loggingEnabled,
 			logConnector: sipPhoneLogger,
-			logLevel: "log",
+			logLevel: logger.loggingEnabled ? "log" : "error",
 			sessionDescriptionHandlerFactoryOptions: {
 				constraints: {
 					audio: true,
@@ -694,6 +696,10 @@ function sipCall() {
 
 function sipPhoneLogger(level, category, label, content) {
 	try {
+		if (!logger.loggingEnabled) {
+			return; // Skip logging if disabled
+		}
+		
 		if (content) {
 			if (content.startsWith("Sending WebSocket")) {
 				handleWebSocketMessageContent(content, "sent");

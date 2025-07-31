@@ -615,7 +615,10 @@ export class ExotelWebClient {
     }
 
     setEnableConsoleLogging(enable) {
-        logger.log(`ExWebClient: setEnableConsoleLogging: ${enable}`);
+        if (enable) {
+            logger.log(`ExWebClient: setEnableConsoleLogging: ${enable}`);
+        } 
+        
         logger.setEnableConsoleLogging(enable);
     }
 }

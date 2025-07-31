@@ -141,5 +141,4 @@ export const audioDeviceManager = {
 
 };
 
-audioDeviceManager.enumerateDevices();
 export default audioDeviceManager;
