@@ -40,7 +40,6 @@ var registerer = null;
 
 
 let logger = coreSDKLogger;
-logger.log(SIP);
 /* NL Additions - Start */
 
 export function getLogger() {
@@ -511,7 +510,7 @@ function sipRegister() {
 				reconnectionAttempts: 0
 
 			},
-			logBuiltinEnabled: true,
+			logBuiltinEnabled: false,
 			logConnector: sipPhoneLogger,
 			logLevel: "log",
 			sessionDescriptionHandlerFactoryOptions: {

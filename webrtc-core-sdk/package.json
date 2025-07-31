@@ -1,6 +1,6 @@
 {
   "name": "@exotel-npm-dev/webrtc-core-sdk",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "core sdk for webrtc based in sip-0.20.0.js",
   "main": "index.js",
   "scripts": {

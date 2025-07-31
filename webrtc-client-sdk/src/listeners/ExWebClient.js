@@ -88,6 +88,8 @@ export function ExDelegationHandler(exClient_) {
 
     this.onStatPeerConnectionIceGatheringStateChange = function (iceGatheringState) {
         logger.log("delegationHandler: onStatPeerConnectionIceGatheringStateChange\n");
+        sessionCallback.initializeSession(`ice_gathering_state_${iceGatheringState}`, exClient.callFromNumber);
+        sessionCallback.triggerSessionCallback();
     }
 
     this.onCallStatIceCandidate = function (ev, icestate) {
@@ -102,8 +104,10 @@ export function ExDelegationHandler(exClient_) {
         logger.log("delegationHandler: onCallStatSignalingStateChange\n");
     }
 
-    this.onStatPeerConnectionIceConnectionStateChange = function () {
+    this.onStatPeerConnectionIceConnectionStateChange = function (iceConnectionState) {
         logger.log("delegationHandler: onStatPeerConnectionIceConnectionStateChange\n");
+        sessionCallback.initializeSession(`ice_connection_state_${iceConnectionState}`, exClient.callFromNumber);
+        sessionCallback.triggerSessionCallback();
     }
 
     this.onStatPeerConnectionConnectionStateChange = function () {
@@ -116,6 +120,9 @@ export function ExDelegationHandler(exClient_) {
 
     this.onGetUserMediaErrorCallstatCallback = function () {
         logger.log("delegationHandler: onGetUserMediaErrorCallstatCallback\n");
+        sessionCallback.initializeSession(`media_permission_denied`, exClient.callFromNumber);
+        sessionCallback.triggerSessionCallback();
+
     }
 
     this.onCallStatAddStream = function () {
@@ -231,11 +238,13 @@ export class ExotelWebClient {
         /* 
         Register the logger callback and emit the onLog event
         */
+
+        let exwebClientOb = this;
         logger.registerLoggerCallback(function (type, message, args) {
 
             LogManager.onLog(type, message, args);
-            if (this.clientSDKLoggerCallback)
-                this.clientSDKLoggerCallback("log", arg1, args);
+            if (exwebClientOb.clientSDKLoggerCallback)
+                exwebClientOb.clientSDKLoggerCallback("log", message, args);
     
         });
       }
@@ -407,7 +416,7 @@ export class ExotelWebClient {
             this.callListener.onCallEstablished(param, phone);
         } else if (event === "terminated") {
             this.callListener.onCallEnded(param, phone);
-        }
+        } 
     };
 
     /**
@@ -605,6 +614,14 @@ export class ExotelWebClient {
 
     registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
         webrtcSIPPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
+    }
+
+    setEnableConsoleLogging(enable) {
+        if (enable) {
+            logger.log(`ExWebClient: setEnableConsoleLogging: ${enable}`);
+        } 
+
+        logger.setEnableConsoleLogging(enable);
     }
 }
 

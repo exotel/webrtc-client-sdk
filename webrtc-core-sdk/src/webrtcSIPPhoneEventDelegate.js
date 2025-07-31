@@ -61,9 +61,9 @@ const webrtcSIPPhoneEventDelegate = {
 	},
 
 	
-	onStatPeerConnectionIceConnectionStateChange: () => {
+	onStatPeerConnectionIceConnectionStateChange: (iceConnectionState) => {
 		if(delegate) {
-			delegate.onStatPeerConnectionIceConnectionStateChange();
+			delegate.onStatPeerConnectionIceConnectionStateChange(iceConnectionState);
 		}
 	},
 	
