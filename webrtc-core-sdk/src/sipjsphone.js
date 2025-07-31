@@ -40,9 +40,6 @@ var registerer = null;
 
 
 let logger = coreSDKLogger;
-if (logger.loggingEnabled) {
-logger.log(SIP);
-}
 /* NL Additions - Start */
 
 export function getLogger() {
