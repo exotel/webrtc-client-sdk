@@ -1,5 +1,8 @@
 Change Log
 
+## v1.0.24 31 July, 2025
+-[VST-1038] prevent exotel / sipjs from throwing logs in the console based on a flag, added missing iceconnectionstate in session event callback
+
 ## v1.0.21 21 July, 2025
 -[VST-1038] make auto audio device change handling configurable
 
