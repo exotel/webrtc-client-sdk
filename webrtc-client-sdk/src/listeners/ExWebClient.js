@@ -88,7 +88,7 @@ export function ExDelegationHandler(exClient_) {
 
     this.onStatPeerConnectionIceGatheringStateChange = function (iceGatheringState) {
         logger.log("delegationHandler: onStatPeerConnectionIceGatheringStateChange\n");
-        sessionCallback.initializeSession(`ice_connection_state_change ${iceGatheringState}`, exClient.callFromNumber);
+        sessionCallback.initializeSession(`ice_gathering_state_${iceGatheringState}`, exClient.callFromNumber);
         sessionCallback.triggerSessionCallback();
     }
 
@@ -106,7 +106,7 @@ export function ExDelegationHandler(exClient_) {
 
     this.onStatPeerConnectionIceConnectionStateChange = function (iceConnectionState) {
         logger.log("delegationHandler: onStatPeerConnectionIceConnectionStateChange\n");
-        sessionCallback.initializeSession(`ice_connection_state_change ${iceConnectionState}`, exClient.callFromNumber);
+        sessionCallback.initializeSession(`ice_connection_state_${iceConnectionState}`, exClient.callFromNumber);
         sessionCallback.triggerSessionCallback();
     }
 
@@ -618,7 +618,7 @@ export class ExotelWebClient {
         if (enable) {
             logger.log(`ExWebClient: setEnableConsoleLogging: ${enable}`);
         } 
-        
+
         logger.setEnableConsoleLogging(enable);
     }
 }
