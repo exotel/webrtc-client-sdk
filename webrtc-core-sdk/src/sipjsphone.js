@@ -4,7 +4,6 @@ import coreSDKLogger from './coreSDKLogger.js';
 import WebrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 
 let logger = coreSDKLogger;
-logger.log(SIP);
 
 var beeptone = document.createElement("audio");
 beeptone.src = require("./static/beep.wav");
@@ -622,7 +621,7 @@ class SIPJSPhone {
 				traceSip: true,
 				reconnectionAttempts: 0
 			},
-			logBuiltinEnabled: true,
+			logBuiltinEnabled: false,
 				logConfiguration: true,
 				authorizationUsername: this.txtPrivateIdentity,
 				authorizationPassword: this.txtPassword,

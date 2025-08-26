@@ -18,7 +18,7 @@ export const audioDeviceManager = {
         this.resetOutputDevice = value;
     },
 
-    async changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
+    async changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
         logger.log(`SIPJSPhone:changeAudioInputDevice entry`);
         try {
             if (this.enableAutoAudioDeviceChangeHandling && !forceDeviceChange) {
@@ -45,12 +45,12 @@ export const audioDeviceManager = {
         }
     },
 
-    async changeAudioOutputDevice(audioRemote, deviceId, onSuccess, onError, forceDeviceChange = false) {
+    async changeAudioOutputDevice(audioRemote, deviceId, onSuccess, onError, forceDeviceChange) {
         logger.log(`audioDeviceManager:changeAudioOutputDevice : entry`);
         const audioElement = audioRemote;
         if (typeof audioElement.sinkId !== 'undefined') {
             try {
-                if (enableAutoAudioDeviceChangeHandling && !forceDeviceChange) {
+                if (this.enableAutoAudioDeviceChangeHandling && !forceDeviceChange) {
                     if (deviceId == audioDeviceManager.currentAudioOutputDeviceId) {
                         logger.log(`SIPJSPhone:changeAudioOutputDevice current output device is same as ${deviceId}`);
                         if (onError) onError("current output device is same as " + deviceId);
@@ -58,7 +58,7 @@ export const audioDeviceManager = {
                     }
                     if (!audioDeviceManager.mediaDevices || audioDeviceManager.mediaDevices.length == 0) {
                         logger.error("audioDeviceManager:changeAudioOutputDevice mediaDeviceList is empty ");
-                        if (onError) logger.error(deviceId + "not found in mediaDeviceList in audioManager");
+                        if (onError) onError(deviceId + "not found in mediaDeviceList in audioManager");
                         return;
                     }
                     const outputDevice = audioDeviceManager.mediaDevices.find(device => device.deviceId === deviceId && device.kind === 'audiooutput');
@@ -139,5 +139,4 @@ export const audioDeviceManager = {
 
 };
 
-audioDeviceManager.enumerateDevices();
 export default audioDeviceManager;
