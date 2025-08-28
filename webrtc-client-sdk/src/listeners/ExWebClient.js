@@ -65,6 +65,7 @@ function fetchPublicIP(sipAccountInfo) {
 class ExDelegationHandler {
     constructor(exClient) {
         this.exClient = exClient;
+        this.sessionCallback = exClient.sessionCallback;
     }
     setTestingMode(mode) {
         logger.log("delegationHandler: setTestingMode\n");
@@ -88,6 +89,8 @@ class ExDelegationHandler {
     }
     onStatPeerConnectionIceGatheringStateChange(iceGatheringState) {
         logger.log("delegationHandler: onStatPeerConnectionIceGatheringStateChange\n");
+        this.sessionCallback.initializeSession(`ice_gathering_state_${iceGatheringState}`, this.exClient.callFromNumber);
+        this.sessionCallback.triggerSessionCallback();
     }
     onCallStatIceCandidate(ev, icestate) {
         logger.log("delegationHandler: onCallStatIceCandidate\n");
@@ -98,8 +101,10 @@ class ExDelegationHandler {
     onCallStatSignalingStateChange(cstate) {
         logger.log("delegationHandler: onCallStatSignalingStateChange\n");
     }
-    onStatPeerConnectionIceConnectionStateChange() {
+    onStatPeerConnectionIceConnectionStateChange(iceConnectionState) {
         logger.log("delegationHandler: onStatPeerConnectionIceConnectionStateChange\n");
+        this.sessionCallback.initializeSession(`ice_connection_state_${iceConnectionState}`, this.exClient.callFromNumber);
+        this.sessionCallback.triggerSessionCallback();
     }
     onStatPeerConnectionConnectionStateChange() {
         logger.log("delegationHandler: onStatPeerConnectionConnectionStateChange\n");
@@ -109,6 +114,8 @@ class ExDelegationHandler {
     }
     onGetUserMediaErrorCallstatCallback() {
         logger.log("delegationHandler: onGetUserMediaErrorCallstatCallback\n");
+        this.sessionCallback.initializeSession(`media_permission_denied`, this.exClient.callFromNumber);
+        this.sessionCallback.triggerSessionCallback();
     }
     onCallStatAddStream() {
         logger.log("delegationHandler: onCallStatAddStream\n");
@@ -231,17 +238,18 @@ export class ExotelWebClient {
         this.logger = getLogger();
 
         // Register logger callback
+        let exwebClientOb = this;
         this.logger.registerLoggerCallback((type, message, args) => {
             LogManager.onLog(type, message, args);
-            if (this.clientSDKLoggerCallback) {
-                this.clientSDKLoggerCallback("log", message, args);
+            if (exwebClientOb.clientSDKLoggerCallback) {
+                exwebClientOb.clientSDKLoggerCallback("log", message, args);
             }
         });
     }
     
 
     initWebrtc = async (sipAccountInfo_,
-        RegisterEventCallBack, CallListenerCallback, SessionCallback) => {
+        RegisterEventCallBack, CallListenerCallback, SessionCallback, enableAutoAudioDeviceChangeHandling=false) => {
         const userName = sipAccountInfo_?.userName;
         if (!userName) return false;
 
@@ -271,6 +279,7 @@ export class ExotelWebClient {
             this.ctrlr = new CallController();
         }
 
+        sipAccountInfo_.enableAutoAudioDeviceChangeHandling = enableAutoAudioDeviceChangeHandling;
         logger.log("ExWebClient: initWebrtc: Exotel Client Initialised with " + JSON.stringify(sipAccountInfo_))
         this.sipAccountInfo = sipAccountInfo_;
         if (!this.sipAccountInfo["userName"] || !this.sipAccountInfo["sipdomain"] || !this.sipAccountInfo["port"]) {
@@ -301,7 +310,7 @@ export class ExotelWebClient {
         }
 
         // Initialize the phone with SIP engine
-        this.webrtcSIPPhone.registerPhone("sipjs", new ExDelegationHandler(this));
+        this.webrtcSIPPhone.registerPhone("sipjs", new ExDelegationHandler(this), this.sipAccountInfo.enableAutoAudioDeviceChangeHandling);
 
         // Create call instance after phone is initialized
         if (!this.call) {
@@ -533,7 +542,7 @@ export class ExotelWebClient {
         var userName = this.userName;
 
 
-        this.webrtcSIPPhone.registerPhone("sipjs", delegationHandler);
+        this.webrtcSIPPhone.registerPhone("sipjs", delegationHandler, this.sipAccountInfo.enableAutoAudioDeviceChangeHandling);
         this.webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler);
         phonePool[this.userName] = this.webrtcSIPPhone;     
 
@@ -585,14 +594,14 @@ export class ExotelWebClient {
             });
     };
 
-    changeAudioInputDevice(deviceId, onSuccess, onError) {
+    changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
         logger.log(`ExWebClient: changeAudioInputDevice: Entry`);
-        this.webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError);
+        this.webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange);
     }
 
-    changeAudioOutputDevice(deviceId, onSuccess, onError) {
+    changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
         logger.log(`ExWebClient: changeAudioOutputDevice: Entry`);
-        this.webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError);
+        this.webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange);
     }
 
 	downloadLogs() {
@@ -621,6 +630,15 @@ export class ExotelWebClient {
         }
         this.webrtcSIPPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
     }
+
+    setEnableConsoleLogging(enable) {
+        if (enable) {
+            logger.log(`ExWebClient: setEnableConsoleLogging: ${enable}`);
+        } 
+
+        logger.setEnableConsoleLogging(enable);
+    }
+
 }
 
 export default ExotelWebClient;

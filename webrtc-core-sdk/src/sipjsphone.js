@@ -4,7 +4,6 @@ import coreSDKLogger from './coreSDKLogger.js';
 import WebrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 
 let logger = coreSDKLogger;
-logger.log(SIP);
 
 var beeptone = document.createElement("audio");
 beeptone.src = require("./static/beep.wav");
@@ -120,6 +119,7 @@ class SIPJSPhone {
 		this.bMicEnable = true;
 		this.bHoldEnable = false;
 		this.register_flag = false;
+		this.enableAutoAudioDeviceChangeHandling = false;
 
 		this.ringtone = ringtone;
 		this.beeptone = beeptone;
@@ -129,8 +129,6 @@ class SIPJSPhone {
 		this.audioRemote.style.display = 'none';
 		document.body.appendChild(this.audioRemote);
 
-		navigator.mediaDevices.addEventListener('devicechange', this._onDeviceChange.bind(this));
-
 		this.addPreferredCodec = this.addPreferredCodec.bind(this);
 
 		// In the constructor, after initializing audio elements:
@@ -139,6 +137,17 @@ class SIPJSPhone {
 			audio.volume = 1.0;
 		});
 	}
+
+	attachGlobalDeviceChangeListener() {
+		logger.log("SIPJSPhone: Attaching global devicechange event listener enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
+		navigator.mediaDevices.addEventListener('devicechange', this._onDeviceChange.bind(this));
+	}
+
+	setEnableAutoAudioDeviceChangeHandling(flag) {
+		logger.log("sipjsphone: setEnableAutoAudioDeviceChangeHandling: entry, enableAutoAudioDeviceChangeHandling = ",flag);
+        this.enableAutoAudioDeviceChangeHandling = flag;
+		audioDeviceManager.setEnableAutoAudioDeviceChangeHandling(flag);
+    }
 
 	init(onInitDoneCallback) {
 
@@ -612,7 +621,7 @@ class SIPJSPhone {
 				traceSip: true,
 				reconnectionAttempts: 0
 			},
-			logBuiltinEnabled: true,
+			logBuiltinEnabled: false,
 				logConfiguration: true,
 				authorizationUsername: this.txtPrivateIdentity,
 				authorizationPassword: this.txtPassword,
@@ -913,8 +922,8 @@ destroySocketConnection() {
 	switch (direction) {
 		case "sent":
 
-			if (sipMessage.method == "CONNECTION")
-					this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("sent_request", sipMessage.method);
+			if (sipMessage.method == "REGISTER")
+					this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("sent_request", "CONNECTION");
 
 				this.webrtcSIPPhoneEventDelegate.onCallStatSipSendCallback(newtext, "sipjs");
 
@@ -1352,8 +1361,8 @@ destroySocketConnection() {
 		return this.lastRegistererState;
 	}
 
-	changeAudioInputDevice(deviceId, onSuccess, onError) {
-		logger.log("sipjsphone: changeAudioInputDevice : ", deviceId, onSuccess, onError);
+	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
+		logger.log("sipjsphone: changeAudioInputDevice : ", deviceId, onSuccess, onError, "forceDeviceChange = ", forceDeviceChange, "enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
 		audioDeviceManager.changeAudioInputDevice(deviceId, (stream) => {
 			const trackChanged = this.replaceSenderTrack(stream, deviceId);
 			if (trackChanged) {
@@ -1367,10 +1376,12 @@ destroySocketConnection() {
 		}, (err) => {
 			logger.error("sipjsphone: changeAudioInputDevice error:", err);
 			if (onError) onError(err);
-		});
+		},
+		forceDeviceChange);
 	}
 
-	async changeAudioOutputDevice(deviceId, onSuccess, onError) {
+	async changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
+		logger.log("sipjsphone: changeAudioOutputDevice : ", deviceId, onSuccess, onError, "forceDeviceChange = ", forceDeviceChange, "enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
 		try {
 			// Ensure device list is up-to-date
 			await audioDeviceManager.enumerateDevices();
@@ -1392,7 +1403,8 @@ destroySocketConnection() {
 			}, (err) => {
 				logger.error('SIPJSPhone:changeAudioOutputDevice error:', err);
 				if (onError) onError(err);
-			});
+			},
+			forceDeviceChange);
 		} catch (e) {
 			logger.error('SIPJSPhone:changeAudioOutputDevice unexpected error:', e);
 			if (onError) onError(e);

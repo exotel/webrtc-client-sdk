@@ -30,8 +30,8 @@ class WebrtcSIPPhone {
 		return coreSDKLogger;
 	}
 
-	registerPhone(engine, delegate) {
-		logger.log("webrtcSIPPhone: registerPhone : ", engine);
+	registerPhone(engine, delegate, enableAutoAudioDeviceChangeHandling = false) {
+		logger.log("webrtcSIPPhone: registerPhone : ", engine, "enableAutoAudioDeviceChangeHandling:", enableAutoAudioDeviceChangeHandling);
 		this.webrtcSIPEngine = engine;
 		
 		if (!this.webrtcSIPPhoneEventDelegate) {
@@ -53,6 +53,10 @@ class WebrtcSIPPhone {
 		}
 		
 		this.webrtcSIPPhoneEventDelegate.onRegisterWebRTCSIPEngine(engine);
+		this.phone.setEnableAutoAudioDeviceChangeHandling(enableAutoAudioDeviceChangeHandling);
+		if(enableAutoAudioDeviceChangeHandling) {
+			this.phone.attachGlobalDeviceChangeListener();
+		}
 	}
 
 	getWebRTCStatus() {
@@ -240,14 +244,14 @@ class WebrtcSIPPhone {
 		}
 	}
 
-	changeAudioInputDevice(deviceId, onSuccess, onError) {
-		logger.log("webrtcSIPPhone: changeAudioInputDevice : ", deviceId, onSuccess, onError);
-		this.phone.changeAudioInputDevice(deviceId, onSuccess, onError);
+	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
+		logger.log("webrtcSIPPhone: changeAudioInputDevice : ", deviceId, onSuccess, onError, "forceDeviceChange = ", forceDeviceChange);
+		this.phone.changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	}
 
-	changeAudioOutputDevice(deviceId, onSuccess, onError) {
-		logger.log("webrtcSIPPhone: changeAudioOutputDevice : ", deviceId, onSuccess, onError);
-		this.phone.changeAudioOutputDevice(deviceId, onSuccess, onError);
+	changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
+		logger.log("webrtcSIPPhone: changeAudioOutputDevice : ", deviceId, onSuccess, onError, "forceDeviceChange = ", forceDeviceChange);
+		this.phone.changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	}
 
 	setPreferredCodec(codecName) {
