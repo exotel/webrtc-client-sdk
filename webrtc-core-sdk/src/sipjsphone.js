@@ -120,6 +120,7 @@ class SIPJSPhone {
 		this.bHoldEnable = false;
 		this.register_flag = false;
 		this.enableAutoAudioDeviceChangeHandling = false;
+		this.addPreferredCodec = this.addPreferredCodec.bind(this);
 
 		this.ringtone = ringtone;
 		this.beeptone = beeptone;
@@ -129,13 +130,91 @@ class SIPJSPhone {
 		this.audioRemote.style.display = 'none';
 		document.body.appendChild(this.audioRemote);
 
-		this.addPreferredCodec = this.addPreferredCodec.bind(this);
+		// --- Web Audio mixer setup ---
+		this._wa = { ctx: null, dest: null, gains: {}, sources: {}, outEl: null };
 
-		// In the constructor, after initializing audio elements:
-		[this.ringtone, this.beeptone, this.ringbacktone, this.dtmftone].forEach(audio => {
-			audio.muted = false;
-			audio.volume = 1.0;
-		});
+		this._initWebAudio = () => {
+			if (this._wa.ctx) return;
+			const AudioCtx = window.AudioContext || window.webkitAudioContext;
+			this._wa.ctx = new AudioCtx();
+
+			// Per-type gains (no master)
+			this._wa.gains = {
+				ringtone: this._wa.ctx.createGain(),
+				ringback: this._wa.ctx.createGain(),
+				beep:     this._wa.ctx.createGain(),
+				dtmf:     this._wa.ctx.createGain(),
+				call:     this._wa.ctx.createGain(),
+			};
+
+			// Initial volumes (tweak if you prefer different defaults)
+			this._wa.gains.ringtone.gain.value = 1.0;
+			this._wa.gains.ringback.gain.value = 1.0;
+			this._wa.gains.beep.gain.value     = 1.0;
+			this._wa.gains.dtmf.gain.value     = 1.0;
+			this._wa.gains.call.gain.value     = 1.0;
+
+			// Connect chain: per-type -> MediaStreamDestination (no master)
+			this._wa.dest = this._wa.ctx.createMediaStreamDestination();
+			Object.values(this._wa.gains).forEach(g => g.connect(this._wa.dest));
+
+			// Hidden output element that carries the mixed stream (keeps setSinkId working)
+			this._wa.outEl = document.createElement('audio');
+			this._wa.outEl.autoplay = true;
+			this._wa.outEl.playsInline = true;
+			this._wa.outEl.style.display = 'none';
+			this._wa.outEl.srcObject = this._wa.dest.stream;
+			document.body.appendChild(this._wa.outEl);
+
+			// Apply current output device if not "default"
+			try {
+				if (audioDeviceManager.currentAudioOutputDeviceId !== "default") {
+					this._wa.outEl.setSinkId(audioDeviceManager.currentAudioOutputDeviceId);
+				}
+			} catch (e) {
+				logger.log("Web Audio: Could not set initial sink ID:", e);
+			}
+		};
+
+		// Initialize Web Audio
+		this._initWebAudio();
+	}
+
+	// Volume control methods
+	setSoundVolume(type, value) {
+		if (!this._wa || !this._wa.gains[type]) {
+			logger.error(`setSoundVolume: Invalid sound type: ${type}`);
+			return false;
+		}
+		this._wa.gains[type].gain.value = Math.max(0, Math.min(1, value));
+		logger.log(`setSoundVolume: ${type} volume set to ${value}`);
+		return true;
+	}
+
+	getSoundVolume(type) {
+		if (!this._wa || !this._wa.gains[type]) {
+			logger.error(`getSoundVolume: Invalid sound type: ${type}`);
+			return 0;
+		}
+		return this._wa.gains[type].gain.value;
+	}
+
+	setCallVolume(value) {
+		if (!this._wa || !this._wa.gains.call) {
+			logger.error("setCallVolume: Web Audio not initialized");
+			return false;
+		}
+		this._wa.gains.call.gain.value = Math.max(0, Math.min(1, value));
+		logger.log(`setCallVolume: call volume set to ${value}`);
+		return true;
+	}
+
+	getCallVolume() {
+		if (!this._wa || !this._wa.gains.call) {
+			logger.error("getCallVolume: Web Audio not initialized");
+			return 0;
+		}
+		return this._wa.gains.call.gain.value;
 	}
 
 	attachGlobalDeviceChangeListener() {
@@ -182,31 +261,45 @@ class SIPJSPhone {
 		ringtoneCount: 30,
 
 			startRingTone: () => {
-			try {
-				var count = 0;
-				if (!this.ctxSip.ringtone) {
-					this.ctxSip.ringtone = this.ringtone;
-				}
-				logger.log('DEBUG: startRingTone called, audio element:', this.ctxSip.ringtone);
-				logger.log('DEBUG: startRingTone src:', this.ctxSip.ringtone.src);
-				this.ctxSip.ringtone.load();
-				this.ctxSip.ringToneIntervalID = setInterval(() => {
-					this.ctxSip.ringtone.play()
-						.then(() => {
-							logger.log("DEBUG: startRingTone: Audio is playing...");
-						})
-						.catch(e => {
-							logger.log("DEBUG: startRingTone: Exception:", e);
-						});
-					count++;
-					if (count > this.ctxSip.ringtoneCount) {
-						clearInterval(this.ctxSip.ringToneIntervalID);
+				try {
+					var count = 0;
+					if (!this.ctxSip.ringtone) {
+						this.ctxSip.ringtone = this.ringtone;
 					}
-				}, 500);
-			} catch (e) {
-				logger.log("DEBUG: startRingTone: Exception:", e);
-			}
-		},
+					logger.log('DEBUG: startRingTone called, audio element:', this.ctxSip.ringtone);
+					logger.log('DEBUG: startRingTone src:', this.ctxSip.ringtone.src);
+					this.ctxSip.ringtone.load();
+					
+					// Connect to Web Audio if available
+					if (this._wa && this._wa.ctx && this._wa.gains?.ringtone) {
+						this._wa.sources = this._wa.sources || {};
+						if (!this._wa.sources.ringtone) {
+							try {
+								this._wa.sources.ringtone = this._wa.ctx.createMediaElementSource(this.ctxSip.ringtone);
+								this._wa.sources.ringtone.connect(this._wa.gains.ringtone);
+							} catch (e) {
+								logger.warn("startRingTone: source already exists; using existing connection");
+							}
+						}
+					}
+					
+					this.ctxSip.ringToneIntervalID = setInterval(() => {
+						this.ctxSip.ringtone.play()
+							.then(() => {
+								logger.log("DEBUG: startRingTone: Audio is playing...");
+							})
+							.catch(e => {
+								logger.log("DEBUG: startRingTone: Exception:", e);
+							});
+						count++;
+						if (count > this.ctxSip.ringtoneCount) {
+							clearInterval(this.ctxSip.ringToneIntervalID);
+						}
+					}, 500);
+				} catch (e) {
+					logger.log("DEBUG: startRingTone: Exception:", e);
+				}
+			},
 
 			stopRingTone: () => {
 				try {
@@ -220,11 +313,25 @@ class SIPJSPhone {
 			} catch (e) { logger.log("sipjsphone: stopRingTone: Exception:", e); }
 		},
 
+			// Update the startRingbackTone method (around line 223) to use Web Audio:
 			startRingbackTone: () => {
 				if (!this.ctxSip.ringbacktone) {
 					this.ctxSip.ringbacktone = this.ringbacktone;
-			}
-			try {
+				}
+				try {
+					// Connect to Web Audio if available
+					if (this._wa && this._wa.ctx && this._wa.gains?.ringback) {
+						this._wa.sources = this._wa.sources || {};
+						if (!this._wa.sources.ringback) {
+							try {
+								this._wa.sources.ringback = this._wa.ctx.createMediaElementSource(this.ctxSip.ringbacktone);
+								this._wa.sources.ringback.connect(this._wa.gains.ringback);
+							} catch (e) {
+								logger.warn("startRingbackTone: source already exists; using existing connection");
+							}
+						}
+					}
+					
 					this.ctxSip.ringbacktone.play()
 						.then(() => {
 							logger.log("sipjsphone: startRingbackTone: Audio is playing...");
@@ -233,8 +340,8 @@ class SIPJSPhone {
 							logger.log("sipjsphone: startRingbackTone: Exception:", e);
 							// Optionally, prompt user to interact with the page to enable audio
 						});
-			} catch (e) { logger.log("sipjsphone: startRingbackTone: Exception:", e); }
-		},
+				} catch (e) { logger.log("sipjsphone: startRingbackTone: Exception:", e); }
+			},
 
 			stopRingbackTone: () => {
 				if (!this.ctxSip.ringbacktone) {
@@ -386,35 +493,49 @@ class SIPJSPhone {
 
 		},
 
+			// Update the sipSendDTMF method (around line 389) to use Web Audio:
 			sipSendDTMF: (digit) => {
-
-				try { this.ctxSip.dtmfTone.play(); } catch (e) { logger.log("sipjsphone: sipSendDTMF: Exception:", e); }
+				try { 
+					// Connect to Web Audio if available
+					if (this._wa && this._wa.ctx && this._wa.gains?.dtmf) {
+						this._wa.sources = this._wa.sources || {};
+						if (!this._wa.sources.dtmf) {
+							try {
+								this._wa.sources.dtmf = this._wa.ctx.createMediaElementSource(this.ctxSip.dtmfTone);
+								this._wa.sources.dtmf.connect(this._wa.gains.dtmf);
+							} catch (e) {
+								logger.warn("sipSendDTMF: source already exists; using existing connection");
+							}
+						}
+					}
+					this.ctxSip.dtmfTone.play(); 
+				} catch (e) { logger.log("sipjsphone: sipSendDTMF: Exception:", e); }
 
 				var a = this.ctxSip.callActiveID;
-			if (a) {
+				if (a) {
 					var s = this.ctxSip.Sessions[a];
 
-				if (!/^[0-9A-D#*,]$/.exec(digit)) {
-					return Promise.reject(new Error("Invalid DTMF tone."));
-				}
-				if (!s) {
-					return Promise.reject(new Error("Session does not exist."));
-				}
+					if (!/^[0-9A-D#*,]$/.exec(digit)) {
+						return Promise.reject(new Error("Invalid DTMF tone."));
+					}
+					if (!s) {
+						return Promise.reject(new Error("Session does not exist."));
+					}
 
-				const dtmf = digit;
-				const duration = 240;
-				const body = {
-					contentDisposition: "render",
-					contentType: "application/dtmf-relay",
-					content: "Signal=" + dtmf + "\r\nDuration=" + duration
-				};
-				const requestOptions = { body };
-				return s.info({ requestOptions }).then(() => {
-					return;
-				});
+					const dtmf = digit;
+					const duration = 240;
+					const body = {
+						contentDisposition: "render",
+						contentType: "application/dtmf-relay",
+						content: "Signal=" + dtmf + "\r\nDuration=" + duration
+					};
+					const requestOptions = { body };
+					return s.info({ requestOptions }).then(() => {
+						return;
+					});
 
-			}
-		},
+				}
+			},
 
 			setError: (err, title, msg, closable) => { },
 
@@ -1070,36 +1191,46 @@ destroySocketConnection() {
 }
 
 	 assignStream(stream, element) {
-	if (audioDeviceManager.currentAudioOutputDeviceId != "default")
-		element.setSinkId(audioDeviceManager.currentAudioOutputDeviceId);
-	// Set element source.
-	element.autoplay = true; // Safari does not allow calling .play() from a
-	// non user action
-	element.srcObject = stream;
+	try {
+		if (this._wa && this._wa.ctx && this._wa.gains && this._wa.gains.call) {
+			// Disconnect previous call source if present
+			if (this._wa.sources && this._wa.sources.call) {
+				try { this._wa.sources.call.disconnect(); } catch(e) {}
+			} else {
+				this._wa.sources = this._wa.sources || {};
+			}
 
-	// Load and start playback of media.
-	element.play().catch((error) => {
-		logger.error("Failed to play media");
-		logger.error(error);
-	});
+			// Create a *new* source from the remote MediaStream and connect to call gain
+			this._wa.sources.call = this._wa.ctx.createMediaStreamSource(stream);
+			this._wa.sources.call.connect(this._wa.gains.call);
 
-	// If a track is added, load and restart playback of media.
-	stream.onaddtrack = () => {
-		element.load(); // Safari does not work otheriwse
-		element.play().catch((error) => {
-			logger.error("Failed to play remote media on add track");
-			logger.error(error);
-		});
-	};
+			// Ensure the "raw" remote element doesn't also play (avoid double audio)
+			if (element) {
+				try { element.pause?.(); } catch(e) {}
+				element.srcObject = null;
+				element.muted = true;
+			}
 
-	// If a track is removed, load and restart playback of media.
-	stream.onremovetrack = () => {
-		element.load(); // Safari does not work otheriwse
-		element.play().catch((error) => {
-			logger.error("Failed to play remote media on remove track");
-			logger.error(error);
-		});
-	};
+			// Make sure our output element is playing the *mixed* destination stream
+			const outEl = this._wa.outEl;
+			if (outEl && outEl.srcObject !== this._wa.dest.stream) {
+				outEl.srcObject = this._wa.dest.stream;
+			}
+			outEl.autoplay = true;
+			outEl.play().catch(err => logger.error("assignStream: outEl.play failed", err));
+			return;
+		}
+	} catch (err) {
+		logger.error("assignStream: web audio route failed; falling back", err);
+	}
+
+	// Fallback: play directly without Web Audio
+	if (element) {
+		element.muted = false;
+		element.autoplay = true;
+		element.srcObject = stream;
+		element.play().catch(err => logger.error("assignStream: element.play failed", err));
+	}
 }
 
 	 onUserSessionAcceptFailed(e) {
@@ -1298,7 +1429,36 @@ destroySocketConnection() {
 
 
 	sipHangUp() {
-		this.ctxSip.sipHangUp(this.ctxSip.callActiveID);
+		const s = this.ctxSip.Sessions[this.ctxSip.callActiveID];
+		if (!s) return;
+
+		const SS = SIP.SessionState || { Initial: "Initial", Establishing: "Establishing", Established: "Established", Terminating: "Terminating", Terminated: "Terminated" };
+		const state = s.state;
+
+		// Already going down? Do nothing.
+		if (state === SS.Terminating || state === SS.Terminated) {
+			logger.log("sipHangUp: no-op; session already terminating/terminated");
+			return;
+		}
+
+		try {
+			if (state === SS.Established && typeof s.bye === "function") {
+				return s.bye();
+			}
+
+			// Outgoing before connected or incoming ringing
+			if ((state === SS.Initial || state === SS.Establishing)) {
+				if (typeof s.cancel === "function") return s.cancel();     // outgoing INVITE
+				if (typeof s.reject === "function") return s.reject({ statusCode: 486, reasonPhrase: "Busy" }); // incoming INVITE
+			}
+
+			// Fallback
+			if (typeof s.reject === "function") {
+				return s.reject({ statusCode: 486, reasonPhrase: "Busy" });
+			}
+		} catch (e) {
+			logger.error("sipHangUp: swallow error", e);
+		}
 	}
 
 

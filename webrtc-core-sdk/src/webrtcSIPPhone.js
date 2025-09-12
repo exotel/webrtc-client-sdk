@@ -263,6 +263,42 @@ class WebrtcSIPPhone {
 		logger.log("webrtcSIPPhone: registerAudioDeviceChangeCallback entry");
 		this.phone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
 	}
+
+	setSoundVolume(type, value) {
+		logger.log("webrtcSIPPhone: setSoundVolume: ", type, value);
+		if (!this.phone) {
+			logger.error("webrtcSIPPhone: setSoundVolume: phone not initialized");
+			return false;
+		}
+		return this.phone.setSoundVolume(type, value);
+	}
+
+	getSoundVolume(type) {
+		logger.log("webrtcSIPPhone: getSoundVolume: ", type);
+		if (!this.phone) {
+			logger.error("webrtcSIPPhone: getSoundVolume: phone not initialized");
+			return 0;
+		}
+		return this.phone.getSoundVolume(type);
+	}
+
+	setCallVolume(value) {
+		logger.log("webrtcSIPPhone: setCallVolume: ", value);
+		if (!this.phone) {
+			logger.error("webrtcSIPPhone: setCallVolume: phone not initialized");
+			return false;
+		}
+		return this.phone.setCallVolume(value);
+	}
+
+	getCallVolume() {
+		logger.log("webrtcSIPPhone: getCallVolume");
+		if (!this.phone) {
+			logger.error("webrtcSIPPhone: getCallVolume: phone not initialized");
+			return 0;
+		}
+		return this.phone.getCallVolume();
+	}
 }
 
 export default WebrtcSIPPhone;

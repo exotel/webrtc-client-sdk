@@ -639,6 +639,42 @@ export class ExotelWebClient {
         logger.setEnableConsoleLogging(enable);
     }
 
+    setSoundVolume(type, value) {
+		logger.log("ExWebClient: setSoundVolume: ", type, value);
+		if (!this.webrtcSIPPhone) {
+			logger.error("ExWebClient: setSoundVolume: webrtcSIPPhone not initialized");
+			return false;
+		}
+		return this.webrtcSIPPhone.setSoundVolume(type, value);
+	}
+
+	getSoundVolume(type) {
+		logger.log("ExWebClient: getSoundVolume: ", type);
+		if (!this.webrtcSIPPhone) {
+			logger.error("ExWebClient: getSoundVolume: webrtcSIPPhone not initialized");
+			return 0;
+		}
+		return this.webrtcSIPPhone.getSoundVolume(type);
+	}
+
+	setCallVolume(value) {
+		logger.log("ExWebClient: setCallVolume: ", value);
+		if (!this.webrtcSIPPhone) {
+			logger.error("ExWebClient: setCallVolume: webrtcSIPPhone not initialized");
+			return false;
+		}
+		return this.webrtcSIPPhone.setCallVolume(value);
+	}
+
+    getCallVolume() {
+		logger.log("ExWebClient: getCallVolume");
+		if (!this.webrtcSIPPhone) {
+			logger.error("ExWebClient: getCallVolume: webrtcSIPPhone not initialized");
+			return 0;
+		}
+		return this.webrtcSIPPhone.getCallVolume();
+	}
+
 }
 
 export default ExotelWebClient;
