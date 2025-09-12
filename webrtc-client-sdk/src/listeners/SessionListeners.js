@@ -1,24 +1,23 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 
-const logger = getLogger();
 /**
  * Session listeners is invoked when user opens two tabs, the data in tab 1 is
  * copied into tab 2
  */
 export class SessionListener {
   sessionCallback = null;
-  constructor(sessionCallback) {
+  constructor(sessionCallback, logger) {
     this.sessionCallback = sessionCallback;
+    this.logger = logger;
   }
 
   onSessionEstablished = function (session) {
-    logger.log("SessionListener: onSessionEstablished");
+    this.logger.log("SessionListener: onSessionEstablished");
     this.sessionCallback.triggerCallback("established", session);
   }
 
   onSessionTerminated = function (session) {
-    logger.log("SessionListener: onSessionTerminated");
+    this.logger.log("SessionListener: onSessionTerminated");
     this.sessionCallback.triggerCallback("terminated", session);
   }
 
@@ -92,7 +91,7 @@ export class SessionListener {
         /** Based on activeSessionTab id fetch the type */
 
         if (window.sessionStorage.getItem('activeSessionTab') !== null && window.sessionStorage.getItem('activeSessionTab') == "parent0") {
-          logger.log('Adding a child tab spawned from parent....');
+          this.logger.log('Adding a child tab spawned from parent....');
           /** In order to keep tabID same for all the child ones, we are using below IF to distinguish */
 
           if (tabArr.length > 1 && window.sessionStorage.getItem('activeSessionTab') == "parent0") {

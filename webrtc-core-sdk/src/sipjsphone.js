@@ -1,9 +1,7 @@
 var SIP = require('./sip-0.20.0.js')
 import { audioDeviceManager } from './audioDeviceManager.js';
-import coreSDKLogger from './coreSDKLogger.js';
 import WebrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 
-let logger = coreSDKLogger;
 
 var beeptone = document.createElement("audio");
 beeptone.src = require("./static/beep.wav");
@@ -27,29 +25,12 @@ audioElementNameVsAudioGainNodeMap["beeptone"] = audioDeviceManager.createAudioG
 
 
 
-export function getLogger() {
-	let uaLogger;
 
-	try {
-		let userAgent = SIP.UserAgent
-		uaLogger = userAgent.getLogger("sip.WebrtcLib")
-	} catch (e) {
-		logger.log("sipjsphone: getLogger: No userAgent.getLogger, Using console log")
-		return console;
-	}
-
-	if (uaLogger) {
-		return uaLogger;
-	}
-	else {
-		logger.log("sipjsphone: getLogger: No Logger, Using console log")
-		return logger;
-	}
-}
 
 class SIPJSPhone {
 
-	constructor(delegate, username) {
+	constructor(delegate, username, logger) {
+		this.logger = logger;
 		this.webrtcSIPPhoneEventDelegate = delegate;
 		this.username = username;
 		this.ctxSip = {};

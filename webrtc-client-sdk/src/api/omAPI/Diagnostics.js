@@ -1,7 +1,6 @@
-import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
+
 import { diagnosticsCallback } from "../../listeners/Callback";
 
-const logger = getLogger();
 
 var speakerNode;
 var micNode;
@@ -26,13 +25,14 @@ eventMapper.sipml5.terminated_REGISTER = "USER_REG_TEST_FAIL";
 var candidateProcessData = {};
 
 export class Diagnostics {
-    constructor() {
+    constructor(logger) {
+        this.logger = logger;
         this.report = {};
     }
 
     setReport(key, value) {
         this.report[key] = value;
-        logger.log("Diagnostics: setReport", key, value);
+        this.logger.log("Diagnostics: setReport", key, value);
     }
 
     getReport() {
@@ -83,7 +83,7 @@ export var ameyoWebRTCTroubleshooter = {
       "\n";
     //if(window.addLogToTroubleshootReport) {
     //this.addLogToTroubleshootReport
-    logger.log(msg);
+    this.logger.log(msg);
     var oldMsg = window.localStorage.getItem('troubleShootReport')
     if (oldMsg) {
       msg = oldMsg + msg
@@ -157,7 +157,7 @@ export var ameyoWebRTCTroubleshooter = {
 
   stopSpeakerTesttone: function (webrtcSIPPhone) {
     if (!webrtcSIPPhone) {
-      logger.log("stopSpeakerTesttone: webrtcSIPPhone not provided");
+      this.logger.log("stopSpeakerTesttone: webrtcSIPPhone not provided");
       return;
     }
     speakerTestTone = webrtcSIPPhone.getSpeakerTestTone();
@@ -181,11 +181,11 @@ export var ameyoWebRTCTroubleshooter = {
   startSpeakerTest: function (webrtcSIPPhone) {
     var parent = this;
     if (!webrtcSIPPhone) {
-      logger.log("startSpeakerTest: webrtcSIPPhone not provided");
+      this.logger.log("startSpeakerTest: webrtcSIPPhone not provided");
       return;
     }
     if (intervalID) {
-      logger.log("startSpeakerTest: already running");
+      this.logger.log("startSpeakerTest: already running");
       return;
     }
     try {
@@ -193,29 +193,29 @@ export var ameyoWebRTCTroubleshooter = {
 
         try {
           speakerTestTone = webrtcSIPPhone.getSpeakerTestTone();
-          logger.log("close last track");
+          this.logger.log("close last track");
           speakerTestTone.pause();
           parent.closeAudioTrack();
 
           parent.addToTrobuleshootReport("INFO", "Speaker device testing is started");
-          logger.log("speakerTestTone : play start", speakerTestTone);
+          this.logger.log("speakerTestTone : play start", speakerTestTone);
 
           speakerTestTone.addEventListener("ended", function (event) {
-            logger.log("speakerTestTone : tone iteration ended");
+            this.logger.log("speakerTestTone : tone iteration ended");
           });
 
-          logger.log("start new track")
+          this.logger.log("start new track")
 
           var playPromise = speakerTestTone.play();
 
           if (playPromise !== undefined) {
             playPromise.then(_ => {
-              logger.log("speakerTestTone : promise successfull");
+              this.logger.log("speakerTestTone : promise successfull");
             })
               .catch(error => {
                 // Auto-play was prevented
                 // Show paused UI.
-                logger.log("speakerTestTone : failed", error);
+                this.logger.log("speakerTestTone : failed", error);
               });
           }
 
@@ -229,7 +229,7 @@ export var ameyoWebRTCTroubleshooter = {
           } catch {
             browserName = "Firefox"
           }
-          logger.log("browserVersion = [" + browserVersion + "] browserName = [" + browserName + "]\n")
+          this.logger.log("browserVersion = [" + browserVersion + "] browserName = [" + browserName + "]\n")
 
           if (browserName == "Firefox") {
             stream = speakerTestTone.mozCaptureStream();
@@ -238,12 +238,12 @@ export var ameyoWebRTCTroubleshooter = {
           }
           parent.fillStreamSpeaker(stream, "speaker");
         } catch {
-          logger.log("No speakertone to test..\n")
+          this.logger.log("No speakertone to test..\n")
         }
         //Enable this for tone loop - Start     
       }, 1000)
     } catch (e) {
-      logger.log("speakerTestTone : start failed", e);
+      this.logger.log("speakerTestTone : start failed", e);
     }
     //Enable this for tone loop - End     
 
@@ -252,7 +252,7 @@ export var ameyoWebRTCTroubleshooter = {
   stopSpeakerTest: function (webrtcSIPPhone) {
     var parent = this;
     if (!webrtcSIPPhone) {
-      logger.log("stopSpeakerTest: webrtcSIPPhone not provided");
+      this.logger.log("stopSpeakerTest: webrtcSIPPhone not provided");
       return;
     }
     speakerTestTone = webrtcSIPPhone.getSpeakerTestTone();
@@ -266,7 +266,7 @@ export var ameyoWebRTCTroubleshooter = {
       parent.addToTrobuleshootReport("INFO", "Speaker device testing is stopped");
       //Enable this for tone loop - Start     
     } catch (e) {
-      logger.log("speakerTestTone : stop failed", e);
+      this.logger.log("speakerTestTone : stop failed", e);
     }
     //Enable this for tone loop - End     
   },
@@ -385,7 +385,7 @@ export var ameyoWebRTCTroubleshooter = {
   },
 
   closeAudioTrack: function () {
-    logger.log("In close audio track..")
+    this.logger.log("In close audio track..")
     if (audioTrack) {
       audioTrack.stop();
       audioTrack = undefined;
@@ -427,7 +427,7 @@ export var ameyoWebRTCTroubleshooter = {
         }
       };
     } catch (e) {
-      logger.log("Media source not available for mic test ..")
+      this.logger.log("Media source not available for mic test ..")
       average = 0;
       //diagnosticsCallback.triggerDiagnosticsMicStatusCallback(average, "mic error");      
       diagnosticsCallback.triggerKeyValueSetCallback("mic", average, "mic error")
@@ -457,14 +457,14 @@ export var ameyoWebRTCTroubleshooter = {
         diagnosticsCallback.triggerKeyValueSetCallback("speaker", average, "speaker ok");
       };
     } catch (e) {
-      logger.log("Media source not available for speaker test ..")
+      this.logger.log("Media source not available for speaker test ..")
       average = 0;
       diagnosticsCallback.triggerKeyValueSetCallback("speaker", average, "speaker error");
     }
   },
 
   setUserRegTroubleshootData: function (txtUser) {
-    logger.log("No explicit registration sent during testing...")
+    this.logger.log("No explicit registration sent during testing...")
   },
 
   setWSTroubleshootData: function (txtWsStatus, webrtcSIPPhone) {
@@ -476,7 +476,7 @@ export var ameyoWebRTCTroubleshooter = {
     try {
       this.startNetworkProtocolTest();
     } catch (e) {
-      logger.log(e);
+      this.logger.log(e);
     }
   },
 
@@ -509,7 +509,7 @@ export var ameyoWebRTCTroubleshooter = {
   },
 
   setTroubleshootCandidateData: function (key, status, value) {
-    logger.log(
+    this.logger.log(
       "Candidate Data \n\t key = " + key + " status = " + status + "\n\tValue = " + value + "\n\n"
     );
     diagnosticsCallback.triggerKeyValueSetCallback(key, status, value);
@@ -589,14 +589,14 @@ export var ameyoWebRTCTroubleshooter = {
         var candidates = candidateProcessData[key + "Candidates"];
         if (candidates.length == 0) {
           this.setTroubleshootCandidateData(key, failure_status[j], "");
-          logger.log("empty candidates:" + candidates);
+          this.logger.log("empty candidates:" + candidates);
         } else {
           var cmsg = "found  candidates " + candidates.length + "\n";
           for (var k = 0; k < candidates.length; k++) {
             this.setTroubleshootCandidateData(key, success_status[j], candidates[k]);
             cmsg = cmsg + candidates[k] + "\n";
           }
-          logger.log(cmsg);
+          this.logger.log(cmsg);
         }
       }
     }
@@ -643,7 +643,7 @@ export var ameyoWebRTCTroubleshooter = {
     });
 
     pc.addEventListener("iceconnectionstatechange", function (e) {
-      logger.log("ice connection state: " + pc.iceConnectionState);
+      this.logger.log("ice connection state: " + pc.iceConnectionState);
     });
 
     pc.addEventListener("icegatheringstatechange", function (e) {

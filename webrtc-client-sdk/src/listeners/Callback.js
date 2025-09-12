@@ -1,6 +1,4 @@
-import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 
-const logger = getLogger();
 
 /**
  * The call backs are called through this function. First initiates the call object and then
@@ -11,7 +9,8 @@ const logger = getLogger();
  * Initializes call event callbacks and also sends to which phone callback was received
  */
 export class Callback {
-    constructor() {
+    constructor(logger) {
+        this.logger = logger;
         this.callbacks = {};
         this.call = null;
         this.phone = '';
@@ -30,7 +29,7 @@ export class Callback {
         if (this.callbacks[event]) {
             this.callbacks[event](...args);
         } else {
-            logger.log("No callback registered for event:", event);
+            this.logger.log("No callback registered for event:", event);
         }
     }
 }
@@ -71,7 +70,7 @@ export var phoneInstance = {
     getPhone: function (phone) {
         for (var x = 0; x < this.phones.length; x++) {
             if (this.phones[x].username == phone) {
-                logger.log('Username...' + this.phones[x].username);
+                this.logger.log('Username...' + this.phones[x].username);
                 return this.phones[x];
             }
         }
@@ -94,6 +93,10 @@ export class SessionCallback  {
     document= null;
     documentCallback= null;
     phone= '';
+    logger = null;
+    constructor(logger) {
+        this.logger = logger;
+    }
     initializeSessionCallback= function (SessionCallback) {
         this.sessioncallback = SessionCallback;
     };
@@ -116,7 +119,7 @@ export class SessionCallback  {
         if (sessionCallBackFunc) {
             return sessionCallBackFunc(this.callState, this.phone);
         } else {
-            logger.log("Session callback is null")
+            this.logger.log("Session callback is null")
             return;
         }
     }
@@ -166,7 +169,7 @@ export var webrtcTroubleshooterEventBus = {
     ipv6TestCompletedEvent: function () { diagnosticsCallback.triggerKeyValueSetCallback("ipv6", false, "ipv6 done"); },
     hostCandidateTestCompletedEvent: function () { diagnosticsCallback.triggerKeyValueSetCallback("host", true, "host ok"); },
     reflexCandidateTestCompletedEvent: function (event, phone, param) {
-        logger.log("diagnosticEventCallback: Received ---> " + event + 'param sent....' + param + 'for phone....' + phone)
+        this.logger.log("diagnosticEventCallback: Received ---> " + event + 'param sent....' + param + 'for phone....' + phone)
         diagnosticsCallback.triggerKeyValueSetCallback("srflx", true, "reflex ok");
     }
 }

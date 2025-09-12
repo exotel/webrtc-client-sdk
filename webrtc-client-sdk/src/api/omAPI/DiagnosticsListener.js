@@ -2,10 +2,9 @@ import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 import { diagnosticsCallback } from '../../listeners/Callback';
 import { ameyoWebRTCTroubleshooter } from './Diagnostics';
 
-const logger = getLogger();
 
-
-export function initDiagnostics(setDiagnosticsReportCallback, keyValueSetCallback) {
+export function initDiagnostics(setDiagnosticsReportCallback, keyValueSetCallback, logger) {
+    
     if (!keyValueSetCallback || !setDiagnosticsReportCallback) {
         logger.log("Callbacks are not set")
         return
@@ -17,13 +16,15 @@ export function initDiagnostics(setDiagnosticsReportCallback, keyValueSetCallbac
     return;
 }
 
-export function closeDiagnostics() {
+export function closeDiagnostics(logger) {
+    
     diagnosticsCallback.setKeyValueCallback(null);
     diagnosticsCallback.setDiagnosticsReportCallback(null);
     return;
 }
 
-export function startSpeakerDiagnosticsTest(webrtcSIPPhone) {
+export function startSpeakerDiagnosticsTest(webrtcSIPPhone, logger) {
+    
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
@@ -32,7 +33,8 @@ export function startSpeakerDiagnosticsTest(webrtcSIPPhone) {
     return;
 }
 
-export function stopSpeakerDiagnosticsTest(speakerTestResponse, webrtcSIPPhone) {
+export function stopSpeakerDiagnosticsTest(speakerTestResponse, webrtcSIPPhone, logger) {
+    
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
@@ -48,7 +50,8 @@ export function stopSpeakerDiagnosticsTest(speakerTestResponse, webrtcSIPPhone) 
     return;
 }
 
-export function startMicDiagnosticsTest() {
+export function startMicDiagnosticsTest(logger) {
+   
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
@@ -57,7 +60,8 @@ export function startMicDiagnosticsTest() {
     return;
 }
 
-export function stopMicDiagnosticsTest(micTestResponse) {
+export function stopMicDiagnosticsTest(micTestResponse, logger) {
+   
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
@@ -75,7 +79,8 @@ export function stopMicDiagnosticsTest(micTestResponse) {
 /**
  * Function to troubleshoot the environment
  */
-export function startNetworkDiagnostics() {
+export function startNetworkDiagnostics(logger) {
+  
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
@@ -87,7 +92,8 @@ export function startNetworkDiagnostics() {
 /**
  * Function to troubleshoot the environment
  */
-export function stopNetworkDiagnostics() {
+export function stopNetworkDiagnostics(logger) {
+    
     /**
      * When user registers the agent phone for the first time, register your callback onto webrtc client
      */
@@ -96,12 +102,14 @@ export function stopNetworkDiagnostics() {
 }
 
 export class DiagnosticsListener {
-    constructor(diagnosticsCallback) {
+    constructor(diagnosticsCallback, logger) {
+        
+        this.logger = logger;
         this.diagnosticsCallback = diagnosticsCallback;
     }
 
     onDiagnosticsEvent(event) {
-        logger.log("DiagnosticsListener: onDiagnosticsEvent", event);
+        this.logger.log("DiagnosticsListener: onDiagnosticsEvent", event);
         this.diagnosticsCallback.triggerCallback(event);
     }
 }

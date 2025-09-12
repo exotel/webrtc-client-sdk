@@ -153,6 +153,8 @@ export const audioDeviceManager = {
 
         // Connect audio graph: track -> gainNode -> destination
         track.connect(gainNode).connect(this.webAudioCtx.destination);
+
+        logger.log("audioDeviceManager:createAudioGainNode gainNodeMaxValue", gainNode.gain.maxValue);
         gainNode.gain.value = 1.0;
         
         // resume audio context when audio element is played
