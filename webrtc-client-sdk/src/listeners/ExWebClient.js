@@ -42,16 +42,16 @@ function fetchPublicIP(sipAccountInfo, logger) {
             if (split[7] === "host") {
                 logger.log(`fetchPublicIP:Local IP : ${split[4]}`);
             } else {
-                this.logger.log(`fetchPublicIP:External IP : ${split[4]}`);
+                logger.log(`fetchPublicIP:External IP : ${split[4]}`);
                 publicIp = `${split[4]}`
-                this.logger.log("fetchPublicIP:Public IP :" + publicIp);
+                logger.log("fetchPublicIP:Public IP :" + publicIp);
                 localStorage.setItem("contactHost", publicIp);
                 pc.close();
                 resolve();
             }
         };
         setTimeout(() => {
-            this.logger.log("fetchPublicIP: public ip = ", publicIp)
+            logger.log("fetchPublicIP: public ip = ", publicIp)
             if (publicIp == "") {
                 sipAccountInfo.contactHost = window.localStorage.getItem('contactHost');
             } else {
@@ -63,9 +63,10 @@ function fetchPublicIP(sipAccountInfo, logger) {
 }
 
 class ExDelegationHandler {
-    constructor(exClient) {
+    constructor(exClient, logger) {
         this.exClient = exClient;
         this.sessionCallback = exClient.sessionCallback;
+        this.logger = logger;
     }
     setTestingMode(mode) {
         this.logger.log("delegationHandler: setTestingMode\n");
@@ -184,6 +185,9 @@ class ExDelegationHandler {
 }
 
 class ExSynchronousHandler {
+    constructor(logger) {
+        this.logger = logger;
+    }
     onFailure() {
         this.logger.log("synchronousHandler: onFailure, phone is offline.\n");
     }
@@ -234,7 +238,7 @@ export class ExotelWebClient {
         this.sipAccountInfo = null;
         this.clientSDKLoggerCallback = null;
         this.callbacks = new Callback(this.logger);
-        this.registerCallback = new RegisterCallback();
+        this.registerCallback = new RegisterCallback(this.logger);
         this.sessionCallback = new SessionCallback(this.logger);
         
 
@@ -265,15 +269,15 @@ export class ExotelWebClient {
         phonePool.set(userName, null); 
 
         if (!this.eventListener) {
-            this.eventListener = new ExotelVoiceClientListener(this.registerCallback);
+            this.eventListener = new ExotelVoiceClientListener(this.registerCallback, this.logger);
         }
 
         if (!this.callListener) {
-            this.callListener = new CallListener(this.callbacks);
+            this.callListener = new CallListener(this.callbacks, this.logger);
         }
 
         if (!this.sessionListener) {
-            this.sessionListener = new SessionListener(this.sessionCallback);
+            this.sessionListener = new SessionListener(this.sessionCallback, this.logger);
         }
 
         if (!this.ctrlr) {
@@ -311,11 +315,11 @@ export class ExotelWebClient {
         }
 
         // Initialize the phone with SIP engine
-        this.webrtcSIPPhone.registerPhone("sipjs", new ExDelegationHandler(this), this.sipAccountInfo.enableAutoAudioDeviceChangeHandling);
+        this.webrtcSIPPhone.registerPhone("sipjs", new ExDelegationHandler(this, this.logger), this.sipAccountInfo.enableAutoAudioDeviceChangeHandling);
 
         // Create call instance after phone is initialized
         if (!this.call) {
-            this.call = new Call(this.webrtcSIPPhone);
+            this.call = new Call(this.webrtcSIPPhone, this.logger);
         }
 
         return true;
@@ -379,7 +383,7 @@ export class ExotelWebClient {
 
     getCall = () => {
         if (!this.call) {
-            this.call = new Call(this.webrtcSIPPhone);
+            this.call = new Call(this.webrtcSIPPhone, this.logger);
         }
         return this.call;
     };
@@ -425,7 +429,7 @@ export class ExotelWebClient {
         this.logger.log("ExWebClient: callEventCallback: Received ---> " + event + 'param sent....' + param + 'for phone....' + phone)
         if (event === "i_new_call") {
             if (!this.call) {
-                this.call = new Call(param); // param is the session
+                this.call = new Call(param, this.logger); // param is the session
             }
             this.callListener.onIncomingCall(param, phone);
         } else if (event === "ringing" || event === "accept_reject") {
@@ -537,8 +541,8 @@ export class ExotelWebClient {
         localStorage.setItem('contactHost', this.contactHost);
 
         
-        var synchronousHandler = new ExSynchronousHandler();
-        var delegationHandler = new ExDelegationHandler(this);
+        var synchronousHandler = new ExSynchronousHandler(this.logger);
+        var delegationHandler = new ExDelegationHandler(this, this.logger);
 
         var userName = this.userName;
 

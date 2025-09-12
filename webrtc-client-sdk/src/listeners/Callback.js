@@ -39,9 +39,13 @@ export class Callback {
  */
 
 export class RegisterCallback  {
+    logger = null;
     registerCallbackHandler = null;
     registerState= null;
     phone= '';
+    constructor(logger) {
+        this.logger = logger;
+    }
     initializeRegisterCallback= function (RegisterEventCallBack) {
         this.registerCallbackHandler = RegisterEventCallBack;
     };

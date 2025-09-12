@@ -1,11 +1,9 @@
-import coreSDKLogger from './coreSDKLogger';
-
-const logger = coreSDKLogger;
 
 class WebrtcSIPPhoneEventDelegate {
 
-	constructor(username) {
+	constructor(username, logger) {
 		this.username = username;
+		this.logger = logger;
 		this._listeners = new Map();
 		this.delegates = new Set();
 	}
@@ -60,9 +58,9 @@ class WebrtcSIPPhoneEventDelegate {
 	}
 
 	sendWebRTCEventsToFSM(eventType, sipMethod) {
-		logger.log("delegationHandler: sendWebRTCEventsToFSM");
-		logger.log("delegationHandler: eventType", [eventType]);
-		logger.log("delegationHandler: sipMethod", [sipMethod]);
+		this.logger.log("delegationHandler: sendWebRTCEventsToFSM");
+		this.logger.log("delegationHandler: eventType", [eventType]);
+		this.logger.log("delegationHandler: sipMethod", [sipMethod]);
 		this.delegates.forEach(delegate => {
 			if (delegate && typeof delegate.sendWebRTCEventsToFSM === 'function') {
 				delegate.sendWebRTCEventsToFSM(eventType, sipMethod);
@@ -159,7 +157,7 @@ class WebrtcSIPPhoneEventDelegate {
 	}
 
 	setWebRTCFSMMapper(stack) {
-		logger.log("webrtcSIPPhoneEventDelegate: setWebRTCFSMMapper: Initialisation complete");
+		this.logger.log("webrtcSIPPhoneEventDelegate: setWebRTCFSMMapper: Initialisation complete");
 	}
 
 	onCallStatSipJsTransportEvent(ev) {

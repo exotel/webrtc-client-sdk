@@ -1,12 +1,9 @@
 import { CallDetails } from "./CallDetails";
-import { getLogger } from '@exotel-npm-dev/webrtc-core-sdk';
 
 
-export function Call(webrtcSIPPhone) {
+export function Call(webrtcSIPPhone, logger) {
 
-
-
-    this.logger = webrtcSIPPhone.logger;
+    this.logger = logger;
 
     if (!webrtcSIPPhone) {
         throw new Error("webrtcSIPPhone is required for Call");

@@ -1,6 +1,3 @@
-import coreSDKLogger from "./coreSDKLogger";
-
-const logger = coreSDKLogger;
 const AudioManagerCtx = window.AudioContext || window.webkitAudioContext;
 
 export const audioDeviceManager = {
@@ -25,7 +22,7 @@ export const audioDeviceManager = {
         this.resetOutputDevice = value;
     },
 
-    async changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
+    async changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange, logger) {
         logger.log(`SIPJSPhone:changeAudioInputDevice entry`);
         try {
             if (this.enableAutoAudioDeviceChangeHandling && !forceDeviceChange) {
@@ -52,7 +49,7 @@ export const audioDeviceManager = {
         }
     },
 
-    async changeAudioOutputDevice(audioRemote, deviceId, onSuccess, onError, forceDeviceChange) {
+    async changeAudioOutputDevice(audioRemote, deviceId, onSuccess, onError, forceDeviceChange, logger) {
         logger.log(`audioDeviceManager:changeAudioOutputDevice : entry`);
         const audioElement = audioRemote;
         if (typeof audioElement.sinkId !== 'undefined') {
@@ -97,16 +94,16 @@ export const audioDeviceManager = {
         this.enableAutoAudioDeviceChangeHandling = flag;
     },
 
-    async resetAudioDevice(audioRemote, onInputDeviceChangeCallback, onOutputDeviceChangeCallback) {
-        audioDeviceManager._resetAudioDevice(audioRemote, onInputDeviceChangeCallback, onOutputDeviceChangeCallback, audioDeviceManager.resetOutputDevice, audioDeviceManager.resetInputDevice);
+    async resetAudioDevice(audioRemote, onInputDeviceChangeCallback, onOutputDeviceChangeCallback, logger) {
+        audioDeviceManager._resetAudioDevice(audioRemote, onInputDeviceChangeCallback, onOutputDeviceChangeCallback, audioDeviceManager.resetOutputDevice, audioDeviceManager.resetInputDevice, logger);
     },
 
-    onAudioDeviceChange(audioRemote, onInputDeviceChangeCallback, onOutputDeviceChangeCallback) {
+    onAudioDeviceChange(audioRemote, onInputDeviceChangeCallback, onOutputDeviceChangeCallback, logger) {
         logger.log("audioDeviceManager:onAudioDeviceChange entry");
-        audioDeviceManager._resetAudioDevice(audioRemote, onInputDeviceChangeCallback, onOutputDeviceChangeCallback, true, true);
+        audioDeviceManager._resetAudioDevice(audioRemote, onInputDeviceChangeCallback, onOutputDeviceChangeCallback, true, true, logger);
     },
 
-    async _resetAudioDevice(audioRemote, onInputDeviceChangeCallback, onOutputDeviceChangecallback, resetOutputDevice, resetInputDevice) {
+    async _resetAudioDevice(audioRemote, onInputDeviceChangeCallback, onOutputDeviceChangecallback, resetOutputDevice, resetInputDevice, logger) {
         logger.log("audioDeviceManager:_resetAudioDevice entry");
         try {
 
@@ -117,7 +114,8 @@ export const audioDeviceManager = {
                 audioDeviceManager.changeAudioOutputDevice(audioRemote,
                     outputDevice.deviceId,
                     () => onOutputDeviceChangecallback(outputDevice.deviceId),
-                    (error) => logger.error(`audioDeviceManager:_resetAudioDevice Failed to change output device: ${error}`)
+                    (error) => logger.error(`audioDeviceManager:_resetAudioDevice Failed to change output device: ${error}`),
+                    logger
                 );
             }
             if (resetInputDevice) {
@@ -126,7 +124,8 @@ export const audioDeviceManager = {
                 audioDeviceManager.changeAudioInputDevice(
                     inputDevice.deviceId,
                     (stream) => onInputDeviceChangeCallback(stream, inputDevice.deviceId),
-                    (error) => logger.log(`audioDeviceManager:_resetAudioDevice Failed to change input device: ${error}`)
+                    (error) => logger.log(`audioDeviceManager:_resetAudioDevice Failed to change input device: ${error}`),
+                    logger
                 );
             }
         } catch (error) {
@@ -134,7 +133,7 @@ export const audioDeviceManager = {
         }
     },
 
-    async enumerateDevices(callback) {
+    async enumerateDevices(callback, logger) {
         logger.log("audioDeviceManager:enumerateDevices entry")
         try {
             audioDeviceManager.mediaDevices = await navigator.mediaDevices.enumerateDevices();
@@ -154,7 +153,7 @@ export const audioDeviceManager = {
         // Connect audio graph: track -> gainNode -> destination
         track.connect(gainNode).connect(this.webAudioCtx.destination);
 
-        logger.log("audioDeviceManager:createAudioGainNode gainNodeMaxValue", gainNode.gain.maxValue);
+        // logger.log("audioDeviceManager:createAudioGainNode gainNodeMaxValue", gainNode.gain.maxValue);
         gainNode.gain.value = 1.0;
         
         // resume audio context when audio element is played
