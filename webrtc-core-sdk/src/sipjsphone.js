@@ -131,41 +131,41 @@ class SIPJSPhone {
 	// Volume control methods
 	setAudioOutputVolume(audioElementName, value) {
 		
-		logger.log(`entry setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
+		this.logger.log(`entry setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
 		let gainNode = null;
 		if(audioElementName == "audioRemote") {
 			gainNode = this.audioRemoteGainNode;
 		} else if(audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
 			gainNode = audioElementNameVsAudioGainNodeMap[audioElementName];
 		} else {
-			logger.error(`setAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
+			this.logger.error(`setAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
 			return false;
 		}
 
 		if (gainNode) {
 			gainNode.gain.value = Math.max(0, Math.min(1, value));
-			logger.log(`exit setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
+			this.logger.log(`exit setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
 			return true;
 		}
 		return false;
 	}
 
 	getAudioOutputVolume(audioElementName) {
-		logger.log(`entry getAudioOutputVolume: ${audioElementName}`);
+		this.logger.log(`entry getAudioOutputVolume: ${audioElementName}`);
 		let gainNode = null;
 		if(audioElementName == "audioRemote") {
 			gainNode = this.audioRemoteGainNode;
 		} else if(audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
 			gainNode = audioElementNameVsAudioGainNodeMap[audioElementName];
 		} else {
-			logger.error(`getAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
+			this.logger.error(`getAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
 			return 0;
 		}
 		return gainNode ? gainNode.gain.value : 0;
 	}
 
 	attachGlobalDeviceChangeListener() {
-		logger.log("SIPJSPhone: Attaching global devicechange event listener enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
+		this.logger.log("SIPJSPhone: Attaching global devicechange event listener enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
 		navigator.mediaDevices.addEventListener('devicechange', this._onDeviceChange.bind(this));
 	}
 
@@ -1235,11 +1235,11 @@ destroySocketConnection() {
 	}
 
 	reRegister() {
-		logger.log("sipjsphone: reRegister: registering in case of relogin");
+		this.logger.log("sipjsphone: reRegister: registering in case of relogin");
 		if (this.ctxSip.phone && this.registerer) {
 			this.registerer.register({});
 		} else {
-			logger.log("sipjsphone: reRegister: SIP Session does not exist for re registration");
+			this.logger.log("sipjsphone: reRegister: SIP Session does not exist for re registration");
 		}
 
 	}
