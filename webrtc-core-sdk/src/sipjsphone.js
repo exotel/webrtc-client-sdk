@@ -1424,7 +1424,6 @@ destroySocketConnection() {
 			audioDeviceManager.changeAudioOutputDevice(this.audioRemote, deviceId, () => {
 				this.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
 				if (onSuccess) onSuccess();
-				this
 			}, (err) => {
 				this.logger.error('SIPJSPhone:changeAudioOutputDevice error:', err);
 				if (onError) onError(err);
