@@ -14,7 +14,19 @@ ringbacktone.src = require("./static/ringbacktone.wav");
 var dtmftone = document.createElement("audio");
 dtmftone.src = require("./static/dtmf.wav");
 
-var audioRemote = document.createElement("audio");
+
+
+audioElementNameVsAudioGainNodeMap = {};
+
+audioElementNameVsAudioGainNodeMap["ringtone"] = audioDeviceManager.createAudioGainNode( ringtone);
+audioElementNameVsAudioGainNodeMap["ringbacktone"] = audioDeviceManager.createAudioGainNode(ringbacktone);
+audioElementNameVsAudioGainNodeMap["dtmftone"] = audioDeviceManager.createAudioGainNode(dtmftone);
+audioElementNameVsAudioGainNodeMap["beeptone"] = audioDeviceManager.createAudioGainNode(beeptone);	
+	
+
+
+
+
 
 export function getLogger() {
 	let uaLogger;
@@ -130,91 +142,43 @@ class SIPJSPhone {
 		this.audioRemote.style.display = 'none';
 		document.body.appendChild(this.audioRemote);
 
-		// --- Web Audio mixer setup ---
-		this._wa = { ctx: null, dest: null, gains: {}, sources: {}, outEl: null };
+		this.audioRemoteGainNode = audioDeviceManager.createAudioGainNode(this.audioRemote);
 
-		this._initWebAudio = () => {
-			if (this._wa.ctx) return;
-			const AudioCtx = window.AudioContext || window.webkitAudioContext;
-			this._wa.ctx = new AudioCtx();
-
-			// Per-type gains (no master)
-			this._wa.gains = {
-				ringtone: this._wa.ctx.createGain(),
-				ringback: this._wa.ctx.createGain(),
-				beep:     this._wa.ctx.createGain(),
-				dtmf:     this._wa.ctx.createGain(),
-				call:     this._wa.ctx.createGain(),
-			};
-
-			// Initial volumes (tweak if you prefer different defaults)
-			this._wa.gains.ringtone.gain.value = 1.0;
-			this._wa.gains.ringback.gain.value = 1.0;
-			this._wa.gains.beep.gain.value     = 1.0;
-			this._wa.gains.dtmf.gain.value     = 1.0;
-			this._wa.gains.call.gain.value     = 1.0;
-
-			// Connect chain: per-type -> MediaStreamDestination (no master)
-			this._wa.dest = this._wa.ctx.createMediaStreamDestination();
-			Object.values(this._wa.gains).forEach(g => g.connect(this._wa.dest));
-
-			// Hidden output element that carries the mixed stream (keeps setSinkId working)
-			this._wa.outEl = document.createElement('audio');
-			this._wa.outEl.autoplay = true;
-			this._wa.outEl.playsInline = true;
-			this._wa.outEl.style.display = 'none';
-			this._wa.outEl.srcObject = this._wa.dest.stream;
-			document.body.appendChild(this._wa.outEl);
-
-			// Apply current output device if not "default"
-			try {
-				if (audioDeviceManager.currentAudioOutputDeviceId !== "default") {
-					this._wa.outEl.setSinkId(audioDeviceManager.currentAudioOutputDeviceId);
-				}
-			} catch (e) {
-				logger.log("Web Audio: Could not set initial sink ID:", e);
-			}
-		};
-
-		// Initialize Web Audio
-		this._initWebAudio();
+		
+		
 	}
 
 	// Volume control methods
-	setSoundVolume(type, value) {
-		if (!this._wa || !this._wa.gains[type]) {
-			logger.error(`setSoundVolume: Invalid sound type: ${type}`);
+	setAudioOutputVolume(audioElementName, value) {
+		
+		logger.log(`entry setAudioOutputVolume: ${type} volume set to ${value}`);
+		let gainNode = null;
+		if(audioElementName =="audioRemote") {
+			gainNode = this.audioRemoteGainNode;
+		} else if(audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
+			gainNode = audioElementNameVsAudioGainNodeMap[audioElementName];
+		} else {
+			logger.error(`setAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
 			return false;
 		}
-		this._wa.gains[type].gain.value = Math.max(0, Math.min(1, value));
-		logger.log(`setSoundVolume: ${type} volume set to ${value}`);
+
+		gainNode.gain.value = Math.max(0, Math.min(1, value));
+		logger.log(`exit setAudioOutputVolume: ${type} volume set to ${value}`);
 		return true;
 	}
 
-	getSoundVolume(type) {
-		if (!this._wa || !this._wa.gains[type]) {
-			logger.error(`getSoundVolume: Invalid sound type: ${type}`);
-			return 0;
-		}
-		return this._wa.gains[type].gain.value;
-	}
-
-	setCallVolume(value) {
-		if (!this._wa || !this._wa.gains.call) {
-			logger.error("setCallVolume: Web Audio not initialized");
+	getAudioOutputVolume(audioElementName) {
+		logger.log(`entry getAudioOutputVolume: ${audioElementName}`);
+		let gainNode = null;
+		if(audioElementName =="audioRemote") {
+			gainNode = this.audioRemoteGainNode;
+		} else if(audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
+			gainNode = audioElementNameVsAudioGainNodeMap[audioElementName];
+		} else {
+			logger.error(`getAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
 			return false;
 		}
-		this._wa.gains.call.gain.value = Math.max(0, Math.min(1, value));
-		logger.log(`setCallVolume: call volume set to ${value}`);
-		return true;
-	}
-
-	getCallVolume() {
-		if (!this._wa || !this._wa.gains.call) {
-			logger.error("getCallVolume: Web Audio not initialized");
-			return 0;
-		}
-		return this._wa.gains.call.gain.value;
+		return gainNode.gain.value;
 	}
 
 	attachGlobalDeviceChangeListener() {
@@ -269,19 +233,7 @@ class SIPJSPhone {
 					logger.log('DEBUG: startRingTone called, audio element:', this.ctxSip.ringtone);
 					logger.log('DEBUG: startRingTone src:', this.ctxSip.ringtone.src);
 					this.ctxSip.ringtone.load();
-					
-					// Connect to Web Audio if available
-					if (this._wa && this._wa.ctx && this._wa.gains?.ringtone) {
-						this._wa.sources = this._wa.sources || {};
-						if (!this._wa.sources.ringtone) {
-							try {
-								this._wa.sources.ringtone = this._wa.ctx.createMediaElementSource(this.ctxSip.ringtone);
-								this._wa.sources.ringtone.connect(this._wa.gains.ringtone);
-							} catch (e) {
-								logger.warn("startRingTone: source already exists; using existing connection");
-							}
-						}
-					}
+				
 					
 					this.ctxSip.ringToneIntervalID = setInterval(() => {
 						this.ctxSip.ringtone.play()
@@ -319,18 +271,6 @@ class SIPJSPhone {
 					this.ctxSip.ringbacktone = this.ringbacktone;
 				}
 				try {
-					// Connect to Web Audio if available
-					if (this._wa && this._wa.ctx && this._wa.gains?.ringback) {
-						this._wa.sources = this._wa.sources || {};
-						if (!this._wa.sources.ringback) {
-							try {
-								this._wa.sources.ringback = this._wa.ctx.createMediaElementSource(this.ctxSip.ringbacktone);
-								this._wa.sources.ringback.connect(this._wa.gains.ringback);
-							} catch (e) {
-								logger.warn("startRingbackTone: source already exists; using existing connection");
-							}
-						}
-					}
 					
 					this.ctxSip.ringbacktone.play()
 						.then(() => {
