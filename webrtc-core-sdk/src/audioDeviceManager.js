@@ -1,7 +1,7 @@
 import coreSDKLogger from "./coreSDKLogger";
 
 const logger = coreSDKLogger;
-AudioManagerCtx :window.AudioContext || window.webkitAudioContext;
+const AudioManagerCtx = window.AudioContext || window.webkitAudioContext;
 
 export const audioDeviceManager = {
     resetInputDevice: false,

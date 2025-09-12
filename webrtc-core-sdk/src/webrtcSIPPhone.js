@@ -264,40 +264,22 @@ class WebrtcSIPPhone {
 		this.phone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
 	}
 
-	setSoundVolume(type, value) {
-		logger.log("webrtcSIPPhone: setSoundVolume: ", type, value);
+	setAudioOutputVolume(audioElementName, value){
+		logger.log("webrtcSIPPhone: setAudioOutputVolume: ", audioElementName, value);
 		if (!this.phone) {
-			logger.error("webrtcSIPPhone: setSoundVolume: phone not initialized");
+			logger.error("webrtcSIPPhone: setAudioOutputVolume: phone not initialized");
 			return false;
 		}
-		return this.phone.setSoundVolume(type, value);
+		return this.phone.setAudioOutputVolume(audioElementName, value);
 	}
 
-	getSoundVolume(type) {
-		logger.log("webrtcSIPPhone: getSoundVolume: ", type);
+	getAudioOutputVolume(audioElementName) {
+		logger.log("webrtcSIPPhone: getAudioOutputVolume: ", audioElementName);
 		if (!this.phone) {
-			logger.error("webrtcSIPPhone: getSoundVolume: phone not initialized");
+			logger.error("webrtcSIPPhone: getAudioOutputVolume: phone not initialized");
 			return 0;
 		}
-		return this.phone.getSoundVolume(type);
-	}
-
-	setCallVolume(value) {
-		logger.log("webrtcSIPPhone: setCallVolume: ", value);
-		if (!this.phone) {
-			logger.error("webrtcSIPPhone: setCallVolume: phone not initialized");
-			return false;
-		}
-		return this.phone.setCallVolume(value);
-	}
-
-	getCallVolume() {
-		logger.log("webrtcSIPPhone: getCallVolume");
-		if (!this.phone) {
-			logger.error("webrtcSIPPhone: getCallVolume: phone not initialized");
-			return 0;
-		}
-		return this.phone.getCallVolume();
+		return this.phone.getAudioOutputVolume(audioElementName);
 	}
 }
 
