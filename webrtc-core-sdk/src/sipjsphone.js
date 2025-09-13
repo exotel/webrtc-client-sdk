@@ -13,20 +13,25 @@ ringbacktone.src = require("./static/ringbacktone.wav");
 var dtmftone = document.createElement("audio");
 dtmftone.src = require("./static/dtmf.wav");
 
-
-
-	
-
-var audioElementNameVsAudioGainNodeMap = {};	
-audioElementNameVsAudioGainNodeMap["ringtone"] = audioDeviceManager.createAudioGainNode(ringtone);
-audioElementNameVsAudioGainNodeMap["ringbacktone"] = audioDeviceManager.createAudioGainNode(ringbacktone);
-audioElementNameVsAudioGainNodeMap["dtmftone"] = audioDeviceManager.createAudioGainNode(dtmftone);
-audioElementNameVsAudioGainNodeMap["beeptone"] = audioDeviceManager.createAudioGainNode(beeptone);
-
-
 class SIPJSPhone {
 
+	static toBeConfigure = true;
+	static audioElementNameVsAudioGainNodeMap = {};
+
+	static configure() {
+		logger.log("SIPJSPhone: configure: entry");
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringtone"] = audioDeviceManager.createAudioGainNode(ringtone);
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringbacktone"] = audioDeviceManager.createAudioGainNode(ringbacktone);
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["dtmftone"] = audioDeviceManager.createAudioGainNode(dtmftone);
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["beeptone"] = audioDeviceManager.createAudioGainNode(beeptone);
+	}
+	
+
 	constructor(delegate, username) {
+		if(SIPJSPhone.toBeConfigure) {
+			SIPJSPhone.toBeConfigure = false;
+			SIPJSPhone.configure();
+		}
 		this.webrtcSIPPhoneEventDelegate = delegate;
 		this.username = username;
 		this.ctxSip = {};
@@ -129,40 +134,42 @@ class SIPJSPhone {
 		
 	}
 
-	// Volume control methods
-	setAudioOutputVolume(audioElementName, value) {
-		
-		logger.log(`entry setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
-		let gainNode = null;
-		if(audioElementName == "audioRemote") {
-			gainNode = this.audioRemoteGainNode;
-		} else if(audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
-			gainNode = audioElementNameVsAudioGainNodeMap[audioElementName];
-		} else {
-			logger.error(`setAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
-			return false;
-		}
 
-		if (gainNode) {
-			gainNode.gain.value = Math.max(0, Math.min(1, value));
-			logger.log(`exit setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
-			return true;
-		}
-		return false;
+	setCallAudioOutputVolume(value) {
+		logger.log(`entry setCallAudioOutputVolume: ${value}`);
+		this.callAudioOutputVolume =  Math.max(0, Math.min(1, value));
+		return true;
 	}
 
-	getAudioOutputVolume(audioElementName) {
-		logger.log(`entry getAudioOutputVolume: ${audioElementName}`);
-		let gainNode = null;
-		if(audioElementName == "audioRemote") {
-			gainNode = this.audioRemoteGainNode;
-		} else if(audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
-			gainNode = audioElementNameVsAudioGainNodeMap[audioElementName];
-		} else {
-			logger.error(`getAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
-			return 0;
+	getCallAudioOutputVolume() {
+		logger.log(`entry getCallAudioOutputVolume`);
+		return this.callAudioOutputVolume;
+	}
+
+	// Volume control methods
+	static setAudioOutputVolume(audioElementName, value) {
+		
+		logger.log(`entry setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
+		if(!SIPJSPhone.audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
+			logger.error(`setAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
+			throw new Error(`Invalid audio element name: ${audioElementName}`);
 		}
-		return gainNode ? gainNode.gain.value : 0;
+
+		let gainNode = SIPJSPhone.audioElementNameVsAudioGainNodeMap[audioElementName];
+		gainNode.gain.value = Math.max(0, Math.min(1, value));
+		logger.log(`exit setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
+		return true;
+	
+	}
+
+	static getAudioOutputVolume(audioElementName) {
+		logger.log(`entry getAudioOutputVolume: ${audioElementName}`);
+		if(!SIPJSPhone.audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
+			logger.error(`getAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
+			throw new Error(`Invalid audio element name: ${audioElementName}`);
+		}
+		let gainNode = SIPJSPhone.audioElementNameVsAudioGainNodeMap[audioElementName];
+		return gainNode.gain.value;	
 	}
 
 	attachGlobalDeviceChangeListener() {

@@ -192,9 +192,8 @@ class ExSynchronousHandler {
     }
 }
 
-export { ExDelegationHandler, ExSynchronousHandler };
 
-export class ExotelWebClient {
+class ExotelWebClient {
   /**
    * @param {Object} sipAccntInfo 
    */
@@ -217,6 +216,8 @@ export class ExotelWebClient {
     registerCallback = null;
     sessionCallback = null;
     logger = getLogger();
+    static clientSDKLoggerCallback = null;
+        
         
     constructor() {
         // Initialize properties
@@ -231,20 +232,12 @@ export class ExotelWebClient {
         this.currentSIPUserName = "";      
         this.isReadyToRegister = true;
         this.sipAccountInfo = null;
-        this.clientSDKLoggerCallback = null;
         this.callbacks = new Callback();
         this.registerCallback = new RegisterCallback();
         this.sessionCallback = new SessionCallback();
-        this.logger = getLogger();
-
-        // Register logger callback
-        let exwebClientOb = this;
-        this.logger.registerLoggerCallback((type, message, args) => {
-            LogManager.onLog(type, message, args);
-            if (exwebClientOb.clientSDKLoggerCallback) {
-                exwebClientOb.clientSDKLoggerCallback("log", message, args);
-            }
-        });
+        
+        
+        
     }
     
 
@@ -618,8 +611,8 @@ export class ExotelWebClient {
         this.webrtcSIPPhone.setPreferredCodec(codecName);
     }
 
-    registerLoggerCallback(callback) {
-        this.clientSDKLoggerCallback = callback;
+    static registerLoggerCallback(callback) {
+        ExotelWebClient.clientSDKLoggerCallback = callback;
     }
 
     registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
@@ -631,24 +624,44 @@ export class ExotelWebClient {
         this.webrtcSIPPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
     }
 
-    setEnableConsoleLogging(enable) {
+    static setEnableConsoleLogging(enable) {
         if (enable) {
-            logger.log(`ExWebClient: setEnableConsoleLogging: ${enable}`);
+            logger.log(`ExWebClient: setEnableConsoleLogging: entry ${enable}`);
         } 
-
         logger.setEnableConsoleLogging(enable);
     }
 
-    setAudioOutputVolume(audioElementName, value) {
+    static setAudioOutputVolume(audioElementName, value) {
         logger.log(`ExWebClient: setAudioOutputVolume: Entry`);
-        this.webrtcSIPPhone.setAudioOutputVolume(audioElementName, value);
+        WebrtcSIPPhone.setAudioOutputVolume(audioElementName, value);
     }
 
-    getAudioOutputVolume(audioElementName) {
+    static getAudioOutputVolume(audioElementName) {
         logger.log(`ExWebClient: getAudioOutputVolume: Entry`);
-        return this.webrtcSIPPhone.getAudioOutputVolume(audioElementName);
+        return WebrtcSIPPhone.getAudioOutputVolume(audioElementName);
+    }
+
+    setCallAudioOutputVolume(value) {
+        logger.log(`ExWebClient: setCallAudioOutputVolume: Entry`);
+        this.webrtcSIPPhone.setCallAudioOutputVolume(value);
+    }
+
+    getCallAudioOutputVolume() {
+        logger.log(`ExWebClient: getCallAudioOutputVolume: Entry`);
+        return this.webrtcSIPPhone.getCallAudioOutputVolume();
     }
 
 }
+
+
+logger.registerLoggerCallback((type, message, args) => {
+    LogManager.onLog(type, message, args);
+    if (ExotelWebClient.clientSDKLoggerCallback) {
+        ExotelWebClient.clientSDKLoggerCallback("log", message, args);
+    }
+});
+
+
+export { ExDelegationHandler, ExSynchronousHandler, ExotelWebClient };
 
 export default ExotelWebClient;
