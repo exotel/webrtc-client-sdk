@@ -1,4 +1,6 @@
+import { getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 
+const logger = getLogger();
 
 /**
  * Function to register the phone onto a webRTC client
@@ -23,7 +25,7 @@ export function DoRegister(sipAccountInfo, exWebClient, delay = 500) {
                 '', sipAccountInfo); // subscriberToken        
         }, delay);
     } catch (e) {
-        //logger.log("Register failed ", e)
+        logger.log("Register failed ", e)
     }
 
 }
@@ -38,6 +40,6 @@ export function UnRegister(sipAccountInfo, exWebClient) {
     try {
         exWebClient.unregister(sipAccountInfo);
     } catch (e) {
-       // logger.log("Unregister failed ", e)
+        logger.log("Unregister failed ", e)
     }
 }

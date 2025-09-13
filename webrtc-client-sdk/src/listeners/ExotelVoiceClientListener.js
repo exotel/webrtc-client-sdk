@@ -3,10 +3,9 @@ import { diagnosticsCallback } from "./Callback";
 export class ExotelVoiceClientListener {
 
     registerCallback  = null;
-    logger = null;
-    constructor(registerCallback, logger) {
+    constructor(registerCallback) {
         this.registerCallback = registerCallback;
-        this.logger = logger;
+
     }
     onInitializationSuccess(phone) {
         /**
