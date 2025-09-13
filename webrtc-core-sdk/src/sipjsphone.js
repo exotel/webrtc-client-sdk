@@ -34,8 +34,7 @@ function configureAudioGainNode(elementName, audioElement, logger) {
 
 class SIPJSPhone {
 
-	constructor(delegate, username, logger) {
-		this.logger = logger;
+	constructor(delegate, username) {
 		this.webrtcSIPPhoneEventDelegate = delegate;
 		this.username = username;
 		this.ctxSip = {};
@@ -129,11 +128,11 @@ class SIPJSPhone {
 
 
 
-		configureAudioGainNode("ringtone", ringtone, this.logger);
-		configureAudioGainNode("ringbacktone", ringbacktone, this.logger);
-		configureAudioGainNode("dtmftone", dtmftone, this.logger);
-		configureAudioGainNode("beeptone", beeptone, this.logger);
-		configureAudioGainNode("audioRemote", this.audioRemote, this.logger);
+		configureAudioGainNode("ringtone", ringtone, logger);
+		configureAudioGainNode("ringbacktone", ringbacktone, logger);
+		configureAudioGainNode("dtmftone", dtmftone, logger);
+		configureAudioGainNode("beeptone", beeptone, logger);
+		configureAudioGainNode("audioRemote", this.audioRemote, logger);
 
 
 		this.audioRemoteGainNode = audioDeviceManager.createAudioGainNode(this.audioRemote);
@@ -145,46 +144,46 @@ class SIPJSPhone {
 	// Volume control methods
 	setAudioOutputVolume(audioElementName, value) {
 		
-		this.logger.log(`entry setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
+		logger.log(`entry setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
 		let gainNode = null;
 		if(audioElementName == "audioRemote") {
 			gainNode = this.audioRemoteGainNode;
 		} else if(audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
 			gainNode = audioElementNameVsAudioGainNodeMap[audioElementName];
 		} else {
-			this.logger.error(`setAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
+			logger.error(`setAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
 			return false;
 		}
 
 		if (gainNode) {
 			gainNode.gain.value = Math.max(0, Math.min(1, value));
-			this.logger.log(`exit setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
+			logger.log(`exit setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
 			return true;
 		}
 		return false;
 	}
 
 	getAudioOutputVolume(audioElementName) {
-		this.logger.log(`entry getAudioOutputVolume: ${audioElementName}`);
+		logger.log(`entry getAudioOutputVolume: ${audioElementName}`);
 		let gainNode = null;
 		if(audioElementName == "audioRemote") {
 			gainNode = this.audioRemoteGainNode;
 		} else if(audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
 			gainNode = audioElementNameVsAudioGainNodeMap[audioElementName];
 		} else {
-			this.logger.error(`getAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
+			logger.error(`getAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
 			return 0;
 		}
 		return gainNode ? gainNode.gain.value : 0;
 	}
 
 	attachGlobalDeviceChangeListener() {
-		this.logger.log("SIPJSPhone: Attaching global devicechange event listener enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
+		logger.log("SIPJSPhone: Attaching global devicechange event listener enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
 		navigator.mediaDevices.addEventListener('devicechange', this._onDeviceChange.bind(this));
 	}
 
 	setEnableAutoAudioDeviceChangeHandling(flag) {
-		this.logger.log("sipjsphone: setEnableAutoAudioDeviceChangeHandling: entry, enableAutoAudioDeviceChangeHandling = ",flag);
+		logger.log("sipjsphone: setEnableAutoAudioDeviceChangeHandling: entry, enableAutoAudioDeviceChangeHandling = ",flag);
         this.enableAutoAudioDeviceChangeHandling = flag;
 		audioDeviceManager.setEnableAutoAudioDeviceChangeHandling(flag);
     }
@@ -192,14 +191,14 @@ class SIPJSPhone {
 	init(onInitDoneCallback) {
 
 		const preInit = () => {
-			this.logger.log("sipjsphone: init:readyState, calling postInit")
+			logger.log("sipjsphone: init:readyState, calling postInit")
 			this.postInit(onInitDoneCallback);
 		}
 
 		const oReadyStateTimer = setInterval(() => {
 			if (document.readyState === "complete") {
 				clearInterval(oReadyStateTimer);
-				this.logger.log("sipjsphone: init:readyState, calling preinit")
+				logger.log("sipjsphone: init:readyState, calling preinit")
 				preInit();
 			}
 		}, 100);
@@ -227,16 +226,16 @@ class SIPJSPhone {
 				if (!this.ctxSip.ringtone) {
 					this.ctxSip.ringtone = this.ringtone;
 				}
-				this.logger.log('DEBUG: startRingTone called, audio element:', this.ctxSip.ringtone);
-				this.logger.log('DEBUG: startRingTone src:', this.ctxSip.ringtone.src);
+				logger.log('DEBUG: startRingTone called, audio element:', this.ctxSip.ringtone);
+				logger.log('DEBUG: startRingTone src:', this.ctxSip.ringtone.src);
 				this.ctxSip.ringtone.load();
 				this.ctxSip.ringToneIntervalID = setInterval(() => {
 					this.ctxSip.ringtone.play()
 						.then(() => {
-							this.logger.log("DEBUG: startRingTone: Audio is playing...");
+							logger.log("DEBUG: startRingTone: Audio is playing...");
 						})
 						.catch(e => {
-							this.logger.log("DEBUG: startRingTone: Exception:", e);
+							logger.log("DEBUG: startRingTone: Exception:", e);
 						});
 					count++;
 					if (count > this.ctxSip.ringtoneCount) {
@@ -244,7 +243,7 @@ class SIPJSPhone {
 					}
 					}, 500);
 				} catch (e) {
-					this.logger.log("DEBUG: startRingTone: Exception:", e);
+					logger.log("DEBUG: startRingTone: Exception:", e);
 				}
 			},
 
@@ -255,9 +254,9 @@ class SIPJSPhone {
 						this.ctxSip.ringtone = this.ringtone;
 					}
 					this.ctxSip.ringtone.pause();
-					this.logger.log("sipjsphone: stopRingTone: intervalID:", this.ctxSip.ringToneIntervalID);
+					logger.log("sipjsphone: stopRingTone: intervalID:", this.ctxSip.ringToneIntervalID);
 					clearInterval(this.ctxSip.ringToneIntervalID)
-			} catch (e) { this.logger.log("sipjsphone: stopRingTone: Exception:", e); }
+			} catch (e) { logger.log("sipjsphone: stopRingTone: Exception:", e); }
 		},
 
 			// Update the startRingbackTone method (around line 223) to use Web Audio:
@@ -268,20 +267,20 @@ class SIPJSPhone {
 				try {
 					this.ctxSip.ringbacktone.play()
 						.then(() => {
-							this.logger.log("sipjsphone: startRingbackTone: Audio is playing...");
+							logger.log("sipjsphone: startRingbackTone: Audio is playing...");
 						})
 						.catch(e => {
-							this.logger.log("sipjsphone: startRingbackTone: Exception:", e);
+							logger.log("sipjsphone: startRingbackTone: Exception:", e);
 							// Optionally, prompt user to interact with the page to enable audio
 						});
-				} catch (e) { this.logger.log("sipjsphone: startRingbackTone: Exception:", e); }
+				} catch (e) { logger.log("sipjsphone: startRingbackTone: Exception:", e); }
 			},
 
 			stopRingbackTone: () => {
 				if (!this.ctxSip.ringbacktone) {
 					this.ctxSip.ringbacktone = this.ringbacktone;
 				}
-				try { this.ctxSip.ringbacktone.pause(); } catch (e) { this.logger.log("sipjsphone: stopRingbackTone: Exception:", e); }
+				try { this.ctxSip.ringbacktone.pause(); } catch (e) { logger.log("sipjsphone: stopRingbackTone: Exception:", e); }
 			},
 
 			getUniqueID: () => {
@@ -323,8 +322,8 @@ class SIPJSPhone {
 					let pc = sdh._peerConnection;
 						this.webrtcSIPPhoneEventDelegate.initGetStats(pc, callId, username);
 				} catch (e) {
-					this.logger.log("sipjsphone: newSession: something went wrong while initing getstats");
-					this.logger.log(e);
+					logger.log("sipjsphone: newSession: something went wrong while initing getstats");
+					logger.log(e);
 				}
 
 				sdh.peerConnectionDelegate = {
@@ -351,7 +350,7 @@ class SIPJSPhone {
 
 			let status;
 			if (newSess.direction === 'incoming') {
-					this.logger.log('DEBUG: Incoming call detected, about to start ring tone');
+					logger.log('DEBUG: Incoming call detected, about to start ring tone');
 					this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('incoming');
 				status = "Incoming: " + newSess.displayName;
 					this.ctxSip.startRingTone();
@@ -460,7 +459,7 @@ class SIPJSPhone {
 
 
 			phoneMuteButtonPressed: (sessionid) => {
-				this.logger.log(" sipjsphone: phoneMuteButtonPressed: bMicEnable, sessionid", this.bMicEnable, sessionid);
+				logger.log(" sipjsphone: phoneMuteButtonPressed: bMicEnable, sessionid", this.bMicEnable, sessionid);
 				var s = this.ctxSip.Sessions[sessionid];
 
 				if (this.bMicEnable) {
@@ -476,12 +475,12 @@ class SIPJSPhone {
 			phoneMute: (sessionid, bMute) => {
 			if (sessionid) {
 					var s = this.ctxSip.Sessions[sessionid];
-				this.logger.log(" sipjsphone: phoneMute: bMute", bMute)
+				logger.log(" sipjsphone: phoneMute: bMute", bMute)
 					this.toggleMute(s, bMute);
 					this.bMicEnable = !bMute;
 			}
 			else{
-				this.logger.log(" sipjsphone: phoneMute: doing nothing as sessionid not found")
+				logger.log(" sipjsphone: phoneMute: doing nothing as sessionid not found")
 
 			}
 		},
@@ -489,7 +488,7 @@ class SIPJSPhone {
 			phoneHold: (sessionid, bHold) => {
 			if (sessionid) {
 					var s = this.ctxSip.Sessions[sessionid];
-				this.logger.log("sipjsphone: phoneHold: bHold", bHold)
+				logger.log("sipjsphone: phoneHold: bHold", bHold)
 					this.toggleHold(s, bHold);
 					this.bHoldEnable = bHold;
 			}
@@ -523,7 +522,7 @@ class SIPJSPhone {
 				return true;
 			} else {
 					this.ctxSip.setError(true, 'Unsupported Browser.', 'Your browser does not support the features required for this phone.');
-				this.logger.error("WebRTC support not found");
+				logger.error("WebRTC support not found");
 				return false;
 			}
 		}
@@ -540,7 +539,7 @@ class SIPJSPhone {
 			this.webrtcSIPPhoneEventDelegate.setWebRTCFSMMapper("sipjs");
 		}
 
-	this.logger.log("sipjsphone: init: Initialization complete...")
+	logger.log("sipjsphone: init: Initialization complete...")
 		this.initializeComplete = true;
 		if (onInitDoneCallback) {
 	onInitDoneCallback();
@@ -548,10 +547,10 @@ class SIPJSPhone {
 }
 
 	addPreferredCodec(description) {
-		this.logger.log("sipjsphone:addPreferredCodec entry");
+		logger.log("sipjsphone:addPreferredCodec entry");
 		// Ensure a preferred codec is set
 		if (!this.preferredCodec) {
-			this.logger.info("sipjsphone:addPreferredCodec: No preferred codec set. Using default.");
+			logger.info("sipjsphone:addPreferredCodec: No preferred codec set. Using default.");
 			return Promise.resolve(description);
 		}
 
@@ -559,7 +558,7 @@ class SIPJSPhone {
 		const codecRtpMap = `a=rtpmap:${payloadType} ${rtpMap}`;
 		const codecFmtp = fmtp ? `a=fmtp:${payloadType} ${fmtp}` : "";
 
-		this.logger.log("sipjsphone:addPreferredCodec: Original SDP:", description.sdp);
+		logger.log("sipjsphone:addPreferredCodec: Original SDP:", description.sdp);
 
 		// Parse SDP into lines
 		let sdpLines = description.sdp.split("\r\n");
@@ -569,7 +568,7 @@ class SIPJSPhone {
 		const audioMLineIndex = sdpLines.findIndex((line) => line.startsWith("m=audio"));
 
 		if (existingOpusIndex !== -1 && audioMLineIndex !== -1) {
-			this.logger.log("sipjsphone:addPreferredCodec: Opus codec already exists. Prioritizing it.");
+			logger.log("sipjsphone:addPreferredCodec: Opus codec already exists. Prioritizing it.");
 
 			// Extract and modify the audio m-line
 			let audioMLine = sdpLines[audioMLineIndex];
@@ -593,7 +592,7 @@ class SIPJSPhone {
 			// Update the audio m-line
 			sdpLines[audioMLineIndex] = `${mLineStart.join(" ")} ${mLineCodecs.join(" ")}`;
 		} else if (audioMLineIndex !== -1) {
-			this.logger.log("sipjsphone:addPreferredCodec: Opus codec not found. Adding it to SDP.");
+			logger.log("sipjsphone:addPreferredCodec: Opus codec not found. Adding it to SDP.");
 
 			// Extract and modify the audio m-line
 			let audioMLine = sdpLines[audioMLineIndex];
@@ -617,7 +616,7 @@ class SIPJSPhone {
 				sdpLines.splice(audioMLineIndex + 2, 0, codecFmtp); // Add fmtp after rtpmap
 			}
 		} else {
-			this.logger.error("sipjsphone:addPreferredCodec: No audio m-line found in SDP. Cannot modify.");
+			logger.error("sipjsphone:addPreferredCodec: No audio m-line found in SDP. Cannot modify.");
 			return Promise.resolve(description);
 		}
 
@@ -626,13 +625,13 @@ class SIPJSPhone {
 
 		// Combine back into SDP
 		description.sdp = sdpLines.join("\r\n");
-		this.logger.log("sipjsphone:addPreferredCodec: Modified SDP:", description.sdp);
+		logger.log("sipjsphone:addPreferredCodec: Modified SDP:", description.sdp);
 
 		return Promise.resolve(description);
 	}
 
 	sipRegister() {
-		this.logger.log("sipjsphone: sipRegister: Starting registration with config:", [{
+		logger.log("sipjsphone: sipRegister: Starting registration with config:", [{
 			authorizationUsername: this.txtPrivateIdentity,
 			authorizationPassword: this.txtPassword,
 			uri: this.txtPublicIdentity,
@@ -642,13 +641,13 @@ class SIPJSPhone {
 
 		try {
 			if (!this.txtRealm || !this.txtPrivateIdentity || !this.txtPublicIdentity) {
-				this.logger.error("sipjsphone: sipRegister: Missing required credentials");
+				logger.error("sipjsphone: sipRegister: Missing required credentials");
 				return;
 			}
 
 			const uri = SIP.UserAgent.makeURI(this.txtPublicIdentity);
 			if (!uri) {
-				this.logger.error("sipjsphone: sipRegister: Failed to create SIP URI");
+				logger.error("sipjsphone: sipRegister: Failed to create SIP URI");
 				return;
 			}
 
@@ -685,7 +684,7 @@ class SIPJSPhone {
 			},
 				delegate: {
 					onInvite: (incomingSession) => {
-						this.logger.log("onInvite called");
+						logger.log("onInvite called");
 						if (this.ctxSip.callActiveID == null) {
 							// Tell the PSTN/SIP proxy we are ringing so it doesn't CANCEL
 							incomingSession.progress({ statusCode: 180, reasonPhrase: "Ringing" });
@@ -699,7 +698,7 @@ class SIPJSPhone {
 				}
 			};
 
-			this.logger.log("sipjsphone: sipRegister: Created UserAgent with config:", [userAgentConfig]);
+			logger.log("sipjsphone: sipRegister: Created UserAgent with config:", [userAgentConfig]);
 			this.ctxSip.userAgent = new SIP.UserAgent(userAgentConfig);
 			this.ctxSip.userAgent.start();
 			this.ctxSip.phone = this.ctxSip.userAgent;
@@ -718,16 +717,16 @@ class SIPJSPhone {
 
 			this.ctxSip.userAgent.transport.stateChange.addListener(this.transportStateChangeListener.bind(this));
 		} catch (error) {
-			this.logger.error("sipjsphone: sipRegister: Error during registration setup:", error);
+			logger.error("sipjsphone: sipRegister: Error during registration setup:", error);
 		}
 	}
 
 	registererStateEventListner(newState) {
-		this.logger.log("sipjsphone: registererStateEventListner: Registration state changed to:", [newState]);
+		logger.log("sipjsphone: registererStateEventListner: Registration state changed to:", [newState]);
 
 	switch (newState) {
 			case "Registered":
-				this.logger.log("sipjsphone: registererStateEventListner: Registration successful");
+				logger.log("sipjsphone: registererStateEventListner: Registration successful");
 				this.webRTCStatus = "ready";
 				this.isRegistered = true;
 
@@ -741,7 +740,7 @@ class SIPJSPhone {
 				}
 				break;
 			case "Unregistered":
-				this.logger.error("sipjsphone: registererStateEventListner: Registration failed");
+				logger.error("sipjsphone: registererStateEventListner: Registration failed");
 				this.webRTCStatus = "offline";
 				this.isRegistered = false;
 
@@ -755,7 +754,7 @@ class SIPJSPhone {
 				}
 				break;
 			case "Terminated":
-				this.logger.log("sipjsphone: registererStateEventListner: Registration terminated");
+				logger.log("sipjsphone: registererStateEventListner: Registration terminated");
 				this.webRTCStatus = "offline";
 				this.isRegistered = false;
 
@@ -782,16 +781,16 @@ class SIPJSPhone {
 	}
 
 	transportStateChangeListener(newState) {
-		this.logger.log("sipjsphone: transportStateChangeListener: Transport state changed to:", [newState]);
+		logger.log("sipjsphone: transportStateChangeListener: Transport state changed to:", [newState]);
 		this.lastTransportState = newState;
 
 		if (newState === "Connected") {
-			this.logger.log("sipjsphone: transportStateChangeListener: WebSocket connected");
+			logger.log("sipjsphone: transportStateChangeListener: WebSocket connected");
 			this.onUserAgentTransportConnected();
 		}
 
 		if (newState === "Disconnected") {
-			this.logger.log("sipjsphone: transportStateChangeListener: WebSocket disconnected");
+			logger.log("sipjsphone: transportStateChangeListener: WebSocket disconnected");
 
 			if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent === 'function') {
 				this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent("disconnected");
@@ -832,13 +831,13 @@ destroySocketConnection() {
 		transport.disconnect();
 	  }
   	} catch (e) {
-	  this.logger.error("destroySocketConnection: cleanup failed", e);
+	  logger.error("destroySocketConnection: cleanup failed", e);
 	}
   }
 
 
 	uiOnConnectionEvent(b_connected, b_connecting) {
-		this.logger.log("sipjsphone: uiOnConnectionEvent: Connection state changed:", [b_connected, b_connecting]);
+		logger.log("sipjsphone: uiOnConnectionEvent: Connection state changed:", [b_connected, b_connecting]);
 
 		if (b_connecting) {
 			this.webRTCStatus = "connecting";
@@ -860,7 +859,7 @@ destroySocketConnection() {
 	}
 
 	onUserAgentTransportConnected() {
-		this.logger.log("sipjsphone: onUserAgentTransportConnected: Transport connected");
+		logger.log("sipjsphone: onUserAgentTransportConnected: Transport connected");
 
 		if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent === 'function') {
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent('connected');
@@ -892,7 +891,7 @@ destroySocketConnection() {
 
 
 		} catch (e) {
-			this.logger.log("sipjsphone: cleanupRegistererTimer: ERROR", e);
+			logger.log("sipjsphone: cleanupRegistererTimer: ERROR", e);
 
 		}
 			this.registerer = null;
@@ -1011,26 +1010,26 @@ destroySocketConnection() {
 
 
 	onMuted(s) {
-		this.logger.log(`[onMuted] Before: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
+		logger.log(`[onMuted] Before: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
 		this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('muted');
 		if (s) s.isMuted = true;
 		this.isMuted = true;
-		this.logger.log(`[onMuted] After: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
+		logger.log(`[onMuted] After: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
 		this.ctxSip.setCallSessionStatus("Muted");
 	}
 
 	onUnmuted(s) {
-		this.logger.log(`[onUnmuted] Before: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
+		logger.log(`[onUnmuted] Before: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
 		this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('unmuted');
 		if (s) s.isMuted = false;
 		this.isMuted = false;
-		this.logger.log(`[onUnmuted] After: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
+		logger.log(`[onUnmuted] After: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
 		this.ctxSip.setCallSessionStatus("Answered");
 	}
 
 	onHold(s) {
 	//webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('hold');
-	this.logger.warn(`[${s.id}] re-invite request was accepted`);
+	logger.warn(`[${s.id}] re-invite request was accepted`);
 	s.held = true;
 		this.enableSenderTracks(s, !s.held && !s.isMuted);
 		this.enableReceiverTracks(s, !s.held);
@@ -1039,7 +1038,7 @@ destroySocketConnection() {
 
 	 onUnhold(s) {
 	//webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('unhold');
-	this.logger.warn(`[${s.id}] re-invite request was rejected`);
+	logger.warn(`[${s.id}] re-invite request was rejected`);
 	s.held = false;
 		this.enableSenderTracks(s, !s.held && !s.isMuted);
 		this.enableReceiverTracks(s, !s.held);
@@ -1055,13 +1054,13 @@ destroySocketConnection() {
 			throw new Error("Peer connection closed.");
 		}
 		peerConnection.getReceivers().forEach((receiver) => {
-			this.logger.log("sipjsphone: enableReceiverTracks: Receiver ", receiver)
+			logger.log("sipjsphone: enableReceiverTracks: Receiver ", receiver)
 			if (receiver.track) {
 				receiver.track.enabled = enable;
 			}
 		});
 	} catch (e) {
-		this.logger.log("sipjsphone: enableReceiverTracks: Error in updating receiver tracks  ", e)
+		logger.log("sipjsphone: enableReceiverTracks: Error in updating receiver tracks  ", e)
 
 	}
 }
@@ -1080,7 +1079,7 @@ destroySocketConnection() {
 			}
 		});
 	} catch (e) {
-		this.logger.log("sipjsphone: enableSenderTracks: Error in updating sender tracks  ", e)
+		logger.log("sipjsphone: enableSenderTracks: Error in updating sender tracks  ", e)
 	}
 }
 
@@ -1103,7 +1102,7 @@ destroySocketConnection() {
 			this.enableReceiverTracks(s, !hold);
 			this.enableSenderTracks(s, !hold && !s.isMuted);
 	}).catch((error) => {
-		this.logger.error(`Error in hold request [${s.id}]`);
+		logger.error(`Error in hold request [${s.id}]`);
 	});
 }
 
@@ -1117,23 +1116,23 @@ destroySocketConnection() {
 	
 		// Load and start playback of media.
 		element.play().catch((error) => {
-			this.logger.error("Failed to play media");
-			this.logger.error(error);
+			logger.error("Failed to play media");
+			logger.error(error);
 		});
 	// If a track is added, load and restart playback of media.
 	stream.onaddtrack = () => {
 		element.load(); // Safari does not work otheriwse
 		element.play().catch((error) => {
-			this.logger.error("Failed to play remote media on add track");
-			this.logger.error(error);
+			logger.error("Failed to play remote media on add track");
+			logger.error(error);
 		});
 	};
 	// If a track is removed, load and restart playback of media.
 	stream.onremovetrack = () => {
 		element.load(); // Safari does not work otheriwse
 		element.play().catch((error) => {
-			this.logger.error("Failed to play remote media on remove track");
-			this.logger.error(error);
+			logger.error("Failed to play remote media on remove track");
+			logger.error(error);
 		});
 	};
 	
@@ -1145,7 +1144,7 @@ destroySocketConnection() {
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('userMediaFailed');
 			this.webrtcSIPPhoneEventDelegate.onGetUserMediaErrorCallstatCallback();
 	} else {
-		this.logger.log("sipjsphone: onUserSessionAcceptFailed: user media failed due to error ", e);
+		logger.log("sipjsphone: onUserSessionAcceptFailed: user media failed due to error ", e);
 	}
 		this.uiCallTerminated('Media stream permission denied');
 	}
@@ -1249,11 +1248,11 @@ destroySocketConnection() {
 	}
 
 	reRegister() {
-		this.logger.log("sipjsphone: reRegister: registering in case of relogin");
+		logger.log("sipjsphone: reRegister: registering in case of relogin");
 		if (this.ctxSip.phone && this.registerer) {
 			this.registerer.register({});
 		} else {
-			this.logger.log("sipjsphone: reRegister: SIP Session does not exist for re registration");
+			logger.log("sipjsphone: reRegister: SIP Session does not exist for re registration");
 		}
 
 	}
@@ -1283,15 +1282,15 @@ destroySocketConnection() {
 		let sessionMuted = undefined;
 		if (this.ctxSip && this.ctxSip.callActiveID && this.ctxSip.Sessions && this.ctxSip.Sessions[this.ctxSip.callActiveID]) {
 			sessionMuted = !!this.ctxSip.Sessions[this.ctxSip.callActiveID].isMuted;
-			this.logger.log(`[getMicMuteStatus] sessionMuted: ${sessionMuted}, global isMuted: ${this.isMuted}`);
+			logger.log(`[getMicMuteStatus] sessionMuted: ${sessionMuted}, global isMuted: ${this.isMuted}`);
 			return sessionMuted;
 		}
-		this.logger.log(`[getMicMuteStatus] No active session, global isMuted: ${this.isMuted}`);
+		logger.log(`[getMicMuteStatus] No active session, global isMuted: ${this.isMuted}`);
 		return this.isMuted;
 	}
 
 	setPreferredCodec(codecName) {
-		this.logger.log("sipjsphone:setPreferredCodec entry");
+		logger.log("sipjsphone:setPreferredCodec entry");
 		const codecPayloadTypes = {
 			opus: { payloadType: 111, rtpMap: "opus/48000/2", fmtp: "minptime=10;useinbandfec=1" },
 		};
@@ -1300,17 +1299,17 @@ destroySocketConnection() {
 		if (codecName && codecPayloadTypes[codecName.toLowerCase()]) {
 			codec = codecName.toLowerCase();
 		} else if (codecName) {
-			this.logger.error("sipjsphone:setPreferredCodec: Unsupported codec " + codecName + " specified. Defaulting to opus.");
+			logger.error("sipjsphone:setPreferredCodec: Unsupported codec " + codecName + " specified. Defaulting to opus.");
 		}
 
 		this.preferredCodec = codecPayloadTypes[codec];
 
-		this.logger.log("sipjsphone:setPreferredCodec: Preferred codec set to " + codec);
+		logger.log("sipjsphone:setPreferredCodec: Preferred codec set to " + codec);
 	}
 
 	pickPhoneCall() {
 		var newSess = this.ctxSip.Sessions[this.ctxSip.callActiveID];
-		this.logger.log("sipjsphone: pickphonecall: ", this.ctxSip.callActiveID);
+		logger.log("sipjsphone: pickphonecall: ", this.ctxSip.callActiveID);
 		if (newSess) {
 			if (audioDeviceManager.currentAudioInputDeviceId != "default") {
 				newSess.accept({
@@ -1343,7 +1342,7 @@ destroySocketConnection() {
 		try {
 			this.ctxSip.beeptone.play();
 		} catch (e) {
-			this.logger.log("sipjsphone: playBeep: Exception:", e);
+			logger.log("sipjsphone: playBeep: Exception:", e);
 		}
 	}
 
@@ -1379,59 +1378,59 @@ destroySocketConnection() {
 	}
 	/* NL Additions - Start */
 	getSpeakerTestTone() {
-		this.logger.log("sipjsphone: getSpeakerTestTone: Returning speaker test tone:", this.ringtone);
+		logger.log("sipjsphone: getSpeakerTestTone: Returning speaker test tone:", this.ringtone);
 		return this.ringtone;
 	}
 
 
 	getWSSUrl() {
-		this.logger.log("sipjsphone: getWSSUrl: Returning txtWebsocketURL:", this.txtWebsocketURL);
+		logger.log("sipjsphone: getWSSUrl: Returning txtWebsocketURL:", this.txtWebsocketURL);
 		return this.txtWebsocketURL;
 	}
 	/* NL Additions - End */
 	getTransportState() {
-		this.logger.log("sipjsphone: getTransportState: Returning Transport State : ", this.lastTransportState);
+		logger.log("sipjsphone: getTransportState: Returning Transport State : ", this.lastTransportState);
 		return this.lastTransportState;
 	}
 	getRegistrationState() {
-		this.logger.log("sipjsphone: getRegistrationState: Returning Registration State : ", this.lastRegistererState);
+		logger.log("sipjsphone: getRegistrationState: Returning Registration State : ", this.lastRegistererState);
 		return this.lastRegistererState;
 	}
 
 	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
-		this.logger.log("sipjsphone: changeAudioInputDevice : ", deviceId, onSuccess, onError, "forceDeviceChange = ", forceDeviceChange, "enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
+		logger.log("sipjsphone: changeAudioInputDevice : ", deviceId, onSuccess, onError, "forceDeviceChange = ", forceDeviceChange, "enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
 		audioDeviceManager.changeAudioInputDevice(deviceId, (stream) => {
 			const trackChanged = this.replaceSenderTrack(stream, deviceId);
 			if (trackChanged) {
 				audioDeviceManager.currentAudioInputDeviceId = deviceId;
-				this.logger.log(`sipjsphone: changeAudioInputDevice: Input device changed to: ${deviceId}`);
+				logger.log(`sipjsphone: changeAudioInputDevice: Input device changed to: ${deviceId}`);
 				if (onSuccess) onSuccess();
 			} else {
-				this.logger.error("sipjsphone: changeAudioInputDevice: failed");
+				logger.error("sipjsphone: changeAudioInputDevice: failed");
 				if (onError) onError("replaceSenderTrack failed for webrtc");
 			}
 		}, (err) => {
-			this.logger.error("sipjsphone: changeAudioInputDevice error:", err);
+			logger.error("sipjsphone: changeAudioInputDevice error:", err);
 			if (onError) onError(err);
 		},
 		forceDeviceChange,
-		this.logger);
+		logger);
 	}
 
 	async changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
-		this.logger.log("sipjsphone: changeAudioOutputDevice : ", deviceId, onSuccess, onError, "forceDeviceChange = ", forceDeviceChange, "enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
+		logger.log("sipjsphone: changeAudioOutputDevice : ", deviceId, onSuccess, onError, "forceDeviceChange = ", forceDeviceChange, "enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
 		try {
 			// Ensure device list is up-to-date
-			await audioDeviceManager.enumerateDevices(() => {}, this.logger);
+			await audioDeviceManager.enumerateDevices(() => {}, logger);
 			if (!this.audioRemote) {
 				const errorMsg = 'SIPJSPhone:changeAudioOutputDevice audioRemote element is not set.';
-				this.logger.error(errorMsg);
+				logger.error(errorMsg);
 				if (onError) onError(errorMsg);
 				return;
 			}
 			if (typeof this.audioRemote.sinkId === 'undefined') {
 				const errorMsg = 'SIPJSPhone:changeAudioOutputDevice Browser does not support output device selection.';
-				this.logger.error(errorMsg);
+				logger.error(errorMsg);
 				if (onError) onError(errorMsg);
 				return;
 			}
@@ -1439,13 +1438,13 @@ destroySocketConnection() {
 				this.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
 				if (onSuccess) onSuccess();
 			}, (err) => {
-				this.logger.error('SIPJSPhone:changeAudioOutputDevice error:', err);
+				logger.error('SIPJSPhone:changeAudioOutputDevice error:', err);
 				if (onError) onError(err);
 			},
 			forceDeviceChange,
-		this.logger);
+		logger);
 		} catch (e) {
-			this.logger.error('SIPJSPhone:changeAudioOutputDevice unexpected error:', e);
+			logger.error('SIPJSPhone:changeAudioOutputDevice unexpected error:', e);
 			if (onError) onError(e);
 		}
 	}
@@ -1461,7 +1460,7 @@ destroySocketConnection() {
 				elem.setSinkId(deviceId);
 			}
 		} catch (e) {
-			this.logger.error("sipjsphone:changeAudioOutputDeviceForAdditionalAudioElement failed to setSink for additonal AudioElements", e);
+			logger.error("sipjsphone:changeAudioOutputDeviceForAdditionalAudioElement failed to setSink for additonal AudioElements", e);
 		}
 	}
 
@@ -1474,7 +1473,7 @@ destroySocketConnection() {
 				});
 			}
 		} catch (e) {
-			this.logger.error("sipjsphone:stopStreamTracks failed to stop tracks");
+			logger.error("sipjsphone:stopStreamTracks failed to stop tracks");
 		}
 	}
 	replaceSenderTrack(stream, deviceId) {
@@ -1495,7 +1494,7 @@ destroySocketConnection() {
 						sender.track.stop();
 						sender.replaceTrack(audioTrack);
 					} catch (e) {
-						this.logger.error(`replaceSenderTrack unable to replace track for stream for device id ${deviceId} `, stream);
+						logger.error(`replaceSenderTrack unable to replace track for stream for device id ${deviceId} `, stream);
 					}
 				}
 			} else {
@@ -1508,10 +1507,10 @@ destroySocketConnection() {
 
 	}
 	registerLogger(customLogger) {
-		this.logger = customLogger;
+		logger = customLogger;
 	}
 	registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
-		this.logger.log(`sipjsphone: registerAudioDeviceChangeCallback: entry`);
+		logger.log(`sipjsphone: registerAudioDeviceChangeCallback: entry`);
 		this.audioInputDeviceChangeCallback = audioInputDeviceChangeCallback;
 		this.audioOutputDeviceChangeCallback = audioOutputDeviceChangeCallback;
 		this.onDeviceChangeCallback = onDeviceChangeCallback;
@@ -1527,23 +1526,23 @@ destroySocketConnection() {
 	}
 
 	sipCall() {
-		this.logger.log("sipjsphone: sipCall: testing emit accept_reject");
+		logger.log("sipjsphone: sipCall: testing emit accept_reject");
 		if (this.webrtcSIPPhoneEventDelegate)
 			this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("accept_reject", "CALL");
 	}
 
 	onInvitationSessionAccepted(newSess) {
 		// Reset mute state at the start of every call
-		this.logger.log(`[onInvitationSessionAccepted] Resetting mute state. Before: newSess.isMuted=${newSess && newSess.isMuted}, global isMuted=${this.isMuted}`);
+		logger.log(`[onInvitationSessionAccepted] Resetting mute state. Before: newSess.isMuted=${newSess && newSess.isMuted}, global isMuted=${this.isMuted}`);
 		this.isMuted = false;
 		if (newSess && newSess.isMuted !== undefined) {
 			newSess.isMuted = false;
 		}
-		this.logger.log(`[onInvitationSessionAccepted] After reset: newSess.isMuted=${newSess && newSess.isMuted}, global isMuted=${this.isMuted}`);
+		logger.log(`[onInvitationSessionAccepted] After reset: newSess.isMuted=${newSess && newSess.isMuted}, global isMuted=${this.isMuted}`);
 		this.ctxSip.Stream = newSess.sessionDescriptionHandler.localMediaStream;
-		this.logger.log('onInvitationSessionAccepted: assigning remote stream to audioRemote');
+		logger.log('onInvitationSessionAccepted: assigning remote stream to audioRemote');
 		this.assignStream(newSess.sessionDescriptionHandler.remoteMediaStream, this.audioRemote);
-		this.logger.log('onInvitationSessionAccepted: assignStream called');
+		logger.log('onInvitationSessionAccepted: assignStream called');
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('accepted');
 			this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("connected", "CALL");
@@ -1621,10 +1620,10 @@ destroySocketConnection() {
 				} else if (content.startsWith("Received WebSocket text message")) {
 					this.handleWebSocketMessageContent(content, "recv");
 				}
-				this.logger.log("sipjsphone: sipPhoneLogger:" + level + " sipjslog: " + category + ": " + content);
+				logger.log("sipjsphone: sipPhoneLogger:" + level + " sipjslog: " + category + ": " + content);
 			}
 		} catch (e) {
-			this.logger.error("sipjsphone:sipPhoneLogger ERROR", e);
+			logger.error("sipjsphone:sipPhoneLogger ERROR", e);
 		}
 	}
 
@@ -1632,7 +1631,7 @@ destroySocketConnection() {
 		try {
 			audioDeviceManager.enumerateDevices(() => {
 				if (this.onDeviceChangeCallback) {
-				this.logger.info("SIPJSPhone:ondevicechange relaying event to callback");
+				logger.info("SIPJSPhone:ondevicechange relaying event to callback");
 					this.onDeviceChangeCallback(event);
 				return;
 			}
@@ -1654,10 +1653,10 @@ destroySocketConnection() {
 							this.audioOutputDeviceChangeCallback(deviceId);
 					}
 					}
-				, this.logger);
+				, logger);
 				});
 	} catch (e) {
-		this.logger.error("SIPJSPhone:ondevicechange something went wrong during device change", e);
+		logger.error("SIPJSPhone:ondevicechange something went wrong during device change", e);
 	}
 	}
 
@@ -1682,12 +1681,12 @@ destroySocketConnection() {
 	}
 
 	muteAction(bMute) {
-		this.logger.log("webrtcSIPPhone: muteAction: ", [bMute]);
+		logger.log("webrtcSIPPhone: muteAction: ", [bMute]);
 		// Always operate on the current session
 		if (this.ctxSip && this.ctxSip.callActiveID && this.ctxSip.Sessions && this.ctxSip.Sessions[this.ctxSip.callActiveID]) {
 			this.phone.sipMute(bMute);
 		} else {
-			this.logger.warn("webrtcSIPPhone: muteAction: No active session to mute/unmute");
+			logger.warn("webrtcSIPPhone: muteAction: No active session to mute/unmute");
 		}
 	}
 
