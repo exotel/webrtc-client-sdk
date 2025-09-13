@@ -1,6 +1,7 @@
 import coreSDKLogger from "./coreSDKLogger";
 
 const logger = coreSDKLogger;
+const AudioManagerCtx = window.AudioContext || window.webkitAudioContext;
 export const audioDeviceManager = {
     resetInputDevice: false,
     resetOutputDevice: false,
@@ -8,6 +9,7 @@ export const audioDeviceManager = {
     currentAudioOutputDeviceId: "default",
     mediaDevices: [],
     enableAutoAudioDeviceChangeHandling: false,
+    webAudioCtx : new AudioManagerCtx(),
     // Method to set the resetInputDevice flag
     setResetInputDeviceFlag(value) {
         this.resetInputDevice = value;
@@ -136,6 +138,34 @@ export const audioDeviceManager = {
         }
         if (callback) callback();
     },
+
+    createAudioGainNode(audioElement) {
+    
+    
+        logger.log("audioDeviceManager:createAudioGainNode entry for audioElement", audioElement);
+    
+        
+        // Create a GainNode
+        let gainNode = this.webAudioCtx.createGain();
+        // get audio track from audio element
+        let track = this.webAudioCtx.createMediaElementSource(audioElement);
+
+        // Connect audio graph: track -> gainNode -> destination
+        track.connect(gainNode).connect(this.webAudioCtx.destination);
+
+        
+        // resume audio context when audio element is played
+        audioElement.addEventListener("play", () => {
+            if (this.webAudioCtx.state === "suspended") {
+                this.webAudioCtx.resume();
+            }
+        });
+
+        logger.log("audioDeviceManager:createAudioGainNode  node ", gainNode);
+
+        
+        return gainNode;
+    }
 
 };
 
