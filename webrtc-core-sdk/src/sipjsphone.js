@@ -1443,8 +1443,7 @@ destroySocketConnection() {
 			logger.error("sipjsphone: changeAudioInputDevice error:", err);
 			if (onError) onError(err);
 		},
-		forceDeviceChange,
-		logger);
+		forceDeviceChange);
 	}
 
 	async changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
