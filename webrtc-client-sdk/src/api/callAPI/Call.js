@@ -1,10 +1,9 @@
 import { CallDetails } from "./CallDetails";
+import { getLogger } from '@exotel-npm-dev/webrtc-core-sdk';
 
+const logger = getLogger();
 
-export function Call(webrtcSIPPhone, logger) {
-
-    this.logger = logger;
-
+export function Call(webrtcSIPPhone) {
     if (!webrtcSIPPhone) {
         throw new Error("webrtcSIPPhone is required for Call");
     }
@@ -13,7 +12,7 @@ export function Call(webrtcSIPPhone, logger) {
         /**
          * When agent accepts phone, add appropriate msg to be sent to webclient
          */
-        this.logger.log('Call answered')
+        logger.log('Call answered')
         webrtcSIPPhone.pickCall();
     }
 
@@ -21,7 +20,7 @@ export function Call(webrtcSIPPhone, logger) {
         /**
          * When call is terminated
          */
-        this.logger.log('call ended')
+        logger.log('call ended')
         webrtcSIPPhone.rejectCall();
     }
 
@@ -29,7 +28,7 @@ export function Call(webrtcSIPPhone, logger) {
         /**
          * When agent clicks on mute
          */
-        this.logger.log('Call: MuteToggle');
+        logger.log('Call: MuteToggle');
         webrtcSIPPhone.webRTCMuteUnmute();
     }
 
@@ -38,11 +37,11 @@ export function Call(webrtcSIPPhone, logger) {
          * When agent clicks on mute
          */
         var isMuted = webrtcSIPPhone.getMuteStatus();
-        this.logger.log('Call: Mute: isMuted: ', isMuted);
+        logger.log('Call: Mute: isMuted: ', isMuted);
         if (!isMuted) {
             webrtcSIPPhone.muteAction(true);
         } else {
-            this.logger.log('Call: Mute: Already muted');
+            logger.log('Call: Mute: Already muted');
         }
     }
     
@@ -51,11 +50,11 @@ export function Call(webrtcSIPPhone, logger) {
          * When agent clicks on unmute
          */
         var isMuted = webrtcSIPPhone.getMuteStatus();
-        this.logger.log('Call: UnMute: isMuted: ', isMuted);
+        logger.log('Call: UnMute: isMuted: ', isMuted);
         if (isMuted) {
             webrtcSIPPhone.muteAction(false);
         } else {
-            this.logger.log('Call: UnMute: Already unmuted');
+            logger.log('Call: UnMute: Already unmuted');
         }
     }
 
@@ -63,7 +62,7 @@ export function Call(webrtcSIPPhone, logger) {
         /**
          * When user clicks on hold
          */
-        this.logger.log('Hold toggle clicked')
+        logger.log('Hold toggle clicked')
         webrtcSIPPhone.holdCall();
     }
 
@@ -71,7 +70,7 @@ export function Call(webrtcSIPPhone, logger) {
         /**
          * When user clicks on hold
          */
-        this.logger.log('hold clicked')
+        logger.log('hold clicked')
         let dummyFlag = true;
         webrtcSIPPhone.holdCall();
     }
@@ -80,7 +79,7 @@ export function Call(webrtcSIPPhone, logger) {
         /**
          * When user clicks on hold
          */
-        this.logger.log('unhold clicked')
+        logger.log('unhold clicked')
         let dummyFlag = true;
         webrtcSIPPhone.holdCall();
     }
@@ -96,7 +95,7 @@ export function Call(webrtcSIPPhone, logger) {
         /**
          * sends dtmf digit as SIP info over websocket 
          */
-        this.logger.log("trying to send dtmf " + digit);
+        logger.log("trying to send dtmf " + digit);
         webrtcSIPPhone.sendDTMFWebRTC(digit);
     }
 }
