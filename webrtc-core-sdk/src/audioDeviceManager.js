@@ -139,18 +139,17 @@ export const audioDeviceManager = {
         if (callback) callback();
     },
 
-    createAudioGainNode(audioElement) {
-    
-    
-        logger.log("audioDeviceManager:createAudioGainNode entry for audioElement", audioElement);
-    
         
-        // Create a GainNode
-        let gainNode = this.webAudioCtx.createGain();
+    createAndConfigureAudioGainNode(audioElement) {
+    
+        logger.log("audioDeviceManager:createAndConfigureAudioGainNode entry for audioElement", audioElement);
+        
         // get audio track from audio element
         let track = this.webAudioCtx.createMediaElementSource(audioElement);
 
-        // Connect audio graph: track -> gainNode -> destination
+        // Create a GainNode
+        let gainNode = this.webAudioCtx.createGain();
+
         track.connect(gainNode).connect(this.webAudioCtx.destination);
 
         
@@ -160,12 +159,11 @@ export const audioDeviceManager = {
                 this.webAudioCtx.resume();
             }
         });
-
-        logger.log("audioDeviceManager:createAudioGainNode  node ", gainNode);
-
         
-        return gainNode;
+        
     }
+
+
 
 };
 

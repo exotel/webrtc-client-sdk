@@ -20,10 +20,10 @@ class SIPJSPhone {
 
 	static configure() {
 		logger.log("SIPJSPhone: configure: entry");
-		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringtone"] = audioDeviceManager.createAudioGainNode(ringtone);
-		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringbacktone"] = audioDeviceManager.createAudioGainNode(ringbacktone);
-		SIPJSPhone.audioElementNameVsAudioGainNodeMap["dtmftone"] = audioDeviceManager.createAudioGainNode(dtmftone);
-		SIPJSPhone.audioElementNameVsAudioGainNodeMap["beeptone"] = audioDeviceManager.createAudioGainNode(beeptone);
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringtone"] = audioDeviceManager.createAndConfigureAudioGainNode(ringtone);
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringbacktone"] = audioDeviceManager.createAndConfigureAudioGainNode(ringbacktone);
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["dtmftone"] = audioDeviceManager.createAndConfigureAudioGainNode(dtmftone);
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["beeptone"] = audioDeviceManager.createAndConfigureAudioGainNode(beeptone);
 	}
 	
 
@@ -123,49 +123,53 @@ class SIPJSPhone {
 		this.audioRemote.style.display = 'none';
 		document.body.appendChild(this.audioRemote);
 
-
-
-		
-
-		//this.audioRemoteGainNode = audioDeviceManager.webAudioCtx.createGain();
-		this.audioRemoteGainNode = audioDeviceManager.createAudioGainNode(this.audioRemote);
-
-		
+		this.audioRemoteGainNode = null;
+		this.audioRemoteSourceNode = null;
+		this.callAudioOutputVolume = 1;
 		
 	}
 
 
 	setCallAudioOutputVolume(value) {
-		logger.log(`entry setCallAudioOutputVolume: ${value}`);
-		this.callAudioOutputVolume =  Math.max(0, Math.min(1, value));
+		logger.log(`sipjsphone: setCallAudioOutputVolume: ${value}`);
+		this.callAudioOutputVolume = Math.max(0, Math.min(1, value));
+		
+		if(this.audioRemoteGainNode) {
+			this.audioRemoteGainNode.gain.value = this.callAudioOutputVolume;
+			
+			// Ensure audio context is running
+			if (audioDeviceManager.webAudioCtx.state === "suspended") {
+				audioDeviceManager.webAudioCtx.resume();
+			}
+		}
 		return true;
 	}
 
 	getCallAudioOutputVolume() {
-		logger.log(`entry getCallAudioOutputVolume`);
+		logger.log(`sipjsphone: getCallAudioOutputVolume`);
 		return this.callAudioOutputVolume;
 	}
 
 	// Volume control methods
 	static setAudioOutputVolume(audioElementName, value) {
 		
-		logger.log(`entry setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
+		logger.log(`SIPJSPhone: setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
 		if(!SIPJSPhone.audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
-			logger.error(`setAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
+			logger.error(`SIPJSPhone: setAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
 			throw new Error(`Invalid audio element name: ${audioElementName}`);
 		}
 
 		let gainNode = SIPJSPhone.audioElementNameVsAudioGainNodeMap[audioElementName];
 		gainNode.gain.value = Math.max(0, Math.min(1, value));
-		logger.log(`exit setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
+		logger.log(`SIPJSPhone: setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
 		return true;
 	
 	}
 
 	static getAudioOutputVolume(audioElementName) {
-		logger.log(`entry getAudioOutputVolume: ${audioElementName}`);
+		logger.log(`SIPJSPhone: getAudioOutputVolume: ${audioElementName}`);
 		if(!SIPJSPhone.audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
-			logger.error(`getAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
+			logger.error(`SIPJSPhone: getAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
 			throw new Error(`Invalid audio element name: ${audioElementName}`);
 		}
 		let gainNode = SIPJSPhone.audioElementNameVsAudioGainNodeMap[audioElementName];
@@ -1101,36 +1105,67 @@ destroySocketConnection() {
 	});
 }
 
-	 assignStream(stream, element) {
-		if (audioDeviceManager.currentAudioOutputDeviceId != "default")
-			element.setSinkId(audioDeviceManager.currentAudioOutputDeviceId);
-		// Set element source.
-		element.autoplay = true; // Safari does not allow calling .play() from a
-		// non user action
-		element.srcObject = stream;
-	
-		// Load and start playback of media.
-		element.play().catch((error) => {
-			logger.error("Failed to play media");
-			logger.error(error);
-		});
-	// If a track is added, load and restart playback of media.
-	stream.onaddtrack = () => {
-		element.load(); // Safari does not work otheriwse
-		element.play().catch((error) => {
-			logger.error("Failed to play remote media on add track");
-			logger.error(error);
-		});
-	};
-	// If a track is removed, load and restart playback of media.
-	stream.onremovetrack = () => {
-		element.load(); // Safari does not work otheriwse
-		element.play().catch((error) => {
-			logger.error("Failed to play remote media on remove track");
-			logger.error(error);
-		});
-	};
-	
+	assignStream(stream, element) {
+    logger.log("sipjsphone: assignStream: entry for stream", stream);
+    
+    if (audioDeviceManager.currentAudioOutputDeviceId != "default")
+        element.setSinkId(audioDeviceManager.currentAudioOutputDeviceId);
+        
+    // Set element source.
+    element.autoplay = true;
+    element.srcObject = stream;
+    
+    // Set HTML audio element volume to 0 to prevent direct audio output
+    element.volume = 0;
+
+    // Clean up existing audio nodes
+    if(this.audioRemoteSourceNode) {
+        try {
+            this.audioRemoteSourceNode.disconnect();
+            this.audioRemoteGainNode.disconnect();
+        } catch (e) {
+            logger.error("sipjsphone: assignStream: Old audio nodes cleanup:", e);
+        }
+    }
+
+    // Create MediaStreamSource directly from the stream
+    this.audioRemoteSourceNode = audioDeviceManager.webAudioCtx.createMediaStreamSource(stream);
+    this.audioRemoteGainNode = audioDeviceManager.webAudioCtx.createGain();
+
+    // Set the gain value
+    this.audioRemoteGainNode.gain.value = this.callAudioOutputVolume;
+
+    // Connect the audio graph
+    this.audioRemoteSourceNode.connect(this.audioRemoteGainNode);
+    this.audioRemoteGainNode.connect(audioDeviceManager.webAudioCtx.destination);
+
+    // Resume audio context when element plays
+    element.addEventListener("play", () => {
+        if (audioDeviceManager.webAudioCtx.state === "suspended") {
+            audioDeviceManager.webAudioCtx.resume();
+        }
+    });
+    
+    // Load and start playback of media.
+    element.play().catch((error) => {
+        logger.error("sipjsphone: assignStream: Failed to play media", error);
+    });
+
+    // If a track is added, load and restart playback of media.
+    stream.onaddtrack = () => {
+        element.load();
+        element.play().catch((error) => {
+            logger.error("sipjsphone: assignStream: Failed to play remote media on add track", error);
+        });
+    };
+    
+    // If a track is removed, load and restart playback of media.
+    stream.onremovetrack = () => {
+        element.load();
+        element.play().catch((error) => {
+            logger.error("sipjsphone: assignStream: Failed to play remote media on remove track", error);
+        });
+    };
 }
 
 	 onUserSessionAcceptFailed(e) {
