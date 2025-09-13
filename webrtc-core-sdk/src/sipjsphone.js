@@ -1,7 +1,8 @@
 var SIP = require('./sip-0.20.0.js')
 import { audioDeviceManager } from './audioDeviceManager.js';
+import coreSDKLogger from './coreSDKLogger.js';
 import WebrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
-
+let logger = coreSDKLogger;
 
 var beeptone = document.createElement("audio");
 beeptone.src = require("./static/beep.wav");
@@ -20,12 +21,12 @@ var audioElementNameVsAudioGainNodeMap = {};
 
 
 
-function configureAudioGainNode(elementName, audioElement, logger) {
+function configureAudioGainNode(elementName, audioElement) {
 	logger.log(`configureAudioGainNode: ${elementName} entry`);
 	if(audioElementNameVsAudioGainNodeMap.hasOwnProperty(elementName)) {
 		logger.log(`configureAudioGainNode: ${elementName} already configured`);
 	}
-	let gainNode = audioDeviceManager.createAudioGainNode(audioElement, logger);
+	let gainNode = audioDeviceManager.createAudioGainNode(audioElement);
 	audioElementNameVsAudioGainNodeMap[elementName] = gainNode;	
 }
 
@@ -128,11 +129,11 @@ class SIPJSPhone {
 
 
 
-		configureAudioGainNode("ringtone", ringtone, logger);
-		configureAudioGainNode("ringbacktone", ringbacktone, logger);
-		configureAudioGainNode("dtmftone", dtmftone, logger);
-		configureAudioGainNode("beeptone", beeptone, logger);
-		configureAudioGainNode("audioRemote", this.audioRemote, logger);
+		configureAudioGainNode("ringtone", ringtone);
+		configureAudioGainNode("ringbacktone", ringbacktone);
+		configureAudioGainNode("dtmftone", dtmftone);
+		configureAudioGainNode("beeptone", beeptone);
+		configureAudioGainNode("audioRemote", this.audioRemote);
 
 
 		this.audioRemoteGainNode = audioDeviceManager.createAudioGainNode(this.audioRemote);
@@ -1421,7 +1422,7 @@ destroySocketConnection() {
 		logger.log("sipjsphone: changeAudioOutputDevice : ", deviceId, onSuccess, onError, "forceDeviceChange = ", forceDeviceChange, "enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
 		try {
 			// Ensure device list is up-to-date
-			await audioDeviceManager.enumerateDevices(() => {}, logger);
+			await audioDeviceManager.enumerateDevices(() => {});
 			if (!this.audioRemote) {
 				const errorMsg = 'SIPJSPhone:changeAudioOutputDevice audioRemote element is not set.';
 				logger.error(errorMsg);
@@ -1653,7 +1654,7 @@ destroySocketConnection() {
 							this.audioOutputDeviceChangeCallback(deviceId);
 					}
 					}
-				, logger);
+				);
 				});
 	} catch (e) {
 		logger.error("SIPJSPhone:ondevicechange something went wrong during device change", e);
