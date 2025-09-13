@@ -7,6 +7,7 @@ export const audioDeviceManager = {
     currentAudioOutputDeviceId: "default",
     mediaDevices: [],
     enableAutoAudioDeviceChangeHandling: false,
+    audioElementNameVsAudioGainNodeMap : {},
 
    
 	webAudioCtx : new AudioManagerCtx(),
@@ -143,8 +144,12 @@ export const audioDeviceManager = {
         if (callback) callback();
     },
 
-    createAudioGainNode( audioElement) {
-       
+    createAudioGainNode(audioElement, logger) {
+    
+    
+        logger.log("audioDeviceManager:createAudioGainNode entry for audioElement", audioElement);
+    
+        
         // Create a GainNode
         let gainNode = this.webAudioCtx.createGain();
         // get audio track from audio element
@@ -153,8 +158,6 @@ export const audioDeviceManager = {
         // Connect audio graph: track -> gainNode -> destination
         track.connect(gainNode).connect(this.webAudioCtx.destination);
 
-        // logger.log("audioDeviceManager:createAudioGainNode gainNodeMaxValue", gainNode.gain.maxValue);
-        gainNode.gain.value = 1.0;
         
         // resume audio context when audio element is played
         audioElement.addEventListener("play", () => {
@@ -162,6 +165,10 @@ export const audioDeviceManager = {
                 this.webAudioCtx.resume();
             }
         });
+
+        logger.log("audioDeviceManager:createAudioGainNode  node ", gainNode);
+
+        
         return gainNode;
     },
 

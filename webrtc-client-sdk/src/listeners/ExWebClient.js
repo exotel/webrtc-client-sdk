@@ -10,13 +10,13 @@ import { closeDiagnostics as closeDiagnosticsDL, initDiagnostics as initDiagnost
 import { Callback, RegisterCallback, SessionCallback } from '../listeners/Callback';
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
-import { WebrtcSIPPhone } from "@exotel-npm-dev/webrtc-core-sdk";
+import { WebrtcSIPPhone, getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
 import { CallDetails } from "../api/callAPI/CallDetails";
 import LogManager from '../api/LogManager.js';
-import CoreSDKLogger from "@exotel-npm-dev/webrtc-core-sdk/src/coreSDKLogger.js";
 const phonePool = new Map();
 var intervalId;
 var intervalIDMap = new Map();
+const logger = getLogger();   
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -25,7 +25,7 @@ function sleep(ms) {
 /**
  * FQDN for fetching IP
  */
-function fetchPublicIP(sipAccountInfo, logger) {
+function fetchPublicIP(sipAccountInfo) {
     return new Promise((resolve) => {
         var publicIp = "";
         const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
@@ -63,21 +63,20 @@ function fetchPublicIP(sipAccountInfo, logger) {
 }
 
 class ExDelegationHandler {
-    constructor(exClient, logger) {
+    constructor(exClient) {
         this.exClient = exClient;
         this.sessionCallback = exClient.sessionCallback;
-        this.logger = logger;
     }
     setTestingMode(mode) {
-        this.logger.log("delegationHandler: setTestingMode\n");
+        logger.log("delegationHandler: setTestingMode\n");
     }
     onCallStatSipJsSessionEvent(ev) {
-        this.logger.log("delegationHandler: onCallStatSipJsSessionEvent", ev);
+        logger.log("delegationHandler: onCallStatSipJsSessionEvent", ev);
     }
     sendWebRTCEventsToFSM(eventType, sipMethod) {
-        this.logger.log("delegationHandler: sendWebRTCEventsToFSM\n");
-        this.logger.log("delegationHandler: eventType\n", eventType);
-        this.logger.log("delegationHandler: sipMethod\n", sipMethod);
+        logger.log("delegationHandler: sendWebRTCEventsToFSM\n");
+        logger.log("delegationHandler: eventType\n", eventType);
+        logger.log("delegationHandler: sipMethod\n", sipMethod);
 
         if (sipMethod == "CONNECTION") {
             this.exClient.registerEventCallback(eventType, this.exClient.userName);
@@ -86,61 +85,61 @@ class ExDelegationHandler {
         }
     }
     playBeepTone() {
-        this.logger.log("delegationHandler: playBeepTone\n");
+        logger.log("delegationHandler: playBeepTone\n");
     }
     onStatPeerConnectionIceGatheringStateChange(iceGatheringState) {
-        this.logger.log("delegationHandler: onStatPeerConnectionIceGatheringStateChange\n");
+        logger.log("delegationHandler: onStatPeerConnectionIceGatheringStateChange\n");
         this.sessionCallback.initializeSession(`ice_gathering_state_${iceGatheringState}`, this.exClient.callFromNumber);
         this.sessionCallback.triggerSessionCallback();
     }
     onCallStatIceCandidate(ev, icestate) {
-        this.logger.log("delegationHandler: onCallStatIceCandidate\n");
+        logger.log("delegationHandler: onCallStatIceCandidate\n");
     }
     onCallStatNegoNeeded(icestate) {
-        this.logger.log("delegationHandler: onCallStatNegoNeeded\n");
+        logger.log("delegationHandler: onCallStatNegoNeeded\n");
     }
     onCallStatSignalingStateChange(cstate) {
-        this.logger.log("delegationHandler: onCallStatSignalingStateChange\n");
+        logger.log("delegationHandler: onCallStatSignalingStateChange\n");
     }
     onStatPeerConnectionIceConnectionStateChange(iceConnectionState) {
-        this.logger.log("delegationHandler: onStatPeerConnectionIceConnectionStateChange\n");
+        logger.log("delegationHandler: onStatPeerConnectionIceConnectionStateChange\n");
         this.sessionCallback.initializeSession(`ice_connection_state_${iceConnectionState}`, this.exClient.callFromNumber);
         this.sessionCallback.triggerSessionCallback();
     }
     onStatPeerConnectionConnectionStateChange() {
-        this.logger.log("delegationHandler: onStatPeerConnectionConnectionStateChange\n");
+        logger.log("delegationHandler: onStatPeerConnectionConnectionStateChange\n");
     }
     onGetUserMediaSuccessCallstatCallback() {
-        this.logger.log("delegationHandler: onGetUserMediaSuccessCallstatCallback\n");
+        logger.log("delegationHandler: onGetUserMediaSuccessCallstatCallback\n");
     }
     onGetUserMediaErrorCallstatCallback() {
-        this.logger.log("delegationHandler: onGetUserMediaErrorCallstatCallback\n");
+        logger.log("delegationHandler: onGetUserMediaErrorCallstatCallback\n");
         this.sessionCallback.initializeSession(`media_permission_denied`, this.exClient.callFromNumber);
         this.sessionCallback.triggerSessionCallback();
     }
     onCallStatAddStream() {
-        this.logger.log("delegationHandler: onCallStatAddStream\n");
+        logger.log("delegationHandler: onCallStatAddStream\n");
     }
     onCallStatRemoveStream() {
-        this.logger.log("delegationHandler: onCallStatRemoveStream\n");
+        logger.log("delegationHandler: onCallStatRemoveStream\n");
     }
     setWebRTCFSMMapper(stack) {
-        this.logger.log("delegationHandler: setWebRTCFSMMapper : Initialisation complete \n");
+        logger.log("delegationHandler: setWebRTCFSMMapper : Initialisation complete \n");
     }
     onCallStatSipJsTransportEvent() {
-        this.logger.log("delegationHandler: onCallStatSipJsTransportEvent\n");
+        logger.log("delegationHandler: onCallStatSipJsTransportEvent\n");
     }
     onCallStatSipSendCallback() {
-        this.logger.log("delegationHandler: onCallStatSipSendCallback\n");
+        logger.log("delegationHandler: onCallStatSipSendCallback\n");
     }
     onCallStatSipRecvCallback() {
-        this.logger.log("delegationHandler: onCallStatSipRecvCallback\n");
+        logger.log("delegationHandler: onCallStatSipRecvCallback\n");
     }
     stopCallStat() {
-        this.logger.log("delegationHandler: stopCallStat\n");
+        logger.log("delegationHandler: stopCallStat\n");
     }
     onRecieveInvite(incomingSession) {
-        this.logger.log("delegationHandler: onRecieveInvite\n");
+        logger.log("delegationHandler: onRecieveInvite\n");
         const obj = incomingSession.incomingInviteRequest.message.headers;
         this.exClient.callFromNumber = incomingSession.incomingInviteRequest.message.from.displayName;
         if (obj.hasOwnProperty("X-Exotel-Callsid")) {
@@ -165,34 +164,31 @@ class ExDelegationHandler {
         CallDetails.sipHeaders = result;
     }
     onPickCall() {
-        this.logger.log("delegationHandler: onPickCall\n");
+        logger.log("delegationHandler: onPickCall\n");
     }
     onRejectCall() {
-        this.logger.log("delegationHandler: onRejectCall\n");
+        logger.log("delegationHandler: onRejectCall\n");
     }
     onCreaterAnswer() {
-        this.logger.log("delegationHandler: onCreaterAnswer\n");
+        logger.log("delegationHandler: onCreaterAnswer\n");
     }
     onSettingLocalDesc() {
-        this.logger.log("delegationHandler: onSettingLocalDesc\n");
+        logger.log("delegationHandler: onSettingLocalDesc\n");
     }
     initGetStats(pc, callid, username) {
-        this.logger.log("delegationHandler: initGetStats\n");
+        logger.log("delegationHandler: initGetStats\n");
     }
     onRegisterWebRTCSIPEngine(engine) {
-        this.logger.log("delegationHandler: onRegisterWebRTCSIPEngine, engine=\n", engine);
+        logger.log("delegationHandler: onRegisterWebRTCSIPEngine, engine=\n", engine);
     }
 }
 
 class ExSynchronousHandler {
-    constructor(logger) {
-        this.logger = logger;
-    }
     onFailure() {
-        this.logger.log("synchronousHandler: onFailure, phone is offline.\n");
+        logger.log("synchronousHandler: onFailure, phone is offline.\n");
     }
     onResponse() {
-        this.logger.log("synchronousHandler: onResponse, phone is connected.\n");
+        logger.log("synchronousHandler: onResponse, phone is connected.\n");
     }
 }
 
@@ -216,14 +212,13 @@ export class ExotelWebClient {
 
 
     sipAccountInfo = null;
-    loggerCallback = null;
+    clientSDKLoggerCallback = null;
     callbacks  = null;
     registerCallback = null;
     sessionCallback = null;
-    logger = null;
+    logger = getLogger();
         
     constructor() {
-        this.logger = new CoreSDKLogger();
         // Initialize properties
         this.ctrlr = null;
         this.call = null;
@@ -237,12 +232,12 @@ export class ExotelWebClient {
         this.isReadyToRegister = true;
         this.sipAccountInfo = null;
         this.clientSDKLoggerCallback = null;
-        this.callbacks = new Callback(this.logger);
-        this.registerCallback = new RegisterCallback(this.logger);
-        this.sessionCallback = new SessionCallback(this.logger);
-        
+        this.callbacks = new Callback();
+        this.registerCallback = new RegisterCallback();
+        this.sessionCallback = new SessionCallback();
+        this.logger = getLogger();
 
-        // Register this.logger callback
+        // Register logger callback
         let exwebClientOb = this;
         this.logger.registerLoggerCallback((type, message, args) => {
             LogManager.onLog(type, message, args);
@@ -261,7 +256,7 @@ export class ExotelWebClient {
         // --- Duplicate registration guard ---
         if (phonePool.has(userName)) {
             if (this.currentSIPUserName == "" || this.currentSIPUserName !== userName) {
-                this.logger.warn(`ExWebClient: initWebrtc: [Dup‑Reg] ${userName} already in use – init rejected`);
+                logger.warn(`ExWebClient: initWebrtc: [Dup‑Reg] ${userName} already in use – init rejected`);
                 return false;
             }
         }
@@ -269,15 +264,15 @@ export class ExotelWebClient {
         phonePool.set(userName, null); 
 
         if (!this.eventListener) {
-            this.eventListener = new ExotelVoiceClientListener(this.registerCallback, this.logger);
+            this.eventListener = new ExotelVoiceClientListener(this.registerCallback);
         }
 
         if (!this.callListener) {
-            this.callListener = new CallListener(this.callbacks, this.logger);
+            this.callListener = new CallListener(this.callbacks);
         }
 
         if (!this.sessionListener) {
-            this.sessionListener = new SessionListener(this.sessionCallback, this.logger);
+            this.sessionListener = new SessionListener(this.sessionCallback);
         }
 
         if (!this.ctrlr) {
@@ -285,7 +280,7 @@ export class ExotelWebClient {
         }
 
         sipAccountInfo_.enableAutoAudioDeviceChangeHandling = enableAutoAudioDeviceChangeHandling;
-        this.logger.log("ExWebClient: initWebrtc: Exotel Client Initialised with " + JSON.stringify(sipAccountInfo_))
+        logger.log("ExWebClient: initWebrtc: Exotel Client Initialised with " + JSON.stringify(sipAccountInfo_))
         this.sipAccountInfo = sipAccountInfo_;
         if (!this.sipAccountInfo["userName"] || !this.sipAccountInfo["sipdomain"] || !this.sipAccountInfo["port"]) {
             return false;
@@ -295,19 +290,19 @@ export class ExotelWebClient {
         // Register callbacks using the correct methods
         this.callbacks.registerCallback('call', CallListenerCallback);
         this.registerCallback.initializeRegisterCallback(RegisterEventCallBack);
-        this.logger.log("ExWebClient: initWebrtc: Initializing session callback")
+        logger.log("ExWebClient: initWebrtc: Initializing session callback")
         this.sessionCallback.initializeSessionCallback(SessionCallback);
         this.setEventListener(this.eventListener);
 
         // Wait for public IP before registering
-        await fetchPublicIP(this.sipAccountInfo, this.logger);
+        await fetchPublicIP(this.sipAccountInfo);
 
         // Create phone instance if it wasn't created in constructor
         if (!this.phone) {
             this.userName = this.sipAccountInfo.userName;
             let phone = phonePool.get(this.userName);
             if (!phone) {
-                phone = new WebrtcSIPPhone(this.userName, this.logger);
+                phone = new WebrtcSIPPhone(this.userName);
                 phonePool.set(this.userName, phone);
             }
             this.phone = phone;
@@ -315,20 +310,20 @@ export class ExotelWebClient {
         }
 
         // Initialize the phone with SIP engine
-        this.webrtcSIPPhone.registerPhone("sipjs", new ExDelegationHandler(this, this.logger), this.sipAccountInfo.enableAutoAudioDeviceChangeHandling);
+        this.webrtcSIPPhone.registerPhone("sipjs", new ExDelegationHandler(this), this.sipAccountInfo.enableAutoAudioDeviceChangeHandling);
 
         // Create call instance after phone is initialized
         if (!this.call) {
-            this.call = new Call(this.webrtcSIPPhone, this.logger);
+            this.call = new Call(this.webrtcSIPPhone);
         }
 
         return true;
     };
 
     DoRegister = () => {
-        this.logger.log("ExWebClient: DoRegister: Entry")
+        logger.log("ExWebClient: DoRegister: Entry")
         if (!this.isReadyToRegister) {
-            this.logger.warn("ExWebClient: DoRegister: SDK is not ready to register");
+            logger.warn("ExWebClient: DoRegister: SDK is not ready to register");
             return false;
         }
         DoRegisterRL(this.sipAccountInfo, this);
@@ -336,7 +331,7 @@ export class ExotelWebClient {
     };
 
     UnRegister = () => {
-        this.logger.log("ExWebClient: UnRegister: Entry")
+        logger.log("ExWebClient: UnRegister: Entry")
         UnRegisterRL(this.sipAccountInfo, this)
     };
 
@@ -383,7 +378,7 @@ export class ExotelWebClient {
 
     getCall = () => {
         if (!this.call) {
-            this.call = new Call(this.webrtcSIPPhone, this.logger);
+            this.call = new Call(this.webrtcSIPPhone);
         }
         return this.call;
     };
@@ -402,7 +397,7 @@ export class ExotelWebClient {
      */
 
     registerEventCallback = (event, phone, param) => {
-        this.logger.log("ExWebClient: registerEventCallback: Received ---> " +
+        logger.log("ExWebClient: registerEventCallback: Received ---> " +
             event, [phone, param]);
 
         const lowerCaseEvent = event.toLowerCase();
@@ -426,10 +421,10 @@ export class ExotelWebClient {
      * @param {*} param 
      */
     callEventCallback = (event, phone, param) => {
-        this.logger.log("ExWebClient: callEventCallback: Received ---> " + event + 'param sent....' + param + 'for phone....' + phone)
+        logger.log("ExWebClient: callEventCallback: Received ---> " + event + 'param sent....' + param + 'for phone....' + phone)
         if (event === "i_new_call") {
             if (!this.call) {
-                this.call = new Call(param, this.logger); // param is the session
+                this.call = new Call(param); // param is the session
             }
             this.callListener.onIncomingCall(param, phone);
         } else if (event === "ringing" || event === "accept_reject") {
@@ -456,7 +451,7 @@ export class ExotelWebClient {
      * @param {*} sipAccountInfo 
      */
     unregister = (sipAccountInfo) => {
-        this.logger.log("ExWebClient: unregister: Entry");
+        logger.log("ExWebClient: unregister: Entry");
         this.shouldAutoRetry = false;
         this.unregisterInitiated = true;
         if (!this.registrationInProgress) {
@@ -472,7 +467,7 @@ export class ExotelWebClient {
       
 
     webRTCStatusCallbackHandler = (msg1, arg1) => {
-        this.logger.log("ExWebClient: webRTCStatusCallbackHandler: " + msg1 + " " + arg1)
+        logger.log("ExWebClient: webRTCStatusCallbackHandler: " + msg1 + " " + arg1)
     };
 
 
@@ -499,9 +494,9 @@ export class ExotelWebClient {
             'contactHost': ''
         }
 
-        this.logger.log('ExWebClient: initialize: Sending register for the number..', subscriberName);
+        logger.log('ExWebClient: initialize: Sending register for the number..', subscriberName);
 
-        fetchPublicIP(sipAccountInfo, this.logger);
+        fetchPublicIP(sipAccountInfo);
 
         this.domain = hostName = sipAccountInfo.domain;
         this.sipdomain = sipAccountInfo.sipdomain;
@@ -541,8 +536,8 @@ export class ExotelWebClient {
         localStorage.setItem('contactHost', this.contactHost);
 
         
-        var synchronousHandler = new ExSynchronousHandler(this.logger);
-        var delegationHandler = new ExDelegationHandler(this, this.logger);
+        var synchronousHandler = new ExSynchronousHandler();
+        var delegationHandler = new ExDelegationHandler(this);
 
         var userName = this.userName;
 
@@ -594,30 +589,30 @@ export class ExotelWebClient {
                 }
             })
             .catch(function (error) {
-                this.logger.log("ExWebClient: checkClientStatus: something went wrong during checkClientStatus ", error);
+                logger.log("ExWebClient: checkClientStatus: something went wrong during checkClientStatus ", error);
                 callback("media_permission_denied");
             });
     };
 
     changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
-        this.logger.log(`ExWebClient: changeAudioInputDevice: Entry`);
+        logger.log(`ExWebClient: changeAudioInputDevice: Entry`);
         this.webrtcSIPPhone.changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange);
     }
 
     changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange = false) {
-        this.logger.log(`ExWebClient: changeAudioOutputDevice: Entry`);
+        logger.log(`ExWebClient: changeAudioOutputDevice: Entry`);
         this.webrtcSIPPhone.changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange);
     }
 
 	downloadLogs() {
-        this.logger.log(`ExWebClient: downloadLogs: Entry`);
+        logger.log(`ExWebClient: downloadLogs: Entry`);
         LogManager.downloadLogs();
     }
 
     setPreferredCodec(codecName) {
-        this.logger.log("ExWebClient: setPreferredCodec: Entry");
+        logger.log("ExWebClient: setPreferredCodec: Entry");
         if (!this.webrtcSIPPhone || !this.webrtcSIPPhone.phone) {
-            this.logger.warn("ExWebClient: setPreferredCodec: Phone not initialized");
+            logger.warn("ExWebClient: setPreferredCodec: Phone not initialized");
             return;
         }
         this.webrtcSIPPhone.setPreferredCodec(codecName);
@@ -628,9 +623,9 @@ export class ExotelWebClient {
     }
 
     registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
-        this.logger.log("ExWebClient: registerAudioDeviceChangeCallback: Entry");
+        logger.log("ExWebClient: registerAudioDeviceChangeCallback: Entry");
         if (!this.webrtcSIPPhone) {
-            this.logger.warn("ExWebClient: registerAudioDeviceChangeCallback: webrtcSIPPhone not initialized");
+            logger.warn("ExWebClient: registerAudioDeviceChangeCallback: webrtcSIPPhone not initialized");
             return;
         }
         this.webrtcSIPPhone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
@@ -638,19 +633,19 @@ export class ExotelWebClient {
 
     setEnableConsoleLogging(enable) {
         if (enable) {
-            this.logger.log(`ExWebClient: setEnableConsoleLogging: ${enable}`);
+            logger.log(`ExWebClient: setEnableConsoleLogging: ${enable}`);
         } 
 
-        this.logger.setEnableConsoleLogging(enable);
+        logger.setEnableConsoleLogging(enable);
     }
 
     setAudioOutputVolume(audioElementName, value) {
-        this.logger.log(`ExWebClient: setAudioOutputVolume: Entry`);
+        logger.log(`ExWebClient: setAudioOutputVolume: Entry`);
         this.webrtcSIPPhone.setAudioOutputVolume(audioElementName, value);
     }
 
     getAudioOutputVolume(audioElementName) {
-        this.logger.log(`ExWebClient: getAudioOutputVolume: Entry`);
+        logger.log(`ExWebClient: getAudioOutputVolume: Entry`);
         return this.webrtcSIPPhone.getAudioOutputVolume(audioElementName);
     }
 

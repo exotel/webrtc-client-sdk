@@ -14,15 +14,20 @@ dtmftone.src = require("./static/dtmf.wav");
 
 
 
-var audioElementNameVsAudioGainNodeMap = {};	
-audioElementNameVsAudioGainNodeMap["ringtone"] = audioDeviceManager.createAudioGainNode( ringtone);
-audioElementNameVsAudioGainNodeMap["ringbacktone"] = audioDeviceManager.createAudioGainNode(ringbacktone);
-audioElementNameVsAudioGainNodeMap["dtmftone"] = audioDeviceManager.createAudioGainNode(dtmftone);
-audioElementNameVsAudioGainNodeMap["beeptone"] = audioDeviceManager.createAudioGainNode(beeptone);	
 	
 
+var audioElementNameVsAudioGainNodeMap = {};	
 
 
+
+function configureAudioGainNode(elementName, audioElement, logger) {
+	logger.log(`configureAudioGainNode: ${elementName} entry`);
+	if(audioElementNameVsAudioGainNodeMap.hasOwnProperty(elementName)) {
+		logger.log(`configureAudioGainNode: ${elementName} already configured`);
+	}
+	let gainNode = audioDeviceManager.createAudioGainNode(audioElement, logger);
+	audioElementNameVsAudioGainNodeMap[elementName] = gainNode;	
+}
 
 
 
@@ -122,7 +127,16 @@ class SIPJSPhone {
 		this.audioRemote.style.display = 'none';
 		document.body.appendChild(this.audioRemote);
 
-		this.audioRemoteGainNode = audioDeviceManager.createAudioGainNode(this.audioRemote, this.logger);
+
+
+		configureAudioGainNode("ringtone", ringtone, this.logger);
+		configureAudioGainNode("ringbacktone", ringbacktone, this.logger);
+		configureAudioGainNode("dtmftone", dtmftone, this.logger);
+		configureAudioGainNode("beeptone", beeptone, this.logger);
+		configureAudioGainNode("audioRemote", this.audioRemote, this.logger);
+
+
+		this.audioRemoteGainNode = audioDeviceManager.createAudioGainNode(this.audioRemote);
 
 		
 		
