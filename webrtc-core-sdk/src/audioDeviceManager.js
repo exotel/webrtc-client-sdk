@@ -172,11 +172,7 @@ export const audioDeviceManager = {
         if (audioRemoteGainNode) {
             audioRemoteGainNode.disconnect();
         }
-    },
-
-    createAndConfigureAudioGainNodeForSourceNode(sourceNode) {
-        return this.configureAudioGainNode(sourceNode);
-    },
+    }
 
 
 };

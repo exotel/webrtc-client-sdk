@@ -121,12 +121,8 @@ class SIPJSPhone {
 		this.dtmftone = dtmftone;
 		this.audioRemote = document.createElement("audio");
 		this.audioRemote.style.display = 'none';
-		document.body.appendChild(this.audioRemote);
-
-		this.audioRemoteGainNode = null;
-		this.audioRemoteSourceNode = null;
+		document.body.appendChild(this.audioRemote);		
 		this.callAudioOutputVolume = 1;
-		this.activeOutputStream = null;
 		
 	}
 
@@ -134,15 +130,7 @@ class SIPJSPhone {
 	setCallAudioOutputVolume(value) {
 		logger.log(`sipjsphone: setCallAudioOutputVolume: ${value}`);
 		this.callAudioOutputVolume = Math.max(0, Math.min(1, value));
-		
-		if(this.audioRemoteGainNode) {
-			this.audioRemoteGainNode.gain.value = this.callAudioOutputVolume;
-			
-			// Ensure audio context is running
-			if (audioDeviceManager.webAudioCtx.state === "suspended") {
-				audioDeviceManager.webAudioCtx.resume();
-			}
-		}
+		this.audioRemote.volume = this.callAudioOutputVolume;
 		return true;
 	}
 
@@ -1122,9 +1110,7 @@ destroySocketConnection() {
 	assignStream(stream, element) {
     logger.log("sipjsphone: assignStream: entry for stream", stream);
 
-	this.activeOutputStream = stream;
-    
-	audioDeviceManager.cleanUpAudioNodes(this.audioRemoteSourceNode, this.audioRemoteGainNode);
+	
 		
     if (audioDeviceManager.currentAudioOutputDeviceId != "default")
         element.setSinkId(audioDeviceManager.currentAudioOutputDeviceId);
@@ -1134,20 +1120,8 @@ destroySocketConnection() {
     element.srcObject = stream;
     
 
-
     // Set HTML audio element volume to 0 to prevent direct audio output
-    element.volume = 0;
-
-
-	this.confiureAudioGainNodeForOutputStream();
-
-   
-    // Resume audio context when element plays
-    element.addEventListener("play", () => {
-        if (audioDeviceManager.webAudioCtx.state === "suspended") {
-            audioDeviceManager.webAudioCtx.resume();
-        }
-    });
+    element.volume = this.callAudioOutputVolume;
     
     // Load and start playback of media.
     element.play().catch((error) => {
@@ -1466,11 +1440,7 @@ destroySocketConnection() {
 				if (onError) onError(errorMsg);
 				return;
 			}
-
-			audioDeviceManager.cleanUpAudioNodes(this.audioRemoteSourceNode, this.audioRemoteGainNode);
-
 			audioDeviceManager.changeAudioOutputDevice(this.audioRemote, deviceId, () => {
-				this.confiureAudioGainNodeForOutputStream();
 				this.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
 
 				if (onSuccess) onSuccess();
