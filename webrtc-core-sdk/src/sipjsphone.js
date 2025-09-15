@@ -126,6 +126,7 @@ class SIPJSPhone {
 		this.audioRemoteGainNode = null;
 		this.audioRemoteSourceNode = null;
 		this.callAudioOutputVolume = 1;
+		this.activeOutputStream = null;
 		
 	}
 
@@ -1105,9 +1106,26 @@ destroySocketConnection() {
 	});
 }
 
+	confiureAudioGainNodeForOutputStream() {
+		
+		logger.log("sipjsphone: confiureAudioGainNodeForOutputStream: callActiveID", this.ctxSip.callActiveID);
+		if(this.activeOutputStream &&  this.ctxSip.callActiveID) {
+			this.audioRemoteSourceNode = audioDeviceManager.webAudioCtx.createMediaStreamSource(this.activeOutputStream);
+			this.audioRemoteGainNode = audioDeviceManager.createAndConfigureAudioGainNodeForSourceNode(this.audioRemoteSourceNode);
+			this.audioRemoteGainNode.gain.value = this.callAudioOutputVolume;
+		} else {
+			logger.error("sipjsphone: confiureAudioGainNodeForOutputStream: No active output stream");
+		}
+	}
+
+
 	assignStream(stream, element) {
     logger.log("sipjsphone: assignStream: entry for stream", stream);
+
+	this.activeOutputStream = stream;
     
+	audioDeviceManager.cleanUpAudioNodes(this.audioRemoteSourceNode, this.audioRemoteGainNode);
+		
     if (audioDeviceManager.currentAudioOutputDeviceId != "default")
         element.setSinkId(audioDeviceManager.currentAudioOutputDeviceId);
         
@@ -1115,30 +1133,15 @@ destroySocketConnection() {
     element.autoplay = true;
     element.srcObject = stream;
     
+
+
     // Set HTML audio element volume to 0 to prevent direct audio output
     element.volume = 0;
 
-    // Clean up existing audio nodes
-    if(this.audioRemoteSourceNode) {
-        try {
-            this.audioRemoteSourceNode.disconnect();
-            this.audioRemoteGainNode.disconnect();
-        } catch (e) {
-            logger.error("sipjsphone: assignStream: Old audio nodes cleanup:", e);
-        }
-    }
 
-    // Create MediaStreamSource directly from the stream
-    this.audioRemoteSourceNode = audioDeviceManager.webAudioCtx.createMediaStreamSource(stream);
-    this.audioRemoteGainNode = audioDeviceManager.webAudioCtx.createGain();
+	this.confiureAudioGainNodeForOutputStream();
 
-    // Set the gain value
-    this.audioRemoteGainNode.gain.value = this.callAudioOutputVolume;
-
-    // Connect the audio graph
-    this.audioRemoteSourceNode.connect(this.audioRemoteGainNode);
-    this.audioRemoteGainNode.connect(audioDeviceManager.webAudioCtx.destination);
-
+   
     // Resume audio context when element plays
     element.addEventListener("play", () => {
         if (audioDeviceManager.webAudioCtx.state === "suspended") {
@@ -1463,15 +1466,19 @@ destroySocketConnection() {
 				if (onError) onError(errorMsg);
 				return;
 			}
+
+			audioDeviceManager.cleanUpAudioNodes(this.audioRemoteSourceNode, this.audioRemoteGainNode);
+
 			audioDeviceManager.changeAudioOutputDevice(this.audioRemote, deviceId, () => {
+				this.confiureAudioGainNodeForOutputStream();
 				this.changeAudioOutputDeviceForAdditionalAudioElement(deviceId);
+
 				if (onSuccess) onSuccess();
 			}, (err) => {
 				logger.error('SIPJSPhone:changeAudioOutputDevice error:', err);
 				if (onError) onError(err);
 			},
-			forceDeviceChange,
-		logger);
+			forceDeviceChange);
 		} catch (e) {
 			logger.error('SIPJSPhone:changeAudioOutputDevice unexpected error:', e);
 			if (onError) onError(e);

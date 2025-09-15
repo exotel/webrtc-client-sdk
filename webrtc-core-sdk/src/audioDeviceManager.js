@@ -139,32 +139,44 @@ export const audioDeviceManager = {
         if (callback) callback();
     },
 
+    configureAudioGainNode(sourceNode) {
+        let gainNode = this.webAudioCtx.createGain();
         
+        sourceNode.connect(gainNode).connect(this.webAudioCtx.destination);
+        return gainNode;
+    },
+    
     createAndConfigureAudioGainNode(audioElement) {
     
         logger.log("audioDeviceManager:createAndConfigureAudioGainNode entry for audioElement", audioElement);
-        
         // get audio track from audio element
-        let track = this.webAudioCtx.createMediaElementSource(audioElement);
-
+        let sourceNode = this.webAudioCtx.createMediaElementSource(audioElement);
         // Create a GainNode
-        let gainNode = this.webAudioCtx.createGain();
+        let gainNode = this.configureAudioGainNode(sourceNode);
 
-        track.connect(gainNode).connect(this.webAudioCtx.destination);
-
-        
-        // resume audio context when audio element is played
-        audioElement.addEventListener("play", () => {
+         // resume audio context when audio element is played
+         audioElement.addEventListener("play", () => {
             if (this.webAudioCtx.state === "suspended") {
                 this.webAudioCtx.resume();
             }
         });
-
         return gainNode;
         
         
-    }
+    },
 
+    cleanUpAudioNodes(audioRemoteSourceNode, audioRemoteGainNode) {
+        if (audioRemoteSourceNode) {
+            audioRemoteSourceNode.disconnect();
+        }
+        if (audioRemoteGainNode) {
+            audioRemoteGainNode.disconnect();
+        }
+    },
+
+    createAndConfigureAudioGainNodeForSourceNode(sourceNode) {
+        return this.configureAudioGainNode(sourceNode);
+    },
 
 
 };
