@@ -612,6 +612,7 @@ class ExotelWebClient {
     }
 
     static registerLoggerCallback(callback) {
+        logger.log("ExWebClient: registerLoggerCallback: Entry");
         ExotelWebClient.clientSDKLoggerCallback = callback;
     }
 
@@ -625,24 +626,22 @@ class ExotelWebClient {
     }
 
     static setEnableConsoleLogging(enable) {
-        if (enable) {
-            logger.log(`ExWebClient: setEnableConsoleLogging: entry ${enable}`);
-        } 
+        logger.log("ExWebClient: setEnableConsoleLogging: Entry, enable: " + enable);
         logger.setEnableConsoleLogging(enable);
     }
 
     static setAudioOutputVolume(audioElementName, value) {
-        logger.log(`ExWebClient: setAudioOutputVolume: Entry`);
+        logger.log(`ExWebClient: setAudioOutputVolume: Entry, audioElementName: ${audioElementName}, value: ${value}`);
         WebrtcSIPPhone.setAudioOutputVolume(audioElementName, value);
     }
 
     static getAudioOutputVolume(audioElementName) {
-        logger.log(`ExWebClient: getAudioOutputVolume: Entry`);
+        logger.log(`ExWebClient: getAudioOutputVolume: Entry, audioElementName: ${audioElementName}`);
         return WebrtcSIPPhone.getAudioOutputVolume(audioElementName);
     }
 
     setCallAudioOutputVolume(value) {
-        logger.log(`ExWebClient: setCallAudioOutputVolume: Entry`);
+        logger.log(`ExWebClient: setCallAudioOutputVolume: Entry, value: ${value}`);
         this.webrtcSIPPhone.setCallAudioOutputVolume(value);
     }
 

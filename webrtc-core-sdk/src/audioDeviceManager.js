@@ -140,6 +140,7 @@ export const audioDeviceManager = {
     },
 
     configureAudioGainNode(sourceNode) {
+        logger.log("audioDeviceManager:configureAudioGainNode entry");
         let gainNode = this.webAudioCtx.createGain();
         
         sourceNode.connect(gainNode).connect(this.webAudioCtx.destination);

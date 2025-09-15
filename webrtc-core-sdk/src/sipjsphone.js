@@ -1094,23 +1094,9 @@ destroySocketConnection() {
 	});
 }
 
-	confiureAudioGainNodeForOutputStream() {
-		
-		logger.log("sipjsphone: confiureAudioGainNodeForOutputStream: callActiveID", this.ctxSip.callActiveID);
-		if(this.activeOutputStream &&  this.ctxSip.callActiveID) {
-			this.audioRemoteSourceNode = audioDeviceManager.webAudioCtx.createMediaStreamSource(this.activeOutputStream);
-			this.audioRemoteGainNode = audioDeviceManager.createAndConfigureAudioGainNodeForSourceNode(this.audioRemoteSourceNode);
-			this.audioRemoteGainNode.gain.value = this.callAudioOutputVolume;
-		} else {
-			logger.error("sipjsphone: confiureAudioGainNodeForOutputStream: No active output stream");
-		}
-	}
-
 
 	assignStream(stream, element) {
-    logger.log("sipjsphone: assignStream: entry for stream", stream);
-
-	
+	logger.log("sipjsphone: assignStream: entry");
 		
     if (audioDeviceManager.currentAudioOutputDeviceId != "default")
         element.setSinkId(audioDeviceManager.currentAudioOutputDeviceId);
