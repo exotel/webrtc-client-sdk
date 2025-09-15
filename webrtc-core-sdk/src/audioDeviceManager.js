@@ -159,6 +159,8 @@ export const audioDeviceManager = {
                 this.webAudioCtx.resume();
             }
         });
+
+        return gainNode;
         
         
     }
