@@ -626,7 +626,9 @@ class ExotelWebClient {
     }
 
     static setEnableConsoleLogging(enable) {
-        logger.log("ExWebClient: setEnableConsoleLogging: Entry, enable: " + enable);
+        if (enable) {
+            logger.log("ExWebClient: setEnableConsoleLogging: Entry, enable: " + enable);
+        }
         logger.setEnableConsoleLogging(enable);
     }
 
