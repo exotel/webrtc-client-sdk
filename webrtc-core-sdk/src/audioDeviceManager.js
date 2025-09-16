@@ -1,6 +1,7 @@
 import coreSDKLogger from "./coreSDKLogger";
 
 const logger = coreSDKLogger;
+const AudioManagerCtx = window.AudioContext || window.webkitAudioContext;
 export const audioDeviceManager = {
     resetInputDevice: false,
     resetOutputDevice: false,
@@ -8,6 +9,7 @@ export const audioDeviceManager = {
     currentAudioOutputDeviceId: "default",
     mediaDevices: [],
     enableAutoAudioDeviceChangeHandling: false,
+    webAudioCtx : new AudioManagerCtx(),
     // Method to set the resetInputDevice flag
     setResetInputDeviceFlag(value) {
         this.resetInputDevice = value;
@@ -136,6 +138,33 @@ export const audioDeviceManager = {
         }
         if (callback) callback();
     },
+
+    configureAudioGainNode(sourceNode) {
+        logger.log("audioDeviceManager:configureAudioGainNode entry");
+        let gainNode = this.webAudioCtx.createGain();
+        
+        sourceNode.connect(gainNode).connect(this.webAudioCtx.destination);
+        return gainNode;
+    },
+    
+    createAndConfigureAudioGainNode(audioElement) {
+    
+        logger.log("audioDeviceManager:createAndConfigureAudioGainNode entry for audioElement", audioElement);
+        // get audio track from audio element
+        let sourceNode = this.webAudioCtx.createMediaElementSource(audioElement);
+        // Create a GainNode
+        let gainNode = this.configureAudioGainNode(sourceNode);
+
+         // resume audio context when audio element is played
+         audioElement.addEventListener("play", () => {
+            if (this.webAudioCtx.state === "suspended") {
+                this.webAudioCtx.resume();
+            }
+        });
+        return gainNode;
+        
+        
+    }
 
 };
 

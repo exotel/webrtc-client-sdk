@@ -263,6 +263,26 @@ class WebrtcSIPPhone {
 		logger.log("webrtcSIPPhone: registerAudioDeviceChangeCallback entry");
 		this.phone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
 	}
+
+	static setAudioOutputVolume(audioElementName, value){
+		logger.log("WebrtcSIPPhone: setAudioOutputVolume: ", audioElementName, value);
+		return SIPJSPhone.setAudioOutputVolume(audioElementName, value);
+	}
+
+	static getAudioOutputVolume(audioElementName) {
+		logger.log("webrtcSIPPhone: getAudioOutputVolume: ", audioElementName);
+		return SIPJSPhone.getAudioOutputVolume(audioElementName);
+	}
+
+	setCallAudioOutputVolume(value) {
+		logger.log("webrtcSIPPhone: setCallAudioOutputVolume: ", value);
+		return this.phone.setCallAudioOutputVolume(value);
+	}
+
+	getCallAudioOutputVolume() {
+		logger.log("webrtcSIPPhone: getCallAudioOutputVolume");
+		return this.phone.getCallAudioOutputVolume();
+	}
 }
 
 export default WebrtcSIPPhone;

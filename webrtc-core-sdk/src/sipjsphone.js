@@ -2,7 +2,6 @@ var SIP = require('./sip-0.20.0.js')
 import { audioDeviceManager } from './audioDeviceManager.js';
 import coreSDKLogger from './coreSDKLogger.js';
 import WebrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
-
 let logger = coreSDKLogger;
 
 var beeptone = document.createElement("audio");
@@ -14,31 +13,25 @@ ringbacktone.src = require("./static/ringbacktone.wav");
 var dtmftone = document.createElement("audio");
 dtmftone.src = require("./static/dtmf.wav");
 
-var audioRemote = document.createElement("audio");
-
-export function getLogger() {
-	let uaLogger;
-
-	try {
-		let userAgent = SIP.UserAgent
-		uaLogger = userAgent.getLogger("sip.WebrtcLib")
-	} catch (e) {
-		logger.log("sipjsphone: getLogger: No userAgent.getLogger, Using console log")
-		return console;
-	}
-
-	if (uaLogger) {
-		return uaLogger;
-	}
-	else {
-		logger.log("sipjsphone: getLogger: No Logger, Using console log")
-		return logger;
-	}
-}
-
 class SIPJSPhone {
 
+	static toBeConfigure = true;
+	static audioElementNameVsAudioGainNodeMap = {};
+
+	static configure() {
+		logger.log("SIPJSPhone: configure: entry");
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringtone"] = audioDeviceManager.createAndConfigureAudioGainNode(ringtone);
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringbacktone"] = audioDeviceManager.createAndConfigureAudioGainNode(ringbacktone);
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["dtmftone"] = audioDeviceManager.createAndConfigureAudioGainNode(dtmftone);
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["beeptone"] = audioDeviceManager.createAndConfigureAudioGainNode(beeptone);
+	}
+	
+
 	constructor(delegate, username) {
+		if(SIPJSPhone.toBeConfigure) {
+			SIPJSPhone.toBeConfigure = false;
+			SIPJSPhone.configure();
+		}
 		this.webrtcSIPPhoneEventDelegate = delegate;
 		this.username = username;
 		this.ctxSip = {};
@@ -120,6 +113,7 @@ class SIPJSPhone {
 		this.bHoldEnable = false;
 		this.register_flag = false;
 		this.enableAutoAudioDeviceChangeHandling = false;
+		this.addPreferredCodec = this.addPreferredCodec.bind(this);
 
 		this.ringtone = ringtone;
 		this.beeptone = beeptone;
@@ -127,15 +121,48 @@ class SIPJSPhone {
 		this.dtmftone = dtmftone;
 		this.audioRemote = document.createElement("audio");
 		this.audioRemote.style.display = 'none';
-		document.body.appendChild(this.audioRemote);
+		document.body.appendChild(this.audioRemote);		
+		this.callAudioOutputVolume = 1;
+		
+	}
 
-		this.addPreferredCodec = this.addPreferredCodec.bind(this);
 
-		// In the constructor, after initializing audio elements:
-		[this.ringtone, this.beeptone, this.ringbacktone, this.dtmftone].forEach(audio => {
-			audio.muted = false;
-			audio.volume = 1.0;
-		});
+	setCallAudioOutputVolume(value) {
+		logger.log(`sipjsphone: setCallAudioOutputVolume: ${value}`);
+		this.callAudioOutputVolume = Math.max(0, Math.min(1, value));
+		this.audioRemote.volume = this.callAudioOutputVolume;
+		return true;
+	}
+
+	getCallAudioOutputVolume() {
+		logger.log(`sipjsphone: getCallAudioOutputVolume`);
+		return this.callAudioOutputVolume;
+	}
+
+	// Volume control methods
+	static setAudioOutputVolume(audioElementName, value) {
+		
+		logger.log(`SIPJSPhone: setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
+		if(!SIPJSPhone.audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
+			logger.error(`SIPJSPhone: setAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
+			throw new Error(`Invalid audio element name: ${audioElementName}`);
+		}
+
+		let gainNode = SIPJSPhone.audioElementNameVsAudioGainNodeMap[audioElementName];
+		gainNode.gain.value = Math.max(0, Math.min(1, value));
+		logger.log(`SIPJSPhone: setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
+		return true;
+	
+	}
+
+	static getAudioOutputVolume(audioElementName) {
+		logger.log(`SIPJSPhone: getAudioOutputVolume: ${audioElementName}`);
+		if(!SIPJSPhone.audioElementNameVsAudioGainNodeMap.hasOwnProperty(audioElementName)) {
+			logger.error(`SIPJSPhone: getAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
+			throw new Error(`Invalid audio element name: ${audioElementName}`);
+		}
+		let gainNode = SIPJSPhone.audioElementNameVsAudioGainNodeMap[audioElementName];
+		return gainNode.gain.value;	
 	}
 
 	attachGlobalDeviceChangeListener() {
@@ -202,11 +229,11 @@ class SIPJSPhone {
 					if (count > this.ctxSip.ringtoneCount) {
 						clearInterval(this.ctxSip.ringToneIntervalID);
 					}
-				}, 500);
-			} catch (e) {
-				logger.log("DEBUG: startRingTone: Exception:", e);
-			}
-		},
+					}, 500);
+				} catch (e) {
+					logger.log("DEBUG: startRingTone: Exception:", e);
+				}
+			},
 
 			stopRingTone: () => {
 				try {
@@ -220,11 +247,12 @@ class SIPJSPhone {
 			} catch (e) { logger.log("sipjsphone: stopRingTone: Exception:", e); }
 		},
 
+			// Update the startRingbackTone method (around line 223) to use Web Audio:
 			startRingbackTone: () => {
 				if (!this.ctxSip.ringbacktone) {
 					this.ctxSip.ringbacktone = this.ringbacktone;
-			}
-			try {
+				}
+				try {
 					this.ctxSip.ringbacktone.play()
 						.then(() => {
 							logger.log("sipjsphone: startRingbackTone: Audio is playing...");
@@ -233,8 +261,8 @@ class SIPJSPhone {
 							logger.log("sipjsphone: startRingbackTone: Exception:", e);
 							// Optionally, prompt user to interact with the page to enable audio
 						});
-			} catch (e) { logger.log("sipjsphone: startRingbackTone: Exception:", e); }
-		},
+				} catch (e) { logger.log("sipjsphone: startRingbackTone: Exception:", e); }
+			},
 
 			stopRingbackTone: () => {
 				if (!this.ctxSip.ringbacktone) {
@@ -386,35 +414,32 @@ class SIPJSPhone {
 
 		},
 
+			// Update the sipSendDTMF method (around line 389) to use Web Audio:
 			sipSendDTMF: (digit) => {
-
-				try { this.ctxSip.dtmfTone.play(); } catch (e) { logger.log("sipjsphone: sipSendDTMF: Exception:", e); }
-
 				var a = this.ctxSip.callActiveID;
-			if (a) {
+				if (a) {
 					var s = this.ctxSip.Sessions[a];
 
-				if (!/^[0-9A-D#*,]$/.exec(digit)) {
-					return Promise.reject(new Error("Invalid DTMF tone."));
-				}
-				if (!s) {
-					return Promise.reject(new Error("Session does not exist."));
-				}
+					if (!/^[0-9A-D#*,]$/.exec(digit)) {
+						return Promise.reject(new Error("Invalid DTMF tone."));
+					}
+					if (!s) {
+						return Promise.reject(new Error("Session does not exist."));
+					}	
+					const dtmf = digit;
+					const duration = 240;
+					const body = {
+						contentDisposition: "render",
+						contentType: "application/dtmf-relay",
+						content: "Signal=" + dtmf + "\r\nDuration=" + duration
+					};
+					const requestOptions = { body };
+					return s.info({ requestOptions }).then(() => {
+						return;
+					});
 
-				const dtmf = digit;
-				const duration = 240;
-				const body = {
-					contentDisposition: "render",
-					contentType: "application/dtmf-relay",
-					content: "Signal=" + dtmf + "\r\nDuration=" + duration
-				};
-				const requestOptions = { body };
-				return s.info({ requestOptions }).then(() => {
-					return;
-				});
-
-			}
-		},
+				}
+			},
 
 			setError: (err, title, msg, closable) => { },
 
@@ -1069,37 +1094,41 @@ destroySocketConnection() {
 	});
 }
 
-	 assignStream(stream, element) {
-	if (audioDeviceManager.currentAudioOutputDeviceId != "default")
-		element.setSinkId(audioDeviceManager.currentAudioOutputDeviceId);
-	// Set element source.
-	element.autoplay = true; // Safari does not allow calling .play() from a
-	// non user action
-	element.srcObject = stream;
 
-	// Load and start playback of media.
-	element.play().catch((error) => {
-		logger.error("Failed to play media");
-		logger.error(error);
-	});
+	assignStream(stream, element) {
+	logger.log("sipjsphone: assignStream: entry");
+		
+    if (audioDeviceManager.currentAudioOutputDeviceId != "default")
+        element.setSinkId(audioDeviceManager.currentAudioOutputDeviceId);
+        
+    // Set element source.
+    element.autoplay = true;
+    element.srcObject = stream;
+    
 
-	// If a track is added, load and restart playback of media.
-	stream.onaddtrack = () => {
-		element.load(); // Safari does not work otheriwse
-		element.play().catch((error) => {
-			logger.error("Failed to play remote media on add track");
-			logger.error(error);
-		});
-	};
+    // Set HTML audio element volume to 0 to prevent direct audio output
+    element.volume = this.callAudioOutputVolume;
+    
+    // Load and start playback of media.
+    element.play().catch((error) => {
+        logger.error("sipjsphone: assignStream: Failed to play media", error);
+    });
 
-	// If a track is removed, load and restart playback of media.
-	stream.onremovetrack = () => {
-		element.load(); // Safari does not work otheriwse
-		element.play().catch((error) => {
-			logger.error("Failed to play remote media on remove track");
-			logger.error(error);
-		});
-	};
+    // If a track is added, load and restart playback of media.
+    stream.onaddtrack = () => {
+        element.load();
+        element.play().catch((error) => {
+            logger.error("sipjsphone: assignStream: Failed to play remote media on add track", error);
+        });
+    };
+    
+    // If a track is removed, load and restart playback of media.
+    stream.onremovetrack = () => {
+        element.load();
+        element.play().catch((error) => {
+            logger.error("sipjsphone: assignStream: Failed to play remote media on remove track", error);
+        });
+    };
 }
 
 	 onUserSessionAcceptFailed(e) {
@@ -1384,7 +1413,7 @@ destroySocketConnection() {
 		logger.log("sipjsphone: changeAudioOutputDevice : ", deviceId, onSuccess, onError, "forceDeviceChange = ", forceDeviceChange, "enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
 		try {
 			// Ensure device list is up-to-date
-			await audioDeviceManager.enumerateDevices();
+			await audioDeviceManager.enumerateDevices(() => {});
 			if (!this.audioRemote) {
 				const errorMsg = 'SIPJSPhone:changeAudioOutputDevice audioRemote element is not set.';
 				logger.error(errorMsg);
