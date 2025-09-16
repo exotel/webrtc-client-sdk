@@ -1,5 +1,8 @@
 Change Log
 
+## v3.0.4 16 September, 2025
+-[VST-1093] Enabled support for noise suppression
+
 ## v3.0.3 15 September, 2025
 -[VST-1063] granular control over different audio streams, added static registerLogger method for logger callback registration
 

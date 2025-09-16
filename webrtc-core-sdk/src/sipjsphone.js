@@ -114,6 +114,7 @@ class SIPJSPhone {
 		this.register_flag = false;
 		this.enableAutoAudioDeviceChangeHandling = false;
 		this.addPreferredCodec = this.addPreferredCodec.bind(this);
+        this.enableNoiseSuppression = false;
 
 		this.ringtone = ringtone;
 		this.beeptone = beeptone;
@@ -134,6 +135,11 @@ class SIPJSPhone {
 		return true;
 	}
 
+	setNoiseSuppression(enabled) {
+        logger.log(`sipjsphone: setNoiseSuppression: ${enabled}`);
+        this.enableNoiseSuppression = enabled;
+    }
+	
 	getCallAudioOutputVolume() {
 		logger.log(`sipjsphone: getCallAudioOutputVolume`);
 		return this.callAudioOutputVolume;
@@ -664,12 +670,14 @@ class SIPJSPhone {
 				allowLegacyNotifications: true,
 				logConnector: this.sipPhoneLogger.bind(this),
 			logLevel: "log",
-			sessionDescriptionHandlerFactoryOptions: {
-				constraints: {
-					audio: true,
-					video: false
-				}
-			},
+            sessionDescriptionHandlerFactoryOptions: {
+                constraints: {
+                    audio:{
+                        noiseSuppression: this.enableNoiseSuppression
+                    },
+                    video: false
+                }
+            },
 				delegate: {
 					onInvite: (incomingSession) => {
 						logger.log("onInvite called");
@@ -1307,8 +1315,14 @@ destroySocketConnection() {
 			if (audioDeviceManager.currentAudioInputDeviceId != "default") {
 				newSess.accept({
 					sessionDescriptionHandlerOptions: {
-						constraints: { audio: { deviceId: audioDeviceManager.currentAudioInputDeviceId }, video: false }
-					},
+                        constraints: {
+                            audio: {
+                                deviceId: audioDeviceManager.currentAudioInputDeviceId,
+                                noiseSuppression: this.enableNoiseSuppression
+                            },
+                            video: false
+                        }
+                    },
 					sessionDescriptionHandlerModifiers: [this.addPreferredCodec]
 				}).catch((e) => {
 					this.onUserSessionAcceptFailed(e);
@@ -1316,6 +1330,14 @@ destroySocketConnection() {
 			} else {
 
 				newSess.accept({
+					sessionDescriptionHandlerOptions: {
+                        constraints: {
+                            audio: {
+                                noiseSuppression: this.enableNoiseSuppression
+                            },
+                            video: false
+                        }
+                    },
 					sessionDescriptionHandlerModifiers: [this.addPreferredCodec]
 				}).catch((e) => {
 					this.onUserSessionAcceptFailed(e);

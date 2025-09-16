@@ -652,6 +652,11 @@ class ExotelWebClient {
         return this.webrtcSIPPhone.getCallAudioOutputVolume();
     }
 
+    setNoiseSuppression(enabled = false) {
+        logger.log(`ExWebClient: setNoiseSuppression: ${enabled}`);
+        this.webrtcSIPPhone.setNoiseSuppression(enabled);
+    }
+
 }
 
 
