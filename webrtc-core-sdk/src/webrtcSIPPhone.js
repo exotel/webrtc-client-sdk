@@ -283,6 +283,11 @@ class WebrtcSIPPhone {
 		logger.log("webrtcSIPPhone: getCallAudioOutputVolume");
 		return this.phone.getCallAudioOutputVolume();
 	}
+
+	setNoiseSuppression(enabled = false) {
+        logger.log("webrtcSIPPhone: setNoiseSuppression: ", enabled);
+        this.phone.setNoiseSuppression(enabled);
+    }
 }
 
 export default WebrtcSIPPhone;
