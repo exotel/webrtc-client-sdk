@@ -288,7 +288,7 @@ class ExotelWebClient {
         this.setEventListener(this.eventListener);
 
         // Wait for public IP before registering
-        await fetchPublicIP(this.sipAccountInfo);
+        // await fetchPublicIP(this.sipAccountInfo);
 
         // Create phone instance if it wasn't created in constructor
         if (!this.phone) {
