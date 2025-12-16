@@ -1,7 +1,7 @@
 Change Log
 
 ## v3.0.5 16 December, 2025
--[VST-1269] commenting fetchpublicip in initwebrtc as its causing race condition
+-[VST-1292] commenting fetchpublicip in initwebrtc as its causing race condition
 
 ## v3.0.4 16 September, 2025
 -[VST-1093] Enabled support for noise suppression
