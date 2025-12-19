@@ -1,5 +1,8 @@
 Change Log
 
+## v3.0.6 19 December, 2025
+-[VST-1269] fixing noise suppression bug and added wss transport in contact params
+
 ## v3.0.5 16 December, 2025
 -[VST-1292] commenting fetchpublicip in initwebrtc as its causing race condition
 
