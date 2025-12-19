@@ -674,7 +674,7 @@ class SIPJSPhone {
             sessionDescriptionHandlerFactoryOptions: {
                 constraints: {
                     audio:{
-                        noiseSuppression: this.enableNoiseSuppression
+                        noiseSuppression: this.enableNoiseSuppression !== undefined ? this.enableNoiseSuppression : false
                     },
                     video: false
                 }
