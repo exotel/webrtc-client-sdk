@@ -661,6 +661,7 @@ class SIPJSPhone {
 				},
 				displayName: this.txtDisplayName,
 				hackWssInTransport: true,
+				contactParams: {transport: "wss"},
 				stunServers: ["stun:stun.l.google.com:19302"],
 				hackIpInContact: true,
 				forceRport: true,
