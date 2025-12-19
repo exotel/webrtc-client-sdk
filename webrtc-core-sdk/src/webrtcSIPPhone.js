@@ -40,12 +40,19 @@ class WebrtcSIPPhone {
 		
 		this.webrtcSIPPhoneEventDelegate.registerDelegate(delegate);
 		
+		// Preserve noise suppression setting from existing phone instance if it exists
+		const existingNoiseSuppression = this.phone?.enableNoiseSuppression;
+		
 		switch (engine) {
 			case "sipjs":
 				this.phone = new SIPJSPhone(
 					this.webrtcSIPPhoneEventDelegate,
 					this.username
 				);
+				// Restore noise suppression setting if it was set on the previous instance
+				if (existingNoiseSuppression) {
+					this.phone.setNoiseSuppression(existingNoiseSuppression);
+				}
 				break;
 			default:
 				logger.log("webrtcSIPPhone: Unsupported engine type:", engine);
