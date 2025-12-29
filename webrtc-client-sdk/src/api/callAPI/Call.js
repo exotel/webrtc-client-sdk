@@ -62,7 +62,7 @@ export function Call(webrtcSIPPhone) {
         /**
          * When user clicks on hold
          */
-        logger.log('Hold toggle clicked')
+        logger.log('Call: HoldToggle')
         webrtcSIPPhone.holdCall();
     }
 
@@ -70,18 +70,28 @@ export function Call(webrtcSIPPhone) {
         /**
          * When user clicks on hold
          */
-        logger.log('hold clicked')
-        let dummyFlag = true;
-        webrtcSIPPhone.holdCall();
+        logger.log('Call: Hold')
+        var isOnHold = webrtcSIPPhone.getHoldStatus();
+        logger.log('Call: Hold: isOnHold: ', isOnHold);
+        if (!isOnHold) {
+            webrtcSIPPhone.holdAction(true);
+        } else {
+            logger.log('Call: Hold: Already on hold');
+        }
     }
 
     this.UnHold = function () {
         /**
          * When user clicks on hold
          */
-        logger.log('unhold clicked')
-        let dummyFlag = true;
-        webrtcSIPPhone.holdCall();
+        logger.log('Call: UnHold')
+        var isOnHold = webrtcSIPPhone.getHoldStatus();
+        logger.log('Call: UnHold: isOnHold: ', isOnHold);
+        if (isOnHold) {
+            webrtcSIPPhone.holdAction(false);
+        } else {
+            logger.log('Call: UnHold: Already on hold');
+        }
     }
 
     this.callDetails = function () {
