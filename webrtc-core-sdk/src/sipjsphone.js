@@ -64,7 +64,7 @@ class SIPJSPhone {
 		this.isConnecting = false;
 		this.isDisconnected = false;
 		this.isMuted = false;
-		this.isHold = false;
+		this.isOnHold = false;
 		this.isCallActive = false;
 		this.isCallEnded = false;
 		this.isCallRejected = false;
@@ -109,8 +109,6 @@ class SIPJSPhone {
 		this.isCallUnrestricted = false;
 		this.isCallUnshackled = false;
 		this.isCallUntrammeled = false;
-		this.bMicEnable = true;
-		this.bHoldEnable = false;
 		this.register_flag = false;
 		this.enableAutoAudioDeviceChangeHandling = false;
 		this.addPreferredCodec = this.addPreferredCodec.bind(this);
@@ -453,25 +451,15 @@ class SIPJSPhone {
 
 
 			phoneMuteButtonPressed: (sessionid) => {
-				logger.log(" sipjsphone: phoneMuteButtonPressed: bMicEnable, sessionid", this.bMicEnable, sessionid);
-				var s = this.ctxSip.Sessions[sessionid];
-
-				if (this.bMicEnable) {
-					this.toggleMute(s, true);
-					this.bMicEnable = false;
-			} else {
-					this.toggleMute(s, false);
-					this.bMicEnable = true;
-			}
+				logger.log(" sipjsphone: phoneMuteButtonPressed: sessionid", sessionid);
+				this.toggleMute(sessionid);
 		},
 
 		//NL --Implement hold button start
 			phoneMute: (sessionid, bMute) => {
 			if (sessionid) {
-					var s = this.ctxSip.Sessions[sessionid];
 				logger.log(" sipjsphone: phoneMute: bMute", bMute)
-					this.toggleMute(s, bMute);
-					this.bMicEnable = !bMute;
+				this.muteActionBySessionID(sessionid, bMute);
 			}
 			else{
 				logger.log(" sipjsphone: phoneMute: doing nothing as sessionid not found")
@@ -481,24 +469,22 @@ class SIPJSPhone {
 
 			phoneHold: (sessionid, bHold) => {
 			if (sessionid) {
-					var s = this.ctxSip.Sessions[sessionid];
-				logger.log("sipjsphone: phoneHold: bHold", bHold)
-					this.toggleHold(s, bHold);
-					this.bHoldEnable = bHold;
+				logger.log("sipjsphone: phoneHold: bHold:", bHold, "sessionid:", sessionid)
+				this.holdActionBySessionID(sessionid, bHold);
+			}
+			else{
+				logger.log(" sipjsphone: phoneHold: doing nothing as sessionid not found")
+
 			}
 		},
 
 			phoneHoldButtonPressed: (sessionid) => {
-			if (sessionid) {
-					var s = this.ctxSip.Sessions[sessionid];
-					if (this.bHoldEnable) {
-						this.toggleHold(s, false);
-						this.bHoldEnable = false;
-				} else {
-						this.toggleHold(s, true);
-						this.bHoldEnable = true;
+				logger.log("sipjsphone: phoneHoldButtonPressed: sessionid:", sessionid);
+				if(!sessionid) {
+					logger.log("sipjsphone: phoneHoldButtonPressed: invalid sessionid");
+					return;
 				}
-			}
+				this.toggleHold(sessionid);
 		},
 		//NL --Implement hold button end
 
@@ -980,67 +966,82 @@ destroySocketConnection() {
 		this.register_flag = b;
 }
 
-	toggleMute(s, mute) {
-	let pc = s.sessionDescriptionHandler.peerConnection;
-	if (pc.getSenders) {
-			pc.getSenders().forEach((sender) => {
-			if (sender.track) {
-				sender.track.enabled = !mute;
-			}
-		});
-	} else {
-			pc.getLocalStreams().forEach((stream) => {
-				stream.getAudioTracks().forEach((track) => {
-				track.enabled = !mute;
-			});
-				stream.getVideoTracks().forEach((track) => {
-				track.enabled = !mute;
-			});
-		});
+	toggleMute(sessionid) {
+		logger.log("sipjsphone: toggleMute: sessionid:", sessionid);
+		let bMute = !this.isMuted;
+		this.muteActionBySessionID(sessionid, bMute);
 	}
-	if (mute) {
-			this.onMuted(s);
-	} else {
-			this.onUnmuted(s);
+
+	
+	muteActionBySessionID(sessionid, bMute) {
+
+		logger.log("sipjsphone: muteActionBySessionID: sessionid:", sessionid, "bMute:", bMute);
+		
+		if(bMute == this.isMuted) {
+			logger.log("sipjsphone: muteActionBySessionID: already muted", bMute);
+			return;
+		}
+		if(!sessionid) {
+			logger.error("sipjsphone: muteActionBySessionID: invalid sessionid");
+			return;
+		}
+		let s = this.ctxSip.Sessions[sessionid];
+		if(!s) {
+			logger.error("sipjsphone: muteActionBySessionID: invalid session");
+			return;
+		}
+		let pc = s.sessionDescriptionHandler.peerConnection;
+		if (pc.getSenders) {
+				pc.getSenders().forEach((sender) => {
+				if (sender.track) {
+					sender.track.enabled = !bMute;
+				}
+			});
+		} else {
+				pc.getLocalStreams().forEach((stream) => {
+					stream.getAudioTracks().forEach((track) => {
+					track.enabled = !bMute;
+				});
+					stream.getVideoTracks().forEach((track) => {
+					track.enabled = !bMute;
+				});
+			});
+		}
+		if (bMute) {
+				this.onMuted(s);
+		} else {
+				this.onUnmuted(s);
+		}
 	}
-}
 
 
 	onMuted(s) {
-		logger.log(`[onMuted] Before: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
-		this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('muted');
+		logger.log("sipjsphone: onMuted: sessionid:", s.id);
 		if (s) s.isMuted = true;
 		this.isMuted = true;
-		logger.log(`[onMuted] After: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
+		this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('muted');
 		this.ctxSip.setCallSessionStatus("Muted");
 	}
 
 	onUnmuted(s) {
-		logger.log(`[onUnmuted] Before: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
-		this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('unmuted');
+		logger.log("sipjsphone: onUnmuted: sessionid:", s.id);
 		if (s) s.isMuted = false;
 		this.isMuted = false;
-		logger.log(`[onUnmuted] After: s.isMuted=${s && s.isMuted}, global isMuted=${this.isMuted}`);
+		this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('unmuted');
 		this.ctxSip.setCallSessionStatus("Answered");
 	}
 
-	onHold(s) {
-	//webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('hold');
-	logger.warn(`[${s.id}] re-invite request was accepted`);
-	s.held = true;
-		this.enableSenderTracks(s, !s.held && !s.isMuted);
-		this.enableReceiverTracks(s, !s.held);
-		//this.ctxSip.setCallSessionStatus("Hold");
+	onHoldUnholdSuccess(s, hold) {
+		logger.info(`sipjsphone: onHoldUnholdSuccess: [${s.id}] : re-invite request was accepted for hold: ${hold}`);
+		this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('holdunhold_success');
+		s.held = hold;
+		this.isOnHold = hold;
 	}
 
-	 onUnhold(s) {
-	//webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('unhold');
-	logger.warn(`[${s.id}] re-invite request was rejected`);
-	s.held = false;
-		this.enableSenderTracks(s, !s.held && !s.isMuted);
-		this.enableReceiverTracks(s, !s.held);
-		//this.ctxSip.setCallSessionStatus("Unhold");
-}
+	 onHoldUnholdFailure(s, hold) {
+		logger.info(`sipjsphone: onHoldUnholdFailure: [${s.id}] : re-invite request was rejected for hold: ${hold}`);
+		this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('holdunhold_failed');
+	}
 
 /** Helper function to enable/disable media tracks. */
 	 enableReceiverTracks(s, enable) {
@@ -1080,28 +1081,47 @@ destroySocketConnection() {
 	}
 }
 
-	 toggleHold(s, hold) {
-	const options = {
-		requestDelegate: {
-			onAccept: () => {
-					this.onHold(s)
-			},
-			onReject: () => {
-					this.onUnhold(s)
-			}
-		},
-		sessionDescriptionHandlerOptions: {
-			hold: hold
+	 toggleHold(sessionid) {
+		logger.log("sipjsphone: toggleHold: sessionid:", sessionid);
+		this.holdActionBySessionID(sessionid, !this.isOnHold);
+	 } 
+
+	 holdActionBySessionID(sessionid, hold) {
+		logger.log("sipjsphone: holdActionBySessionID: hold:", hold, "sessionid:", sessionid);
+
+		if(hold == this.isOnHold) {
+			logger.log("sipjsphone: holdActionBySessionID: already on hold", hold);
+			return;
 		}
-	};
-	s.invite(options).then(() => {
-		// preemptively enable/disable tracks
-			this.enableReceiverTracks(s, !hold);
-			this.enableSenderTracks(s, !hold && !s.isMuted);
-	}).catch((error) => {
-		logger.error(`Error in hold request [${s.id}]`);
-	});
-}
+		if (!sessionid) {
+			logger.log("sipjsphone: holdActionBySessionID: invalid sessionid");
+			return;
+		}
+		let s = this.ctxSip.Sessions[sessionid];
+		if(!s) {
+			logger.error("sipjsphone: holdActionBySessionID: invalid session");
+			return;
+		}
+
+		
+
+		const options = {
+			requestDelegate: {
+				onAccept: () => {
+						this.onHoldUnholdSuccess(s, hold);
+				},
+				onReject: () => {
+						this.onHoldUnholdFailure(s, hold);
+				}
+			},
+			sessionDescriptionHandlerOptions: {
+				hold: hold
+			}
+		};
+		s.invite(options).catch((error) => {
+			logger.error(`sipjsphone: holdActionBySessionID: Error in hold request [${sessionid}] error:`, error);
+		});
+	}
 
 
 	assignStream(stream, element) {
@@ -1268,14 +1288,20 @@ destroySocketConnection() {
 	}
 
 	holdCall() {
+		logger.log("sipjsphone: holdCall: entry");
 		if (this.ctxSip.callActiveID) {
 			this.ctxSip.phoneHoldButtonPressed(this.ctxSip.callActiveID);
+		} else {
+			logger.log("sipjsphone: holdCall: No active session");
 		}
 	}
 
 	sipHold(bHold) {
+		logger.log("sipjsphone: sipHold: bHold: ", bHold);
 		if (this.ctxSip.callActiveID) {
 			this.ctxSip.phoneHold(this.ctxSip.callActiveID, bHold);
+		} else {
+			logger.log("sipjsphone: sipHold: No active session");
 		}
 	}
 
@@ -1289,6 +1315,18 @@ destroySocketConnection() {
 		}
 		logger.log(`[getMicMuteStatus] No active session, global isMuted: ${this.isMuted}`);
 		return this.isMuted;
+	}
+
+	getHoldStatus() {
+		logger.log("sipjsphone: getHoldStatus: isOnHold:", this.isOnHold);
+		if (this.ctxSip && this.ctxSip.callActiveID && this.ctxSip.Sessions && this.ctxSip.Sessions[this.ctxSip.callActiveID]) {
+			const sessionHold = !!this.ctxSip.Sessions[this.ctxSip.callActiveID].held;
+			logger.log(`[getHoldStatus] sessionHold: ${sessionHold}, global isOnHold: ${this.isOnHold}`);
+			return sessionHold;
+		} else {
+			logger.log(`[getHoldStatus] No active session, global onHold: ${this.isOnHold}`);
+			return this.isOnHold;
+		}
 	}
 
 	setPreferredCodec(codecName) {
@@ -1549,8 +1587,10 @@ destroySocketConnection() {
 		// Reset mute state at the start of every call
 		logger.log(`[onInvitationSessionAccepted] Resetting mute state. Before: newSess.isMuted=${newSess && newSess.isMuted}, global isMuted=${this.isMuted}`);
 		this.isMuted = false;
+		this.isOnHold = false;
 		if (newSess && newSess.isMuted !== undefined) {
 			newSess.isMuted = false;
+			newSess.held = false;
 		}
 		logger.log(`[onInvitationSessionAccepted] After reset: newSess.isMuted=${newSess && newSess.isMuted}, global isMuted=${this.isMuted}`);
 		this.ctxSip.Stream = newSess.sessionDescriptionHandler.localMediaStream;

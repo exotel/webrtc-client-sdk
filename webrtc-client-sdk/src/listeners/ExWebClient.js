@@ -72,6 +72,8 @@ class ExDelegationHandler {
     }
     onCallStatSipJsSessionEvent(ev) {
         logger.log("delegationHandler: onCallStatSipJsSessionEvent", ev);
+        this.sessionCallback.initializeSession(ev, this.exClient.callFromNumber);
+        this.sessionCallback.triggerSessionCallback();
     }
     sendWebRTCEventsToFSM(eventType, sipMethod) {
         logger.log("delegationHandler: sendWebRTCEventsToFSM\n");
@@ -535,7 +537,7 @@ class ExotelWebClient {
         var userName = this.userName;
 
 
-        this.webrtcSIPPhone.registerPhone("sipjs", delegationHandler, this.sipAccountInfo.enableAutoAudioDeviceChangeHandling);
+        //this.webrtcSIPPhone.registerPhone("sipjs", delegationHandler, this.sipAccountInfo.enableAutoAudioDeviceChangeHandling);
         this.webrtcSIPPhone.registerWebRTCClient(this.sipAccntInfo, synchronousHandler);
         phonePool[this.userName] = this.webrtcSIPPhone;     
 

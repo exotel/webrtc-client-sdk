@@ -1,6 +1,6 @@
 {
   "name": "@exotel-npm-dev/webrtc-client-sdk",
-  "version": "3.0.6",
+  "version": "3.0.7",
   "description": "client sdk for webrtc based on webrtc core sdk",
   "main": "index.js",
   "scripts": {
@@ -29,6 +29,6 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "@exotel-npm-dev/webrtc-core-sdk": "^3.0.6"
+    "@exotel-npm-dev/webrtc-core-sdk": "^3.0.7"
   }
 }

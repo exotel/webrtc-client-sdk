@@ -135,6 +135,11 @@ class WebrtcSIPPhone {
 		return this.phone.getMicMuteStatus();
 	}
 
+	getHoldStatus() {
+		logger.log("webrtcSIPPhone: getHoldStatus entry");
+		return this.phone.getHoldStatus();
+	}
+
 	muteAction (bMute){
 		logger.log("webrtcSIPPhone: muteAction: ",bMute);
 		this.phone.sipMute(bMute);
