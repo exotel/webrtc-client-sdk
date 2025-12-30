@@ -552,7 +552,7 @@ class SIPJSPhone {
 
 			// Extract and modify the audio m-line
 			let audioMLine = sdpLines[audioMLineIndex];
-			audioMLine = audioMLine.replace("RTP/SAVP", "RTP/AVP");
+			audioMLine = audioMLine.replace("RTP/SAVP", "RTP/SAVP");
 
 			const codecs = audioMLine.split(" ");
 			const mLineStart = codecs.slice(0, 3); // "m=audio <port> <protocol>"
@@ -576,7 +576,7 @@ class SIPJSPhone {
 
 			// Extract and modify the audio m-line
 			let audioMLine = sdpLines[audioMLineIndex];
-			audioMLine = audioMLine.replace("RTP/SAVP", "RTP/AVP");
+			audioMLine = audioMLine.replace("RTP/SAVP", "RTP/SAVP");
 
 			const codecs = audioMLine.split(" ");
 			const mLineStart = codecs.slice(0, 3); // "m=audio <port> <protocol>"
