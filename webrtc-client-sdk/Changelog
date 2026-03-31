@@ -1,5 +1,8 @@
 Change Log
 
+## v3.0.9 27 March, 2026
+-[VST-1577] Removed the same-device-ID guard from replaceSenderTrack.
+
 ## v3.0.6 19 December, 2025
 -[VST-1269] fixing noise suppression bug and added wss transport in contact params
 

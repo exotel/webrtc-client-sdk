@@ -1530,11 +1530,6 @@ destroySocketConnection() {
 	}
 	replaceSenderTrack(stream, deviceId) {
 		try {
-
-			if (audioDeviceManager.currentAudioInputDeviceId == deviceId) {
-				this.stopStreamTracks(stream);
-				return false;
-			}
 			if (this.ctxSip.callActiveID) {
 				this.ctxSip.Stream = stream;
 				const s = this.ctxSip.Sessions[this.ctxSip.callActiveID];
