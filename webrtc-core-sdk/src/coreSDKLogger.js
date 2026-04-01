@@ -46,10 +46,13 @@ const coreSDKLogger = {
 
     error: (arg1, ...args) => {
         if (coreSDKLogger.loggingEnabled) {
-            if (args.length == 0)
-                console.error(arg1);
-            else
-                console.error(arg1, args);
+             if (args.length == 0) {
+               console.error(arg1);
+               console.trace(arg1);
+             } else {
+               console.error(arg1, args);
+               console.trace(arg1, args);
+             }
         }
         if (coreSDKLogger.loggerCallback)
             coreSDKLogger.loggerCallback("error", arg1, args);
