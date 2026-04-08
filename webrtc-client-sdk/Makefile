@@ -1,3 +1,5 @@
+VERSION := $(shell npm pkg get version | tr -d '"')
+	
 build:dep
 	npm run build
 	cp -r ../webrtc-core-sdk/src/static/* dist/
@@ -16,3 +18,7 @@ dep:
 
 publish: build
 	npm publish
+
+
+tar: build
+	tar -czvf exotelsdk-$(VERSION).tar.gz dist/
