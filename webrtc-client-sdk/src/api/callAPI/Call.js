@@ -21,7 +21,7 @@ export function Call(webrtcSIPPhone) {
          * When call is terminated
          */
         logger.log('call ended')
-        logger.log('Hangup stack trace:', new Error().stack);
+        console.trace();
         webrtcSIPPhone.rejectCall();
     }
 

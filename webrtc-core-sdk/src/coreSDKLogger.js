@@ -49,7 +49,8 @@ const coreSDKLogger = {
             if (args.length == 0)
                 console.error(arg1);
             else
-                console.error(arg1, args);        }
+                console.error(arg1, args);
+        }
         if (coreSDKLogger.loggerCallback)
             coreSDKLogger.loggerCallback("error", arg1, args);
     }
