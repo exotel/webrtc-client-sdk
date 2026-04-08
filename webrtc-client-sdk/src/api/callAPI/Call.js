@@ -21,6 +21,7 @@ export function Call(webrtcSIPPhone) {
          * When call is terminated
          */
         logger.log('call ended')
+        console.trace();
         webrtcSIPPhone.rejectCall();
     }
 
