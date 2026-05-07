@@ -418,8 +418,18 @@ class SIPJSPhone {
 
 		},
 
-			// Update the sipSendDTMF method (around line 389) to use Web Audio:
+			// Local sidetone: play bundled dtmf.wav, then send SIP INFO DTMF.
 			sipSendDTMF: (digit) => {
+				logger.log("sipSendDTMF: digit", digit);
+				try {
+					if (this.ctxSip && this.ctxSip.dtmfTone) {
+						this.ctxSip.dtmfTone.currentTime = 0;
+						this.ctxSip.dtmfTone.play();
+					}
+				} catch (e) {
+					logger.log("sipSendDTMF: local DTMF tone exception:", e);
+				}
+
 				var a = this.ctxSip.callActiveID;
 				if (a) {
 					var s = this.ctxSip.Sessions[a];
@@ -439,6 +449,7 @@ class SIPJSPhone {
 					};
 					const requestOptions = { body };
 					return s.info({ requestOptions }).then(() => {
+						logger.log("sipSendDTMF: SIP INFO DTMF sent", dtmf);
 						return;
 					});
 
