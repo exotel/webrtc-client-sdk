@@ -177,8 +177,10 @@ class ExDelegationHandler {
     onSettingLocalDesc() {
         logger.log("delegationHandler: onSettingLocalDesc\n");
     }
-    initGetStats(pc, callid, username) {
-        logger.log("delegationHandler: initGetStats\n");
+    onMediaRecoveryEvent(eventName, details) {
+        logger.log("delegationHandler: onMediaRecoveryEvent", eventName, details);
+        this.sessionCallback.initializeSession(`media_recovery_${eventName}`, this.exClient.callFromNumber);
+        this.sessionCallback.triggerSessionCallback();
     }
     onRegisterWebRTCSIPEngine(engine) {
         logger.log("delegationHandler: onRegisterWebRTCSIPEngine, engine=\n", engine);
@@ -657,6 +659,51 @@ class ExotelWebClient {
     setNoiseSuppression(enabled = false) {
         logger.log(`ExWebClient: setNoiseSuppression: ${enabled}`);
         this.webrtcSIPPhone.setNoiseSuppression(enabled);
+    }
+
+    setRingingDuration(seconds) {
+        logger.log(`ExWebClient: setRingingDuration: ${seconds}`);
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: setRingingDuration: webrtcSIPPhone not initialized");
+            return false;
+        }
+        return this.webrtcSIPPhone.setRingingDuration(seconds);
+    }
+
+    getRingingDuration() {
+        logger.log("ExWebClient: getRingingDuration");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: getRingingDuration: webrtcSIPPhone not initialized");
+            return 30;
+        }
+        return this.webrtcSIPPhone.getRingingDuration();
+    }
+
+    stopRingTone() {
+        logger.log("ExWebClient: stopRingTone");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: stopRingTone: webrtcSIPPhone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.stopRingTone();
+    }
+
+    async primeUiTones() {
+        logger.log("ExWebClient: primeUiTones");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: primeUiTones: webrtcSIPPhone not initialized");
+            return [];
+        }
+        return this.webrtcSIPPhone.primeUiTones();
+    }
+
+    async playTestTone(toneName) {
+        logger.log("ExWebClient: playTestTone", toneName);
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: playTestTone: webrtcSIPPhone not initialized");
+            return false;
+        }
+        return this.webrtcSIPPhone.playTestTone(toneName);
     }
 
 }

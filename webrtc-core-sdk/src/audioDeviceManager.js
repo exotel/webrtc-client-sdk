@@ -1,7 +1,10 @@
 import coreSDKLogger from "./coreSDKLogger";
 
 const logger = coreSDKLogger;
-const AudioManagerCtx = window.AudioContext || window.webkitAudioContext;
+const AudioManagerCtx = typeof window !== "undefined"
+    ? (window.AudioContext || window.webkitAudioContext)
+    : null;
+
 export const audioDeviceManager = {
     resetInputDevice: false,
     resetOutputDevice: false,
@@ -9,13 +12,14 @@ export const audioDeviceManager = {
     currentAudioOutputDeviceId: "default",
     mediaDevices: [],
     enableAutoAudioDeviceChangeHandling: false,
-    webAudioCtx : new AudioManagerCtx(),
-    // Method to set the resetInputDevice flag
+    webAudioCtx: AudioManagerCtx ? new AudioManagerCtx() : null,
+    uiToneElements: {},
+    uiToneVolumes: {},
+
     setResetInputDeviceFlag(value) {
         this.resetInputDevice = value;
     },
 
-    // Method to set the resetOutputDevice flag
     setResetOutputDeviceFlag(value) {
         this.resetOutputDevice = value;
     },
@@ -70,7 +74,6 @@ export const audioDeviceManager = {
                         return;
                     }
                     logger.log(`audioDeviceManager:changeAudioOutputDevice acquiring output device ${deviceId} : ${outputDevice.label}`);
-                    // audioElement.load();
                 }
                 await audioElement.setSinkId(deviceId);
                 audioDeviceManager.currentAudioOutputDeviceId = deviceId;
@@ -139,33 +142,143 @@ export const audioDeviceManager = {
         if (callback) callback();
     },
 
+    registerUiTone(elementName, audioElement) {
+        logger.log("audioDeviceManager:registerUiTone entry for", elementName);
+        this.uiToneElements[elementName] = audioElement;
+        this.uiToneVolumes[elementName] = 1;
+        audioElement.volume = 1;
+        return true;
+    },
+
+    setUiToneVolume(elementName, value) {
+        const volume = Math.max(0, Math.min(1, value));
+        this.uiToneVolumes[elementName] = volume;
+        const element = this.uiToneElements[elementName];
+        if (element) {
+            element.volume = volume;
+        }
+        return volume;
+    },
+
+    getUiToneVolume(elementName) {
+        if (this.uiToneVolumes.hasOwnProperty(elementName)) {
+            return this.uiToneVolumes[elementName];
+        }
+        return 1;
+    },
+
+    async ensureAudioContextRunning() {
+        if (!this.webAudioCtx) {
+            return false;
+        }
+        if (this.webAudioCtx.state === "suspended") {
+            try {
+                await this.webAudioCtx.resume();
+                logger.log("audioDeviceManager:ensureAudioContextRunning: resumed, state=", this.webAudioCtx.state);
+            } catch (e) {
+                logger.log("audioDeviceManager:ensureAudioContextRunning: resume failed", e);
+            }
+        }
+        return this.webAudioCtx.state === "running";
+    },
+
+    async applyUiToneOutputRouting(audioElement) {
+        if (!audioElement || typeof audioElement.setSinkId === "undefined") {
+            return;
+        }
+        if (this.currentAudioOutputDeviceId && this.currentAudioOutputDeviceId !== "default") {
+            try {
+                await audioElement.setSinkId(this.currentAudioOutputDeviceId);
+            } catch (e) {
+                logger.log("audioDeviceManager:applyUiToneOutputRouting: setSinkId failed", e);
+            }
+        }
+    },
+
+    async primeUiTones() {
+        await this.ensureAudioContextRunning();
+        const primed = [];
+        for (const [elementName, audioElement] of Object.entries(this.uiToneElements)) {
+            if (!audioElement) {
+                continue;
+            }
+            try {
+                await this.applyUiToneOutputRouting(audioElement);
+                if (audioElement.readyState < 2) {
+                    audioElement.load();
+                }
+                const previousVolume = audioElement.volume;
+                audioElement.volume = 0.001;
+                await audioElement.play();
+                audioElement.pause();
+                audioElement.currentTime = 0;
+                audioElement.volume = this.getUiToneVolume(elementName) || previousVolume;
+                primed.push(elementName);
+            } catch (error) {
+                logger.log(`audioDeviceManager:primeUiTones: ${elementName} failed`, error?.name, error?.message);
+            }
+        }
+        logger.log("audioDeviceManager:primeUiTones: primed tones", primed.join(", ") || "none");
+        return primed;
+    },
+
+    async playUiTone(audioElement, elementName, options = {}) {
+        const { resetTime = true, loadBeforePlay = true } = options;
+        if (!audioElement) {
+            logger.log("audioDeviceManager:playUiTone: missing audio element for", elementName);
+            return false;
+        }
+
+        await this.ensureAudioContextRunning();
+        const volume = this.getUiToneVolume(elementName);
+        audioElement.volume = volume;
+        await this.applyUiToneOutputRouting(audioElement);
+
+        if (resetTime) {
+            audioElement.currentTime = 0;
+        }
+        if (loadBeforePlay && audioElement.readyState < 2) {
+            audioElement.load();
+        }
+
+        const retryDelaysMs = [0, 250, 500];
+        for (let attempt = 0; attempt < retryDelaysMs.length; attempt++) {
+            if (retryDelaysMs[attempt] > 0) {
+                await new Promise((resolve) => setTimeout(resolve, retryDelaysMs[attempt]));
+            }
+            try {
+                logger.log(`audioDeviceManager:playUiTone: ${elementName} attempt ${attempt + 1}`);
+                await audioElement.play();
+                logger.log(`audioDeviceManager:playUiTone: ${elementName} playing`);
+                return true;
+            } catch (error) {
+                logger.log(`audioDeviceManager:playUiTone: ${elementName} attempt ${attempt + 1} failed`, error?.name, error?.message);
+                if (error?.name === "NotAllowedError") {
+                    logger.log(`audioDeviceManager:playUiTone: ${elementName} blocked by autoplay policy; prior user gesture may be required`);
+                }
+            }
+        }
+        return false;
+    },
+
     configureAudioGainNode(sourceNode) {
         logger.log("audioDeviceManager:configureAudioGainNode entry");
         let gainNode = this.webAudioCtx.createGain();
-        
         sourceNode.connect(gainNode).connect(this.webAudioCtx.destination);
         return gainNode;
     },
-    
-    createAndConfigureAudioGainNode(audioElement) {
-    
-        logger.log("audioDeviceManager:createAndConfigureAudioGainNode entry for audioElement", audioElement);
-        // get audio track from audio element
-        let sourceNode = this.webAudioCtx.createMediaElementSource(audioElement);
-        // Create a GainNode
-        let gainNode = this.configureAudioGainNode(sourceNode);
 
-         // resume audio context when audio element is played
-         audioElement.addEventListener("play", () => {
+    createAndConfigureAudioGainNode(audioElement) {
+        logger.log("audioDeviceManager:createAndConfigureAudioGainNode entry for audioElement", audioElement);
+        let sourceNode = this.webAudioCtx.createMediaElementSource(audioElement);
+        let gainNode = this.configureAudioGainNode(sourceNode);
+        audioElement.addEventListener("play", () => {
             if (this.webAudioCtx.state === "suspended") {
                 this.webAudioCtx.resume();
             }
         });
         return gainNode;
-        
-        
     }
-
 };
 
 export default audioDeviceManager;
