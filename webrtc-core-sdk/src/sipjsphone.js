@@ -1,6 +1,9 @@
 var SIP = require('./sip-0.20.0.js')
 import { audioDeviceManager } from './audioDeviceManager.js';
 import { attachMediaRecovery, detachMediaRecovery, ensureRemoteAudioPlaying } from './mediaRecovery.js';
+import { buildAudioMediaConstraints } from './audioConstraints.js';
+import { createProcessedStream, stopProcessedStream } from './audioProcessingPipeline.js';
+import webrtcDiagnostics from './webrtcDiagnostics.js';
 import coreSDKLogger from './coreSDKLogger.js';
 import WebrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 let logger = coreSDKLogger;
@@ -126,6 +129,11 @@ class SIPJSPhone {
 		this.enableAutoAudioDeviceChangeHandling = false;
 		this.addPreferredCodec = this.addPreferredCodec.bind(this);
         this.enableNoiseSuppression = false;
+		this.enableEchoCancellation = true;
+		this.enableAutoGainControl = true;
+		this.preferredCodecOptions = {};
+		this.customAudioProcessing = { enabled: false, mode: 'off' };
+		this._processedMicStream = null;
 
 		this.ringtone = ringtone;
 		this.beeptone = beeptone;
@@ -188,6 +196,75 @@ class SIPJSPhone {
         logger.log(`sipjsphone: setNoiseSuppression: ${enabled}`);
         this.enableNoiseSuppression = enabled;
     }
+
+	setEchoCancellation(enabled = true) {
+		logger.log(`sipjsphone: setEchoCancellation: ${enabled}`);
+		this.enableEchoCancellation = enabled;
+	}
+
+	setAutoGainControl(enabled = true) {
+		logger.log(`sipjsphone: setAutoGainControl: ${enabled}`);
+		this.enableAutoGainControl = enabled;
+	}
+
+	setAudioProcessing(options = {}) {
+		if (options.noiseSuppression !== undefined) {
+			this.enableNoiseSuppression = options.noiseSuppression;
+		}
+		if (options.echoCancellation !== undefined) {
+			this.enableEchoCancellation = options.echoCancellation;
+		}
+		if (options.autoGainControl !== undefined) {
+			this.enableAutoGainControl = options.autoGainControl;
+		}
+		logger.log('sipjsphone: setAudioProcessing', this.getAudioProcessing());
+	}
+
+	getAudioProcessing() {
+		const processing = {
+			noiseSuppression: this.enableNoiseSuppression,
+			echoCancellation: this.enableEchoCancellation ?? true,
+			autoGainControl: this.enableAutoGainControl ?? true,
+		};
+		if (this.customAudioProcessing?.enabled && this.customAudioProcessing.mode === 'rnnoise') {
+			processing.noiseSuppression = false;
+		}
+		return processing;
+	}
+
+	getAudioConstraints(deviceId) {
+		return buildAudioMediaConstraints(this.getAudioProcessing(), deviceId);
+	}
+
+	setCustomAudioProcessing(options = {}) {
+		this.customAudioProcessing = {
+			enabled: Boolean(options.enabled),
+			mode: options.mode || 'off',
+		};
+		logger.log('sipjsphone: setCustomAudioProcessing', this.customAudioProcessing);
+	}
+
+	getCustomAudioProcessing() {
+		return { ...this.customAudioProcessing };
+	}
+
+	async _processMicStream(rawStream) {
+		if (!this.customAudioProcessing?.enabled || this.customAudioProcessing.mode === 'off') {
+			return rawStream;
+		}
+		return createProcessedStream(
+			rawStream,
+			this.customAudioProcessing,
+			audioDeviceManager.webAudioCtx
+		);
+	}
+
+	_stopProcessedMicStream() {
+		if (this._processedMicStream) {
+			stopProcessedStream(this._processedMicStream);
+			this._processedMicStream = null;
+		}
+	}
 	
 	getCallAudioOutputVolume() {
 		logger.log(`sipjsphone: getCallAudioOutputVolume`);
@@ -706,12 +783,8 @@ class SIPJSPhone {
 				logConnector: this.sipPhoneLogger.bind(this),
 			logLevel: "log",
             sessionDescriptionHandlerFactoryOptions: {
-                constraints: {
-                    audio:{
-                        noiseSuppression: this.enableNoiseSuppression !== undefined ? this.enableNoiseSuppression : false
-                    },
-                    video: false
-                }
+                constraints: this.getAudioConstraints(),
+                sessionDescriptionHandlerModifiers: [this.addPreferredCodec],
             },
 				delegate: {
 					onInvite: (incomingSession) => {
@@ -1278,12 +1351,25 @@ destroySocketConnection() {
 		}
 		this.txtUDPURL = "udp://" + this.txtHostName + ":" + this.txtSipPort;
 
+		this.applyVoiceQualityFromAccount(sipAccountInfo);
 
 		var oInitializeCompleteTimer =  setTimeout(() => {
 			if (this.initializeComplete) {
 				this.sipRegister()
 			}
 		}, 500);
+	}
+
+	applyVoiceQualityFromAccount(sipAccountInfo = {}) {
+		if (sipAccountInfo.audioProcessing) {
+			this.setAudioProcessing(sipAccountInfo.audioProcessing);
+		}
+		if (sipAccountInfo.preferredCodec) {
+			this.setPreferredCodec(sipAccountInfo.preferredCodec, sipAccountInfo.preferredCodecOptions);
+		}
+		if (sipAccountInfo.customAudioProcessing) {
+			this.setCustomAudioProcessing(sipAccountInfo.customAudioProcessing);
+		}
 	}
 
 	getStatus() {
@@ -1374,59 +1460,57 @@ destroySocketConnection() {
 		}
 	}
 
-	setPreferredCodec(codecName) {
+	setPreferredCodec(codecName, options = {}) {
 		logger.log("sipjsphone:setPreferredCodec entry");
 		const codecPayloadTypes = {
 			opus: { payloadType: 111, rtpMap: "opus/48000/2", fmtp: "minptime=10;useinbandfec=1" },
 		};
 
-		let codec = "opus"; // Default to opus
+		let codec = "opus";
 		if (codecName && codecPayloadTypes[codecName.toLowerCase()]) {
 			codec = codecName.toLowerCase();
 		} else if (codecName) {
 			logger.error("sipjsphone:setPreferredCodec: Unsupported codec " + codecName + " specified. Defaulting to opus.");
 		}
 
-		this.preferredCodec = codecPayloadTypes[codec];
+		this.preferredCodecOptions = options || {};
+		const fmtpParts = ['minptime=10', 'useinbandfec=1'];
+		if (this.preferredCodecOptions.maxAverageBitrate) {
+			fmtpParts.push(`maxaveragebitrate=${this.preferredCodecOptions.maxAverageBitrate}`);
+		}
+		if (this.preferredCodecOptions.stereo === false) {
+			fmtpParts.push('stereo=0');
+		}
+		if (this.preferredCodecOptions.useDtx === false) {
+			fmtpParts.push('usedtx=0');
+		}
+
+		this.preferredCodec = {
+			...codecPayloadTypes[codec],
+			fmtp: fmtpParts.join(';'),
+		};
 
 		logger.log("sipjsphone:setPreferredCodec: Preferred codec set to " + codec);
+	}
+
+	getPreferredCodecOptions() {
+		return { ...this.preferredCodecOptions };
 	}
 
 	pickPhoneCall() {
 		var newSess = this.ctxSip.Sessions[this.ctxSip.callActiveID];
 		logger.log("sipjsphone: pickphonecall: ", this.ctxSip.callActiveID);
 		if (newSess) {
-			if (audioDeviceManager.currentAudioInputDeviceId != "default") {
-				newSess.accept({
-					sessionDescriptionHandlerOptions: {
-                        constraints: {
-                            audio: {
-                                deviceId: audioDeviceManager.currentAudioInputDeviceId,
-                                noiseSuppression: this.enableNoiseSuppression
-                            },
-                            video: false
-                        }
-                    },
-					sessionDescriptionHandlerModifiers: [this.addPreferredCodec]
-				}).catch((e) => {
-					this.onUserSessionAcceptFailed(e);
-				});
-			} else {
-
-				newSess.accept({
-					sessionDescriptionHandlerOptions: {
-                        constraints: {
-                            audio: {
-                                noiseSuppression: this.enableNoiseSuppression
-                            },
-                            video: false
-                        }
-                    },
-					sessionDescriptionHandlerModifiers: [this.addPreferredCodec]
-				}).catch((e) => {
-					this.onUserSessionAcceptFailed(e);
-				});
-			}
+			const deviceId = audioDeviceManager.currentAudioInputDeviceId;
+			const acceptOptions = {
+				sessionDescriptionHandlerOptions: {
+					constraints: this.getAudioConstraints(deviceId),
+				},
+				sessionDescriptionHandlerModifiers: [this.addPreferredCodec],
+			};
+			newSess.accept(acceptOptions).catch((e) => {
+				this.onUserSessionAcceptFailed(e);
+			});
 		}
 
 	}
@@ -1518,8 +1602,11 @@ destroySocketConnection() {
 
 	changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
 		logger.log("sipjsphone: changeAudioInputDevice : ", deviceId, onSuccess, onError, "forceDeviceChange = ", forceDeviceChange, "enableAutoAudioDeviceChangeHandling = ", this.enableAutoAudioDeviceChangeHandling);
-		audioDeviceManager.changeAudioInputDevice(deviceId, (stream) => {
-			const trackChanged = this.replaceSenderTrack(stream, deviceId);
+		const constraints = this.getAudioConstraints(deviceId);
+		audioDeviceManager.changeAudioInputDevice(deviceId, async (stream) => {
+			const processedStream = await this._processMicStream(stream);
+			this._processedMicStream = processedStream !== stream ? stream : null;
+			const trackChanged = await this.replaceSenderTrack(processedStream, deviceId);
 			if (trackChanged) {
 				audioDeviceManager.currentAudioInputDeviceId = deviceId;
 				logger.log(`sipjsphone: changeAudioInputDevice: Input device changed to: ${deviceId}`);
@@ -1532,7 +1619,7 @@ destroySocketConnection() {
 			logger.error("sipjsphone: changeAudioInputDevice error:", err);
 			if (onError) onError(err);
 		},
-		forceDeviceChange);
+		forceDeviceChange, constraints);
 	}
 
 	async changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
@@ -1593,24 +1680,34 @@ destroySocketConnection() {
 			logger.error("sipjsphone:stopStreamTracks failed to stop tracks");
 		}
 	}
-	replaceSenderTrack(stream, deviceId) {
+	async replaceSenderTrack(stream, deviceId) {
 		try {
+			const processedStream = await this._processMicStream(stream);
+			this._processedMicStream = processedStream !== stream ? stream : null;
+			const outboundStream = processedStream;
 			if (this.ctxSip.callActiveID) {
-				this.ctxSip.Stream = stream;
+				this.ctxSip.Stream = outboundStream;
 				const s = this.ctxSip.Sessions[this.ctxSip.callActiveID];
 				const pc = s.sessionDescriptionHandler.peerConnection;
 				if (pc.getSenders) {
 					try {
-						const [audioTrack] = stream.getAudioTracks();
-						const sender = pc.getSenders().find((s) => s.track.kind === audioTrack.kind);
-						sender.track.stop();
-						sender.replaceTrack(audioTrack);
+						const [audioTrack] = outboundStream.getAudioTracks();
+						const sender = pc.getSenders().find((s) => s.track && s.track.kind === audioTrack.kind);
+						if (sender && sender.track) {
+							sender.track.stop();
+						}
+						if (sender) {
+							await sender.replaceTrack(audioTrack);
+						}
 					} catch (e) {
-						logger.error(`replaceSenderTrack unable to replace track for stream for device id ${deviceId} `, stream);
+						logger.error(`replaceSenderTrack unable to replace track for stream for device id ${deviceId} `, stream, e);
 					}
 				}
 			} else {
 				this.stopStreamTracks(stream);
+				if (processedStream !== stream) {
+					this.stopStreamTracks(processedStream);
+				}
 			}
 			return true;
 		} catch (e) {
@@ -1662,6 +1759,14 @@ destroySocketConnection() {
 		if (pc) {
 			this._activeRecoveryPc = pc;
 			attachMediaRecovery(pc, newSess, this);
+			if (webrtcDiagnostics.isEnabled()) {
+				const getBaseContext = () => ({
+					callId: newSess?.id,
+					sipCallId: newSess?.request?.callId,
+				});
+				webrtcDiagnostics.attachWebRTCStateDiagnostics(pc, getBaseContext);
+				webrtcDiagnostics.startWebRTCStatsDiagnostics(pc, getBaseContext);
+			}
 		}
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('accepted');
@@ -1683,9 +1788,13 @@ destroySocketConnection() {
 
 	onInvitationSessionTerminated() {
 		if (this._activeRecoveryPc) {
+			if (webrtcDiagnostics.isEnabled()) {
+				webrtcDiagnostics.stopWebRTCStatsDiagnosticsForPc(this._activeRecoveryPc);
+			}
 			detachMediaRecovery(this._activeRecoveryPc);
 			this._activeRecoveryPc = null;
 		}
+		this._stopProcessedMicStream();
 		this.stopStreamTracks(this.ctxSip.Stream);
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.stopCallStat();
@@ -1798,8 +1907,11 @@ destroySocketConnection() {
 
 	registerWebRTCClient(sipAccountInfo, webrtcSIPPhoneEventDelegate) {
 		this.webrtcSIPPhoneEventDelegate = webrtcSIPPhoneEventDelegate;
-		this.init(sipAccountInfo, () => {
-			this.setPreferredCodec(sipAccountInfo.preferredCodec);
+		this.init(() => {
+			this.applyVoiceQualityFromAccount(sipAccountInfo);
+			if (sipAccountInfo.preferredCodec) {
+				this.setPreferredCodec(sipAccountInfo.preferredCodec, sipAccountInfo.preferredCodecOptions);
+			}
 			this.registerPhoneEventListeners(this.ctxSip);
 		});
 	}

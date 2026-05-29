@@ -18,6 +18,7 @@ import Button from '@mui/material/Button';
 import Input from '@mui/material/Input';
 import { styled } from '@mui/material/styles';
 import { ExotelWebClient} from '@exotel-npm-dev/webrtc-client-sdk';
+import { buildSipAccountInfo } from '../../packages/shared/sipAccountBuilder';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -65,17 +66,7 @@ function App() {
   var lastMicTime = 0.0;
   
 
-  var sipAccountInfo= {
-    'userName':  data[0].Username,
-    'authUser': data[0].Username,
-    'sipdomain': data[0].Domain,
-    'domain': data[0].HostServer + ":" + data[0].Port,
-    'displayname': data[0].DisplayName,
-    'secret': data[0].Password,
-    'port': data[0].Port,
-    'security': data[0].Security,
-    'endpoint': data[0].EndPoint,
-  };
+  const sipAccountInfo = buildSipAccountInfo(data[0], data[0].Username);
   
   var registrationRef = useRef(null);
   var callRef = useRef(null);
@@ -175,15 +166,7 @@ function App() {
 
   function initialise_callbacks() {
     if (configUpdated) {
-      sipAccountInfo['userName'] = phone.Username;
-      sipAccountInfo['authUser'] = phone.Username;
-      sipAccountInfo['sipdomain'] = phone.Domain;
-      sipAccountInfo['domain'] =  phone.HostServer + ":" + phone.Port;
-      sipAccountInfo['displayname'] = phone.DisplayName;
-      sipAccountInfo['secret'] = phone.Password;
-      sipAccountInfo['port'] = phone.Port;
-      sipAccountInfo['security'] = phone.Security;
-      sipAccountInfo['endpoint'] = phone.EndPoint;
+      Object.assign(sipAccountInfo, buildSipAccountInfo(phone, phone.Username));
       exWebClient.initWebrtc(sipAccountInfo, RegisterEventCallBack, CallListenerCallback, SessionCallback)
     }  
   }

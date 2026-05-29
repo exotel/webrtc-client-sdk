@@ -1,0 +1,7 @@
+{
+  "name": "@exotel/webrtc-shared",
+  "version": "1.0.0",
+  "description": "Shared utilities for Exotel WebRTC sample apps",
+  "main": "index.js",
+  "license": "ISC"
+}

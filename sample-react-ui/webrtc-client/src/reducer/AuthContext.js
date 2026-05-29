@@ -27,32 +27,6 @@ export const CONFIGURATION_ADDED = 'CONFIGURATION_ADDED';
 export const CONFIGURATION_MODIFIED = 'CONFIGURATION_MODIFIED';
 export const PHONE_SELECTED = 'PHONE_SELECTED';
 
-/**
- * Action creator
- */
-
- export function login(user_data){
-    return {
-      type: LOGIN_SUCCESSFUL,
-      user_data
-    }
-  }
-  
-  export function logout(user_data){
-    return {
-      type: LOGOUT,
-      user_data
-    }
-  }
-  export function registered(user_data){
-    return {
-      type: REGISTERED_SUCCESSFULLY,
-      user_data
-    }
-  }
-/**
- * Adding a reducer for state management
- */
 export function reducer(state, action){
     switch(action.type){
         case LOGIN_SUCCESSFUL: 
@@ -162,18 +136,15 @@ export function reducer(state, action){
           return res;
         }
         case CONFIGURATION_MODIFIED: {
-          /**
-           * When a particular configuration is modified, look for the details in localstorage
-           * and modify the same
-           */
           var configArr = JSON.parse(window.localStorage.getItem('configObj'));
           var config = JSON.parse(action.payload);
-          /**
-           * Remove the item from that index and push the new content
-           */
           window.localStorage.removeItem('configObj');
           configArr[config.index] = config.configData;
-          window.localStorage.setItem('configObj',JSON.stringify(configArr));
+          window.localStorage.setItem('configObj', JSON.stringify(configArr));
+          return {
+            ...state,
+            configObj: JSON.stringify(configArr),
+          };
         }
         case PHONE_SELECTED: {
           window.localStorage.setItem('selectedPhone', action.payload.selectedPhone);

@@ -40,8 +40,13 @@ class WebrtcSIPPhone {
 		
 		this.webrtcSIPPhoneEventDelegate.registerDelegate(delegate);
 		
-		// Preserve noise suppression setting from existing phone instance if it exists
+		// Preserve voice quality settings from existing phone instance if it exists
 		const existingNoiseSuppression = this.phone?.enableNoiseSuppression;
+		const existingEchoCancellation = this.phone?.enableEchoCancellation;
+		const existingAutoGainControl = this.phone?.enableAutoGainControl;
+		const existingCustomAudioProcessing = this.phone?.customAudioProcessing;
+		const existingPreferredCodecOptions = this.phone?.preferredCodecOptions;
+		const existingPreferredCodec = this.phone?.preferredCodec;
 		const existingRingingDuration = this.phone?.ringingDurationSec;
 		
 		switch (engine) {
@@ -50,9 +55,21 @@ class WebrtcSIPPhone {
 					this.webrtcSIPPhoneEventDelegate,
 					this.username
 				);
-				// Restore noise suppression setting if it was set on the previous instance
-				if (existingNoiseSuppression) {
+				if (existingNoiseSuppression !== undefined) {
 					this.phone.setNoiseSuppression(existingNoiseSuppression);
+				}
+				if (existingEchoCancellation !== undefined) {
+					this.phone.setEchoCancellation(existingEchoCancellation);
+				}
+				if (existingAutoGainControl !== undefined) {
+					this.phone.setAutoGainControl(existingAutoGainControl);
+				}
+				if (existingCustomAudioProcessing) {
+					this.phone.setCustomAudioProcessing(existingCustomAudioProcessing);
+				}
+				if (existingPreferredCodec) {
+					this.phone.setPreferredCodec('opus', existingPreferredCodecOptions);
+					this.phone.preferredCodec = existingPreferredCodec;
 				}
 				if (existingRingingDuration) {
 					this.phone.setRingingDuration(existingRingingDuration);
@@ -270,13 +287,84 @@ class WebrtcSIPPhone {
 		this.phone.changeAudioOutputDevice(deviceId, onSuccess, onError, forceDeviceChange);
 	}
 
-	setPreferredCodec(codecName) {
-		logger.log("webrtcSIPPhone: setPreferredCodec : ", codecName);
-		this.phone.setPreferredCodec(codecName);
+	setPreferredCodec(codecName, options = {}) {
+		logger.log("webrtcSIPPhone: setPreferredCodec : ", codecName, options);
+		if (!this.phone) {
+			return;
+		}
+		this.phone.setPreferredCodec(codecName, options);
+	}
+
+	getPreferredCodecOptions() {
+		if (!this.phone) {
+			return {};
+		}
+		return this.phone.getPreferredCodecOptions();
+	}
+
+	setNoiseSuppression(enabled = false) {
+        logger.log("webrtcSIPPhone: setNoiseSuppression: ", enabled);
+		if (!this.phone) {
+			return;
+		}
+        this.phone.setNoiseSuppression(enabled);
+    }
+
+	setEchoCancellation(enabled = true) {
+		logger.log("webrtcSIPPhone: setEchoCancellation: ", enabled);
+		if (!this.phone) {
+			return;
+		}
+		this.phone.setEchoCancellation(enabled);
+	}
+
+	setAutoGainControl(enabled = true) {
+		logger.log("webrtcSIPPhone: setAutoGainControl: ", enabled);
+		if (!this.phone) {
+			return;
+		}
+		this.phone.setAutoGainControl(enabled);
+	}
+
+	setAudioProcessing(options = {}) {
+		logger.log("webrtcSIPPhone: setAudioProcessing: ", options);
+		if (!this.phone) {
+			return;
+		}
+		this.phone.setAudioProcessing(options);
+	}
+
+	getAudioProcessing() {
+		if (!this.phone) {
+			return {
+				noiseSuppression: false,
+				echoCancellation: true,
+				autoGainControl: true,
+			};
+		}
+		return this.phone.getAudioProcessing();
+	}
+
+	setCustomAudioProcessing(options = {}) {
+		logger.log("webrtcSIPPhone: setCustomAudioProcessing: ", options);
+		if (!this.phone) {
+			return;
+		}
+		this.phone.setCustomAudioProcessing(options);
+	}
+
+	getCustomAudioProcessing() {
+		if (!this.phone) {
+			return { enabled: false, mode: 'off' };
+		}
+		return this.phone.getCustomAudioProcessing();
 	}
 
 	registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback) {
 		logger.log("webrtcSIPPhone: registerAudioDeviceChangeCallback entry");
+		if (!this.phone) {
+			return;
+		}
 		this.phone.registerAudioDeviceChangeCallback(audioInputDeviceChangeCallback, audioOutputDeviceChangeCallback, onDeviceChangeCallback);
 	}
 
@@ -292,18 +380,19 @@ class WebrtcSIPPhone {
 
 	setCallAudioOutputVolume(value) {
 		logger.log("webrtcSIPPhone: setCallAudioOutputVolume: ", value);
+		if (!this.phone) {
+			return false;
+		}
 		return this.phone.setCallAudioOutputVolume(value);
 	}
 
 	getCallAudioOutputVolume() {
 		logger.log("webrtcSIPPhone: getCallAudioOutputVolume");
+		if (!this.phone) {
+			return 1;
+		}
 		return this.phone.getCallAudioOutputVolume();
 	}
-
-	setNoiseSuppression(enabled = false) {
-        logger.log("webrtcSIPPhone: setNoiseSuppression: ", enabled);
-        this.phone.setNoiseSuppression(enabled);
-    }
 
 	setRingingDuration(seconds) {
 		logger.log("webrtcSIPPhone: setRingingDuration: ", seconds);

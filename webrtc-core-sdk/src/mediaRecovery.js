@@ -93,11 +93,13 @@ async function ensureLocalAudioSending(phoneContext, session) {
     if (endedAudioSender && typeof phoneContext.replaceSenderTrack === 'function') {
         const deviceId = audioDeviceManager.currentAudioInputDeviceId || 'default';
         try {
-            const constraints = deviceId === 'default'
-                ? { audio: true }
-                : { audio: { deviceId: { exact: deviceId } } };
+            const constraints = typeof phoneContext.getAudioConstraints === 'function'
+                ? phoneContext.getAudioConstraints(deviceId)
+                : (deviceId === 'default'
+                    ? { audio: true }
+                    : { audio: { deviceId: { exact: deviceId } } });
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            phoneContext.replaceSenderTrack(stream, deviceId);
+            await phoneContext.replaceSenderTrack(stream, deviceId);
             logger.log('mediaRecovery:ensureLocalAudioSending: replaced ended mic track');
             logSenderTrackState(pc, 'ensureLocalAudioSending:after_replace');
             return true;

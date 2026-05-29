@@ -3,21 +3,28 @@ import ReactDOM from 'react-dom';
 import { WebrtcApp } from './routes';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './reducer/AuthContext';
-//import { unstable_useId } from '@mui/material';
-//import { PrimaryPhoneAppBar } from './components/HeaderComponent/AppBar';
+import { WebRtcClientProvider } from './context/WebRtcClientContext';
+import { BroadcastChannelProvider } from './context/BroadcastChannelContext';
+import { CallProvider } from './context/CallContext';
+import { DiagnosticsProvider } from './context/DiagnosticsContext';
 
-var myPhoneDetails = {
-  phoneNo:"test"
-}
+const myPhoneDetails = {
+  phoneNo: 'test',
+};
 
 ReactDOM.render(
   <AuthProvider>
-    <WebrtcApp myPhoneDetails={myPhoneDetails}/>
-    </AuthProvider>,
+    <WebRtcClientProvider>
+      <BroadcastChannelProvider>
+        <CallProvider>
+          <DiagnosticsProvider>
+            <WebrtcApp myPhoneDetails={myPhoneDetails} />
+          </DiagnosticsProvider>
+        </CallProvider>
+      </BroadcastChannelProvider>
+    </WebRtcClientProvider>
+  </AuthProvider>,
   document.getElementById('root')
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

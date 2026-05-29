@@ -24,7 +24,7 @@ export const audioDeviceManager = {
         this.resetOutputDevice = value;
     },
 
-    async changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
+    async changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange, mediaConstraints) {
         logger.log(`SIPJSPhone:changeAudioInputDevice entry`);
         try {
             if (this.enableAutoAudioDeviceChangeHandling && !forceDeviceChange) {
@@ -41,9 +41,10 @@ export const audioDeviceManager = {
                 }
                 logger.log(`SIPJSPhone:changeAudioInputDevice acquiring input device ${deviceId} : ${inputDevice.label}`);
             }
-            const stream = await navigator.mediaDevices.getUserMedia({
+            const constraints = mediaConstraints || {
                 audio: { deviceId: { exact: deviceId } }
-            });
+            };
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
             onSuccess(stream);
         } catch (error) {
             logger.error('SIPJSPhone:changeAudioInputDevice Error changing input device:', error);

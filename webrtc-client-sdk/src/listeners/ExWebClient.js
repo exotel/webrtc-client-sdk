@@ -3,7 +3,7 @@ import { DoRegister as DoRegisterRL, UnRegister as UnRegisterRL } from '../api/r
 import { CallListener } from '../listeners/CallListener';
 import { ExotelVoiceClientListener } from '../listeners/ExotelVoiceClientListener';
 import { SessionListener } from '../listeners/SessionListeners';
-import { CallController } from "./CallCtrlerDummy";
+import { CallController } from "./CallController";
 
 import { closeDiagnostics as closeDiagnosticsDL, initDiagnostics as initDiagnosticsDL, startMicDiagnosticsTest as startMicDiagnosticsTestDL, startNetworkDiagnostics as startNetworkDiagnosticsDL, startSpeakerDiagnosticsTest as startSpeakerDiagnosticsTestDL, stopMicDiagnosticsTest as stopMicDiagnosticsTestDL, stopNetworkDiagnostics as stopNetworkDiagnosticsDL, stopSpeakerDiagnosticsTest as stopSpeakerDiagnosticsTestDL } from '../api/omAPI/DiagnosticsListener';
 
@@ -307,7 +307,11 @@ class ExotelWebClient {
         }
 
         // Initialize the phone with SIP engine
-        this.webrtcSIPPhone.registerPhone("sipjs", new ExDelegationHandler(this), this.sipAccountInfo.enableAutoAudioDeviceChangeHandling);
+        const autoDeviceChange = enableAutoAudioDeviceChangeHandling
+            || Boolean(sipAccountInfo_.autoAudioDeviceChange);
+        this.webrtcSIPPhone.registerPhone("sipjs", new ExDelegationHandler(this), autoDeviceChange);
+
+        this._applyVoiceQualityConfig(sipAccountInfo_);
 
         // Create call instance after phone is initialized
         if (!this.call) {
@@ -606,13 +610,90 @@ class ExotelWebClient {
         LogManager.downloadLogs();
     }
 
-    setPreferredCodec(codecName) {
+    setPreferredCodec(codecName, options = {}) {
         logger.log("ExWebClient: setPreferredCodec: Entry");
         if (!this.webrtcSIPPhone || !this.webrtcSIPPhone.phone) {
             logger.warn("ExWebClient: setPreferredCodec: Phone not initialized");
             return;
         }
-        this.webrtcSIPPhone.setPreferredCodec(codecName);
+        this.webrtcSIPPhone.setPreferredCodec(codecName, options);
+    }
+
+    getPreferredCodecOptions() {
+        if (!this.webrtcSIPPhone) {
+            return {};
+        }
+        return this.webrtcSIPPhone.getPreferredCodecOptions();
+    }
+
+    _applyVoiceQualityConfig(sipAccountInfo = {}) {
+        if (!this.webrtcSIPPhone) {
+            return;
+        }
+        if (sipAccountInfo.audioProcessing) {
+            this.webrtcSIPPhone.setAudioProcessing(sipAccountInfo.audioProcessing);
+        }
+        if (sipAccountInfo.preferredCodec) {
+            this.webrtcSIPPhone.setPreferredCodec(
+                sipAccountInfo.preferredCodec,
+                sipAccountInfo.preferredCodecOptions
+            );
+        }
+        if (sipAccountInfo.customAudioProcessing) {
+            this.webrtcSIPPhone.setCustomAudioProcessing(sipAccountInfo.customAudioProcessing);
+        }
+    }
+
+    setAudioProcessing(options = {}) {
+        logger.log("ExWebClient: setAudioProcessing", options);
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: setAudioProcessing: webrtcSIPPhone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.setAudioProcessing(options);
+    }
+
+    getAudioProcessing() {
+        if (!this.webrtcSIPPhone) {
+            return {
+                noiseSuppression: false,
+                echoCancellation: true,
+                autoGainControl: true,
+            };
+        }
+        return this.webrtcSIPPhone.getAudioProcessing();
+    }
+
+    setEchoCancellation(enabled = true) {
+        logger.log(`ExWebClient: setEchoCancellation: ${enabled}`);
+        if (!this.webrtcSIPPhone) {
+            return;
+        }
+        this.webrtcSIPPhone.setEchoCancellation(enabled);
+    }
+
+    setAutoGainControl(enabled = true) {
+        logger.log(`ExWebClient: setAutoGainControl: ${enabled}`);
+        if (!this.webrtcSIPPhone) {
+            return;
+        }
+        this.webrtcSIPPhone.setAutoGainControl(enabled);
+    }
+
+    setCustomAudioProcessing(options = {}) {
+        logger.log("ExWebClient: setCustomAudioProcessing", options);
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: setCustomAudioProcessing: webrtcSIPPhone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.setCustomAudioProcessing(options);
+    }
+
+    getCustomAudioProcessing() {
+        if (!this.webrtcSIPPhone) {
+            return { enabled: false, mode: 'off' };
+        }
+        return this.webrtcSIPPhone.getCustomAudioProcessing();
     }
 
     static registerLoggerCallback(callback) {
@@ -658,6 +739,9 @@ class ExotelWebClient {
 
     setNoiseSuppression(enabled = false) {
         logger.log(`ExWebClient: setNoiseSuppression: ${enabled}`);
+        if (!this.webrtcSIPPhone) {
+            return;
+        }
         this.webrtcSIPPhone.setNoiseSuppression(enabled);
     }
 
