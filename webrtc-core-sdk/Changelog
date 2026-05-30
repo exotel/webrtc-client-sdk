@@ -1,7 +1,7 @@
 Change Log
 
 ## v3.0.12 06 May, 2026
--[VST-1775] Media resilience: ICE/connection recovery FSM, inbound RTP watchdog, background tab recovery; restore outbound mic (sender tracks / replaceTrack) after network blip; SessionCallback `media_recovery_*` events
+-[VST-1775] Auto-restore call audio after network blip, inbound stall, or tab return; optional SessionCallback events media_recovery_attempted / succeeded / failed / degraded
 
 ## v3.0.9 27 March, 2026
 -[VST-1577] Removed the same-device-ID guard from replaceSenderTrack.

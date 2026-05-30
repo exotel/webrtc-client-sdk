@@ -1,51 +1,37 @@
-# WebSDK media resilience (3.0.12+)
+# 3.0.12 — Media resilience
 
-Public integration notes for release **3.0.12** (PR1: media recovery only). For full API details see the Exotel Voice WebSDK integration guides linked from the repository README.
+Upgrade **webrtc-core-sdk** and **webrtc-client-sdk** to **3.0.12** together.
 
-## What changed
+## What you get
 
-The SDK automatically attempts to restore call audio after:
+Call audio is restored automatically when:
 
-- ICE or connection state blips (`disconnected` → `connected`)
-- Inbound RTP byte stalls on an established session
-- Browser tab returning to the foreground
+- Network drops briefly and reconnects
+- Inbound audio stops on an active call
+- The agent returns to the browser tab
 
-Recovery also attempts to restore outbound microphone tracks after network blips when the call is not on hold or muted.
+No code changes are required for basic recovery.
 
-## Integrator APIs
+## Optional: reconnect UI
 
-### Media recovery events
+If you use `SessionCallback`, you can show a “reconnecting audio” message:
 
-Subscribe via `SessionCallback`. Event names are prefixed with `media_recovery_`:
-
-| Event | Meaning |
-|-------|---------|
+| SessionCallback event | Meaning |
+|-----------------------|---------|
 | `media_recovery_attempted` | Recovery started |
-| `media_recovery_succeeded` | Remote audio play and/or sender restore succeeded |
-| `media_recovery_failed` | Retry budget exhausted (default: 3 attempts per 30s window) |
-| `media_recovery_degraded` | ICE or connection entered a degraded state |
-
-Example handler:
+| `media_recovery_succeeded` | Audio restored |
+| `media_recovery_failed` | Recovery gave up (call may still be up) |
+| `media_recovery_degraded` | Connection is unstable |
 
 ```javascript
 function sessionCallback(eventName, callFromNumber) {
-  if (eventName.startsWith('media_recovery_')) {
-    // Show agent-facing "reconnecting audio" UI if desired
-    console.log(eventName, callFromNumber);
+  if (eventName === 'media_recovery_attempted') {
+    showMessage('Reconnecting audio…');
+  }
+  if (eventName === 'media_recovery_succeeded') {
+    hideMessage();
   }
 }
 ```
 
-## Recommended integration checklist
-
-1. Upgrade **webrtc-core-sdk** and **webrtc-client-sdk** to **3.0.12** or later together.
-2. Handle `media_recovery_*` session events if you want agent-facing reconnect UI.
-3. Avoid heavy main-thread work in the host app during active calls.
-
-## Manual test plan
-
-See [MEDIA-RESILIENCE-TEST-PLAN.md](MEDIA-RESILIENCE-TEST-PLAN.md) for the reviewer test matrix.
-
-## Follow-up (separate PR)
-
-UI tone reliability (`primeUiTones`), configurable ring duration, and optional WebRTC diagnostics are deferred to a follow-up PR. See [VST-1775-PR2-SCOPE.md](VST-1775-PR2-SCOPE.md).
+Recovery is skipped while the call is on hold or muted.
