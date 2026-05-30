@@ -1,0 +1,2186 @@
+[2026-05-30T12:07:16.723Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:07:16.723Z] [LOG] ExWebClient: registerEventCallback: Received ---> registered ["[REDACTED_AGENT]",null]
+[2026-05-30T12:07:16.729Z] [LOG] ExWebClient: registerAudioDeviceChangeCallback: Entry
+[2026-05-30T12:07:16.730Z] [LOG] webrtcSIPPhone: registerAudioDeviceChangeCallback entry
+[2026-05-30T12:07:16.730Z] [LOG] sipjsphone: registerAudioDeviceChangeCallback: entry
+[2026-05-30T12:07:16.731Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringtone, value: 1
+[2026-05-30T12:07:16.732Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringtone" 1
+[2026-05-30T12:07:16.733Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:07:16.734Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:07:16.734Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringbacktone, value: 1
+[2026-05-30T12:07:16.735Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringbacktone" 1
+[2026-05-30T12:07:16.735Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:07:16.736Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:07:16.736Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: beeptone, value: 1
+[2026-05-30T12:07:16.737Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "beeptone" 1
+[2026-05-30T12:07:16.737Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:07:16.738Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:07:16.738Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: dtmftone, value: 1
+[2026-05-30T12:07:16.738Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "dtmftone" 1
+[2026-05-30T12:07:16.739Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:07:16.739Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:07:16.740Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Constructing non-INVITE client transaction with id z9hG4bK8428736.
+[2026-05-30T12:07:16.740Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:07:16.740Z] [LOG] delegationHandler: eventType ["sent_request"]
+[2026-05-30T12:07:16.741Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:07:16.741Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:07:16.741Z] [LOG] delegationHandler: eventType
+ "sent_request"
+[2026-05-30T12:07:16.742Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:07:16.742Z] [LOG] ExWebClient: registerEventCallback: Received ---> sent_request ["[REDACTED_AGENT]",null]
+[2026-05-30T12:07:16.742Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:07:16.742Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+REGISTER sip:siptrunkingpoc1m.voip.exotel.com SIP/2.0
+Via: SIP/2.0/WSS 192.0.2.104;branch=z9hG4bK8428736;rport
+To: <sip:[REDACTED]@[REDACTED]
+From: "[REDACTED_AGENT]" <sip:[REDACTED]@[REDACTED]
+CSeq: 17 REGISTER
+Call-ID: t7m9g5co0tag1hdufjt2
+Max-Forwards: 70
+Authorization: Digest algorithm=MD5, username="[REDACTED_AGENT]", realm="siptrunkingpoc1m.voip.exotel.com", nonce="ahrSPmoa0RLc+EsYdAbUl0KiBv38yhfZ", uri="sip:siptrunkingpoc1m.voip.exotel.com", response="1bd39c9a429ab498d01472be10dd2509", qop=auth, cnonce="rqbll598ei0r", nc=00000001
+Contact: <sip:[REDACTED]@[REDACTED]
+Allow: ACK,CANCEL,INVITE,MESSAGE,BYE,OPTIONS,INFO,NOTIFY,REFER
+Supported: outbound, path, gruu
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:07:16.775Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:07:16.775Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+SIP/2.0 401 Unauthorized
+Via: SIP/2.0/WSS 192.0.2.104;received=151.186.177.146;branch=z9hG4bK8428736;rport=43370
+To: <sip:[REDACTED]@[REDACTED]
+From: "[REDACTED_AGENT]" <sip:[REDACTED]@[REDACTED]
+CSeq: 17 REGISTER
+Call-ID: t7m9g5co0tag1hdufjt2
+WWW-Authenticate: Digest realm="siptrunkingpoc1m.voip.exotel.com", nonce="ahrUIGoa0vSSwVMv2gozY+hwbXZfwU0t", qop="auth"
+Server: kamailio (5.7.0 (x86_64/linux))
+Content-Length: 0
+[2026-05-30T12:07:16.780Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: State change to "Completed" on non-INVITE client transaction with id z9hG4bK8428736.
+[2026-05-30T12:07:16.780Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Constructing non-INVITE client transaction with id z9hG4bK9952658.
+[2026-05-30T12:07:16.780Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:07:16.781Z] [LOG] delegationHandler: eventType ["sent_request"]
+[2026-05-30T12:07:16.781Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:07:16.781Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:07:16.781Z] [LOG] delegationHandler: eventType
+ "sent_request"
+[2026-05-30T12:07:16.782Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:07:16.782Z] [LOG] ExWebClient: registerEventCallback: Received ---> sent_request ["[REDACTED_AGENT]",null]
+[2026-05-30T12:07:16.782Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:07:16.783Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+REGISTER sip:siptrunkingpoc1m.voip.exotel.com SIP/2.0
+Via: SIP/2.0/WSS 192.0.2.104;branch=z9hG4bK9952658;rport
+To: <sip:[REDACTED]@[REDACTED]
+From: "[REDACTED_AGENT]" <sip:[REDACTED]@[REDACTED]
+CSeq: 18 REGISTER
+Call-ID: t7m9g5co0tag1hdufjt2
+Max-Forwards: 70
+Authorization: Digest algorithm=MD5, username="[REDACTED_AGENT]", realm="siptrunkingpoc1m.voip.exotel.com", nonce="ahrUIGoa0vSSwVMv2gozY+hwbXZfwU0t", uri="sip:siptrunkingpoc1m.voip.exotel.com", response="ef8f1d3f873b425554b25a01ba0fdb6f", qop=auth, cnonce="djcbtl09p53v", nc=00000001
+Contact: <sip:[REDACTED]@[REDACTED]
+Allow: ACK,CANCEL,INVITE,MESSAGE,BYE,OPTIONS,INFO,NOTIFY,REFER
+Supported: outbound, path, gruu
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:07:16.783Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Destroyed non-INVITE client transaction with id z9hG4bK8428736.
+[2026-05-30T12:07:16.783Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: State change to "Terminated" on non-INVITE client transaction with id z9hG4bK8428736.
+[2026-05-30T12:07:16.820Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:07:16.821Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+SIP/2.0 200 OK
+Via: SIP/2.0/WSS 192.0.2.104;received=151.186.177.146;branch=z9hG4bK9952658;rport=43370
+To: <sip:[REDACTED]@[REDACTED]
+From: "[REDACTED_AGENT]" <sip:[REDACTED]@[REDACTED]
+CSeq: 18 REGISTER
+Call-ID: t7m9g5co0tag1hdufjt2
+Contact: <sip:[REDACTED]@[REDACTED]"sip:151.186.177.146:43370;transport=ws"
+Server: kamailio (5.7.0 (x86_64/linux))
+Content-Length: 0
+[2026-05-30T12:07:16.823Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: State change to "Completed" on non-INVITE client transaction with id z9hG4bK9952658.
+[2026-05-30T12:07:16.823Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: Waiting toggled to false
+[2026-05-30T12:07:16.823Z] [LOG] sipjsphone: registererStateEventListner: Registration state changed to: ["Registered"]
+[2026-05-30T12:07:16.824Z] [LOG] sipjsphone: registererStateEventListner: Registration successful
+[2026-05-30T12:07:16.824Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:07:16.824Z] [LOG] delegationHandler: eventType ["registered"]
+[2026-05-30T12:07:16.825Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:07:16.825Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:07:16.825Z] [LOG] delegationHandler: eventType
+ "registered"
+[2026-05-30T12:07:16.825Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:07:16.826Z] [LOG] ExWebClient: registerEventCallback: Received ---> registered ["[REDACTED_AGENT]",null]
+[2026-05-30T12:07:16.829Z] [LOG] ExWebClient: registerAudioDeviceChangeCallback: Entry
+[2026-05-30T12:07:16.829Z] [LOG] webrtcSIPPhone: registerAudioDeviceChangeCallback entry
+[2026-05-30T12:07:16.830Z] [LOG] sipjsphone: registerAudioDeviceChangeCallback: entry
+[2026-05-30T12:07:16.830Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringtone, value: 1
+[2026-05-30T12:07:16.830Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringtone" 1
+[2026-05-30T12:07:16.831Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:07:16.831Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:07:16.831Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringbacktone, value: 1
+[2026-05-30T12:07:16.831Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringbacktone" 1
+[2026-05-30T12:07:16.832Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:07:16.832Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:07:16.832Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: beeptone, value: 1
+[2026-05-30T12:07:16.832Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "beeptone" 1
+[2026-05-30T12:07:16.833Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:07:16.833Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:07:16.833Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: dtmftone, value: 1
+[2026-05-30T12:07:16.833Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "dtmftone" 1
+[2026-05-30T12:07:16.834Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:07:16.835Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:07:16.835Z] [LOG] sipjsphone: registererStateEventListner: Registration state changed to: ["Registered"]
+[2026-05-30T12:07:16.835Z] [LOG] sipjsphone: registererStateEventListner: Registration successful
+[2026-05-30T12:07:16.836Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:07:16.836Z] [LOG] delegationHandler: eventType ["registered"]
+[2026-05-30T12:07:16.836Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:07:16.837Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:07:16.837Z] [LOG] delegationHandler: eventType
+ "registered"
+[2026-05-30T12:07:16.838Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:07:16.838Z] [LOG] ExWebClient: registerEventCallback: Received ---> registered ["[REDACTED_AGENT]",null]
+[2026-05-30T12:07:16.841Z] [LOG] ExWebClient: registerAudioDeviceChangeCallback: Entry
+[2026-05-30T12:07:16.842Z] [LOG] webrtcSIPPhone: registerAudioDeviceChangeCallback entry
+[2026-05-30T12:07:16.842Z] [LOG] sipjsphone: registerAudioDeviceChangeCallback: entry
+[2026-05-30T12:07:16.842Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringtone, value: 1
+[2026-05-30T12:07:16.843Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringtone" 1
+[2026-05-30T12:07:16.843Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:07:16.843Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:07:16.844Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringbacktone, value: 1
+[2026-05-30T12:07:16.844Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringbacktone" 1
+[2026-05-30T12:07:16.844Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:07:16.844Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:07:16.845Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: beeptone, value: 1
+[2026-05-30T12:07:16.845Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "beeptone" 1
+[2026-05-30T12:07:16.845Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:07:16.846Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:07:16.846Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: dtmftone, value: 1
+[2026-05-30T12:07:16.846Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "dtmftone" 1
+[2026-05-30T12:07:16.846Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:07:16.847Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:07:16.847Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Destroyed non-INVITE client transaction with id z9hG4bK9952658.
+[2026-05-30T12:07:16.847Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: State change to "Terminated" on non-INVITE client transaction with id z9hG4bK9952658.
+[2026-05-30T12:07:16.848Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Destroyed non-INVITE client transaction with id z9hG4bK9952658.
+[2026-05-30T12:11:17.688Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: Waiting toggled to true
+[2026-05-30T12:11:17.690Z] [LOG] sipjsphone: registererStateEventListner: Registration state changed to: ["Registered"]
+[2026-05-30T12:11:17.690Z] [LOG] sipjsphone: registererStateEventListner: Registration successful
+[2026-05-30T12:11:17.691Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:11:17.692Z] [LOG] delegationHandler: eventType ["registered"]
+[2026-05-30T12:11:17.694Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:11:17.694Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:11:17.695Z] [LOG] delegationHandler: eventType
+ "registered"
+[2026-05-30T12:11:17.696Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:11:17.697Z] [LOG] ExWebClient: registerEventCallback: Received ---> registered ["[REDACTED_AGENT]",null]
+[2026-05-30T12:11:17.706Z] [LOG] ExWebClient: registerAudioDeviceChangeCallback: Entry
+[2026-05-30T12:11:17.707Z] [LOG] webrtcSIPPhone: registerAudioDeviceChangeCallback entry
+[2026-05-30T12:11:17.708Z] [LOG] sipjsphone: registerAudioDeviceChangeCallback: entry
+[2026-05-30T12:11:17.709Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringtone, value: 1
+[2026-05-30T12:11:17.710Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringtone" 1
+[2026-05-30T12:11:17.710Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:11:17.711Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:11:17.711Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringbacktone, value: 1
+[2026-05-30T12:11:17.712Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringbacktone" 1
+[2026-05-30T12:11:17.712Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:11:17.713Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:11:17.713Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: beeptone, value: 1
+[2026-05-30T12:11:17.714Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "beeptone" 1
+[2026-05-30T12:11:17.714Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:11:17.715Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:11:17.715Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: dtmftone, value: 1
+[2026-05-30T12:11:17.715Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "dtmftone" 1
+[2026-05-30T12:11:17.716Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:11:17.716Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:11:17.717Z] [LOG] sipjsphone: registererStateEventListner: Registration state changed to: ["Registered"]
+[2026-05-30T12:11:17.718Z] [LOG] sipjsphone: registererStateEventListner: Registration successful
+[2026-05-30T12:11:17.718Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:11:17.718Z] [LOG] delegationHandler: eventType ["registered"]
+[2026-05-30T12:11:17.719Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:11:17.719Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:11:17.720Z] [LOG] delegationHandler: eventType
+ "registered"
+[2026-05-30T12:11:17.723Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:11:17.723Z] [LOG] ExWebClient: registerEventCallback: Received ---> registered ["[REDACTED_AGENT]",null]
+[2026-05-30T12:11:17.733Z] [LOG] ExWebClient: registerAudioDeviceChangeCallback: Entry
+[2026-05-30T12:11:17.733Z] [LOG] webrtcSIPPhone: registerAudioDeviceChangeCallback entry
+[2026-05-30T12:11:17.734Z] [LOG] sipjsphone: registerAudioDeviceChangeCallback: entry
+[2026-05-30T12:11:17.735Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringtone, value: 1
+[2026-05-30T12:11:17.736Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringtone" 1
+[2026-05-30T12:11:17.737Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:11:17.737Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:11:17.738Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringbacktone, value: 1
+[2026-05-30T12:11:17.739Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringbacktone" 1
+[2026-05-30T12:11:17.740Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:11:17.740Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:11:17.741Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: beeptone, value: 1
+[2026-05-30T12:11:17.742Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "beeptone" 1
+[2026-05-30T12:11:17.742Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:11:17.742Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:11:17.743Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: dtmftone, value: 1
+[2026-05-30T12:11:17.743Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "dtmftone" 1
+[2026-05-30T12:11:17.743Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:11:17.744Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:11:17.744Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Constructing non-INVITE client transaction with id z9hG4bK482332.
+[2026-05-30T12:11:17.744Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:11:17.745Z] [LOG] delegationHandler: eventType ["sent_request"]
+[2026-05-30T12:11:17.745Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:11:17.745Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:11:17.746Z] [LOG] delegationHandler: eventType
+ "sent_request"
+[2026-05-30T12:11:17.746Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:11:17.746Z] [LOG] ExWebClient: registerEventCallback: Received ---> sent_request ["[REDACTED_AGENT]",null]
+[2026-05-30T12:11:17.747Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:11:17.747Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+REGISTER sip:siptrunkingpoc1m.voip.exotel.com SIP/2.0
+Via: SIP/2.0/WSS 192.0.2.104;branch=z9hG4bK482332;rport
+To: <sip:[REDACTED]@[REDACTED]
+From: "[REDACTED_AGENT]" <sip:[REDACTED]@[REDACTED]
+CSeq: 19 REGISTER
+Call-ID: t7m9g5co0tag1hdufjt2
+Max-Forwards: 70
+Authorization: Digest algorithm=MD5, username="[REDACTED_AGENT]", realm="siptrunkingpoc1m.voip.exotel.com", nonce="ahrUIGoa0vSSwVMv2gozY+hwbXZfwU0t", uri="sip:siptrunkingpoc1m.voip.exotel.com", response="ef8f1d3f873b425554b25a01ba0fdb6f", qop=auth, cnonce="djcbtl09p53v", nc=00000001
+Contact: <sip:[REDACTED]@[REDACTED]
+Allow: ACK,CANCEL,INVITE,MESSAGE,BYE,OPTIONS,INFO,NOTIFY,REFER
+Supported: outbound, path, gruu
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:11:17.787Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:11:17.788Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+SIP/2.0 200 OK
+Via: SIP/2.0/WSS 192.0.2.104;received=151.186.177.146;branch=z9hG4bK482332;rport=43370
+To: <sip:[REDACTED]@[REDACTED]
+From: "[REDACTED_AGENT]" <sip:[REDACTED]@[REDACTED]
+CSeq: 19 REGISTER
+Call-ID: t7m9g5co0tag1hdufjt2
+Contact: <sip:[REDACTED]@[REDACTED]"sip:151.186.177.146:43370;transport=ws"
+Server: kamailio (5.7.0 (x86_64/linux))
+Content-Length: 0
+[2026-05-30T12:11:17.793Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: State change to "Completed" on non-INVITE client transaction with id z9hG4bK482332.
+[2026-05-30T12:11:17.793Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: Waiting toggled to false
+[2026-05-30T12:11:17.793Z] [LOG] sipjsphone: registererStateEventListner: Registration state changed to: ["Registered"]
+[2026-05-30T12:11:17.794Z] [LOG] sipjsphone: registererStateEventListner: Registration successful
+[2026-05-30T12:11:17.794Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:11:17.794Z] [LOG] delegationHandler: eventType ["registered"]
+[2026-05-30T12:11:17.794Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:11:17.794Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:11:17.795Z] [LOG] delegationHandler: eventType
+ "registered"
+[2026-05-30T12:11:17.795Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:11:17.795Z] [LOG] ExWebClient: registerEventCallback: Received ---> registered ["[REDACTED_AGENT]",null]
+[2026-05-30T12:11:17.798Z] [LOG] ExWebClient: registerAudioDeviceChangeCallback: Entry
+[2026-05-30T12:11:17.798Z] [LOG] webrtcSIPPhone: registerAudioDeviceChangeCallback entry
+[2026-05-30T12:11:17.799Z] [LOG] sipjsphone: registerAudioDeviceChangeCallback: entry
+[2026-05-30T12:11:17.799Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringtone, value: 1
+[2026-05-30T12:11:17.799Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringtone" 1
+[2026-05-30T12:11:17.799Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:11:17.800Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:11:17.800Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringbacktone, value: 1
+[2026-05-30T12:11:17.800Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringbacktone" 1
+[2026-05-30T12:11:17.800Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:11:17.801Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:11:17.801Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: beeptone, value: 1
+[2026-05-30T12:11:17.801Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "beeptone" 1
+[2026-05-30T12:11:17.801Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:11:17.802Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:11:17.802Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: dtmftone, value: 1
+[2026-05-30T12:11:17.802Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "dtmftone" 1
+[2026-05-30T12:11:17.802Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:11:17.802Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:11:17.803Z] [LOG] sipjsphone: registererStateEventListner: Registration state changed to: ["Registered"]
+[2026-05-30T12:11:17.803Z] [LOG] sipjsphone: registererStateEventListner: Registration successful
+[2026-05-30T12:11:17.803Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:11:17.803Z] [LOG] delegationHandler: eventType ["registered"]
+[2026-05-30T12:11:17.803Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:11:17.804Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:11:17.804Z] [LOG] delegationHandler: eventType
+ "registered"
+[2026-05-30T12:11:17.804Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:11:17.804Z] [LOG] ExWebClient: registerEventCallback: Received ---> registered ["[REDACTED_AGENT]",null]
+[2026-05-30T12:11:17.808Z] [LOG] ExWebClient: registerAudioDeviceChangeCallback: Entry
+[2026-05-30T12:11:17.808Z] [LOG] webrtcSIPPhone: registerAudioDeviceChangeCallback entry
+[2026-05-30T12:11:17.809Z] [LOG] sipjsphone: registerAudioDeviceChangeCallback: entry
+[2026-05-30T12:11:17.809Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringtone, value: 1
+[2026-05-30T12:11:17.810Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringtone" 1
+[2026-05-30T12:11:17.810Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:11:17.810Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:11:17.810Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringbacktone, value: 1
+[2026-05-30T12:11:17.811Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringbacktone" 1
+[2026-05-30T12:11:17.811Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:11:17.811Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:11:17.812Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: beeptone, value: 1
+[2026-05-30T12:11:17.812Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "beeptone" 1
+[2026-05-30T12:11:17.812Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:11:17.812Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:11:17.813Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: dtmftone, value: 1
+[2026-05-30T12:11:17.813Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "dtmftone" 1
+[2026-05-30T12:11:17.813Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:11:17.813Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:11:17.814Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Destroyed non-INVITE client transaction with id z9hG4bK482332.
+[2026-05-30T12:11:17.814Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: State change to "Terminated" on non-INVITE client transaction with id z9hG4bK482332.
+[2026-05-30T12:11:17.814Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Destroyed non-INVITE client transaction with id z9hG4bK482332.
+[2026-05-30T12:12:06.124Z] [LOG] ExWebClient: setEnableConsoleLogging: Entry, enable: true
+[2026-05-30T12:12:06.125Z] [LOG] ExWebClient: registerLoggerCallback: Entry
+[2026-05-30T12:12:06.160Z] [LOG] ExWebClient: initWebrtc: Exotel Client Initialised with {"userName":"[REDACTED_AGENT]","authUser":"[REDACTED_AGENT]","sipdomain":"siptrunkingpoc1m.voip.exotel.com","domain":"in.voip.exotel.com:443","displayname":"Guru","secret":"abcd1234","port":443,"security":"wss","endpoint":"wss","enableAutoAudioDeviceChangeHandling":false}
+[2026-05-30T12:12:06.161Z] [LOG] ExWebClient: initWebrtc: Initializing session callback
+[2026-05-30T12:12:06.161Z] [LOG] webrtcSIPPhone: registerPhone :  "sipjs" "enableAutoAudioDeviceChangeHandling:" false
+[2026-05-30T12:12:06.161Z] [LOG] SIPJSPhone: configure: entry
+[2026-05-30T12:12:06.162Z] [LOG] audioDeviceManager:registerUiTone entry for "ringtone"
+[2026-05-30T12:12:06.162Z] [LOG] audioDeviceManager:registerUiTone entry for "ringbacktone"
+[2026-05-30T12:12:06.162Z] [LOG] audioDeviceManager:registerUiTone entry for "dtmftone"
+[2026-05-30T12:12:06.163Z] [LOG] audioDeviceManager:registerUiTone entry for "beeptone"
+[2026-05-30T12:12:06.163Z] [LOG] sipjsphone: setEnableAutoAudioDeviceChangeHandling: entry, enableAutoAudioDeviceChangeHandling =  false
+[2026-05-30T12:12:06.164Z] [LOG] ExWebClient: getAudioOutputVolume: Entry, audioElementName: ringtone
+[2026-05-30T12:12:06.164Z] [LOG] webrtcSIPPhone: getAudioOutputVolume:  "ringtone"
+[2026-05-30T12:12:06.164Z] [LOG] SIPJSPhone: getAudioOutputVolume: ringtone
+[2026-05-30T12:12:06.165Z] [LOG] ExWebClient: getAudioOutputVolume: Entry, audioElementName: ringbacktone
+[2026-05-30T12:12:06.165Z] [LOG] webrtcSIPPhone: getAudioOutputVolume:  "ringbacktone"
+[2026-05-30T12:12:06.165Z] [LOG] SIPJSPhone: getAudioOutputVolume: ringbacktone
+[2026-05-30T12:12:06.166Z] [LOG] ExWebClient: getAudioOutputVolume: Entry, audioElementName: beeptone
+[2026-05-30T12:12:06.166Z] [LOG] webrtcSIPPhone: getAudioOutputVolume:  "beeptone"
+[2026-05-30T12:12:06.166Z] [LOG] SIPJSPhone: getAudioOutputVolume: beeptone
+[2026-05-30T12:12:06.166Z] [LOG] ExWebClient: getAudioOutputVolume: Entry, audioElementName: dtmftone
+[2026-05-30T12:12:06.166Z] [LOG] webrtcSIPPhone: getAudioOutputVolume:  "dtmftone"
+[2026-05-30T12:12:06.167Z] [LOG] SIPJSPhone: getAudioOutputVolume: dtmftone
+[2026-05-30T12:12:06.167Z] [WARN] ExWebClient: initWebrtc: [Dup‑Reg] [REDACTED_AGENT] already in use – init rejected
+[2026-05-30T12:12:12.530Z] [LOG] ExWebClient: setRingingDuration: 10
+[2026-05-30T12:12:12.531Z] [LOG] webrtcSIPPhone: setRingingDuration:  10
+[2026-05-30T12:12:12.533Z] [LOG] sipjsphone: setRingingDuration: 10 sec
+[2026-05-30T12:12:20.015Z] [LOG] ExWebClient: primeUiTones
+[2026-05-30T12:12:20.017Z] [LOG] webrtcSIPPhone: primeUiTones
+[2026-05-30T12:12:20.023Z] [LOG] audioDeviceManager:primeUiTones: primed tones "ringtone, ringbacktone, dtmftone, beeptone"
+[2026-05-30T12:12:20.026Z] [LOG] ExWebClient: DoRegister: Entry
+[2026-05-30T12:12:20.531Z] [LOG] ExWebClient: initialize: Sending register for the number.. "[REDACTED_AGENT]"
+[2026-05-30T12:12:20.537Z] [LOG] webrtcSIPPhone: registerWebRTCClient :  {"userName":"[REDACTED_AGENT]","authUser":"[REDACTED_AGENT]","domain":"in.voip.exotel.com:443","sipdomain":"siptrunkingpoc1m.voip.exotel.com","displayname":"","accountSid":"","secret":"abcd1234","sipUri":"","security":"wss","endpoint":"wss","port":443,"accountName":"[REDACTED_AGENT]"} {}
+[2026-05-30T12:12:20.542Z] [LOG] iceCandidate =candidate:897845719 1 udp 2122260223 192.168.1.4 57693 typ host generation 0 ufrag KtDm network-id 1 network-cost 10
+[2026-05-30T12:12:20.543Z] [LOG] fetchPublicIP:Local IP : 192.168.1.4
+[2026-05-30T12:12:20.593Z] [LOG] iceCandidate =candidate:1971223422 1 udp 1686052607 182.69.177.252 26238 typ srflx raddr 192.168.1.4 rport 57693 generation 0 ufrag KtDm network-id 1 network-cost 10
+[2026-05-30T12:12:20.595Z] [LOG] fetchPublicIP:External IP : 182.69.177.252
+[2026-05-30T12:12:20.597Z] [LOG] fetchPublicIP:Public IP :182.69.177.252
+[2026-05-30T12:12:20.640Z] [LOG] sipjsphone: init:readyState, calling preinit
+[2026-05-30T12:12:20.642Z] [LOG] sipjsphone: init:readyState, calling postInit
+[2026-05-30T12:12:20.644Z] [LOG] webrtcSIPPhoneEventDelegate: setWebRTCFSMMapper: Initialisation complete
+[2026-05-30T12:12:20.645Z] [LOG] sipjsphone: init: Initialization complete...
+[2026-05-30T12:12:20.647Z] [LOG] webrtcSIPPhone: getWebRTCStatus entry
+[2026-05-30T12:12:20.648Z] [LOG] webrtcSIPPhone: getWebRTCStatus: current status:
+[2026-05-30T12:12:20.649Z] [LOG] synchronousHandler: onResponse, phone is connected.
+[2026-05-30T12:12:21.148Z] [LOG] sipjsphone: sipRegister: Starting registration with config: [{"authorizationUsername: "[REDACTED]","authorizationpassword: "[REDACTED]","uri":"sip:[REDACTED]@[REDACTED]","websocketURL":"wss://[REDACTED]","realm":"siptrunkingpoc1m.voip.exotel.com"}]
+[2026-05-30T12:12:21.152Z] [LOG] sipjsphone: sipRegister: Created UserAgent with config: [{"uri":{"parameters":{},"headers":{},"raw":{"scheme":"sip","user":"[REDACTED_AGENT]","host":"siptrunkingpoc1m.voip.exotel.com"},"normal":{"scheme":"sip","user":"[REDACTED_AGENT]","host":"siptrunkingpoc1m.voip.exotel.com"}},"transportOptions":{"server":"wss://[REDACTED]","traceSip":true,"reconnectionAttempts":0},"logBuiltinEnabled":false,"logConfiguration":true,"authorizationUsername: "[REDACTED]","authorizationpassword: "[REDACTED]","registerOptions":{"expires":300},"displayName":"[REDACTED_AGENT]","hackWssInTransport":true,"contactParams":{"transport":"wss"},"stunServers":["stun:stun.l.google.com:19302"],"hackIpInContact":true,"forceRport":true,"hackViaTcp":false,"hackAllowUnregisteredOptionTags":false,"viaHost":"in.voip.exotel.com","allowLegacyNotifications":true,"logLevel":"log","sessionDescriptionHandlerFactoryOptions":{"constraints":{"audio":{"noiseSuppression":false,"echoCancellation":true,"autoGainControl":true},"video":false},"sessionDescriptionHandlerModifiers":[null]},"delegate":{}}]
+[2026-05-30T12:12:21.154Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: Configuration:
+[2026-05-30T12:12:21.155Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · allowLegacyNotifications: true
+[2026-05-30T12:12:21.156Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · authorizationHa1: ""
+[2026-05-30T12:12:21.157Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · authorizationPassword: NOT SHOWN
+[2026-05-30T12:12:21.158Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · authorizationUsername: "[REDACTED]"
+[2026-05-30T12:12:21.159Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · autoStart: false
+[2026-05-30T12:12:21.160Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · autoStop: true
+[2026-05-30T12:12:21.161Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · delegate: {}
+[2026-05-30T12:12:21.163Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · contactName: ""
+[2026-05-30T12:12:21.163Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · contactParams: {"transport":"wss"}
+[2026-05-30T12:12:21.164Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · displayName: "[REDACTED_AGENT]"
+[2026-05-30T12:12:21.165Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · forceRport: true
+[2026-05-30T12:12:21.166Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · hackAllowUnregisteredOptionTags: false
+[2026-05-30T12:12:21.166Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · hackIpInContact: true
+[2026-05-30T12:12:21.167Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · hackViaTcp: false
+[2026-05-30T12:12:21.167Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · logBuiltinEnabled: false
+[2026-05-30T12:12:21.168Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · logConfiguration: true
+[2026-05-30T12:12:21.169Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · logConnector: undefined
+[2026-05-30T12:12:21.169Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · logLevel: "log"
+[2026-05-30T12:12:21.170Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · noAnswerTimeout: 60
+[2026-05-30T12:12:21.170Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · preloadedRouteSet: []
+[2026-05-30T12:12:21.171Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · reconnectionAttempts: 0
+[2026-05-30T12:12:21.171Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · reconnectionDelay: 4
+[2026-05-30T12:12:21.172Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · sendInitialProvisionalResponse: true
+[2026-05-30T12:12:21.172Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · sessionDescriptionHandlerFactory: (session,options)=>{// provide a default media stream factory if need be
+if(mediaStreamFactory===undefined){mediaStreamFactory=(0,_media_stream_factory_default__WEBPACK_IMPORTED_MODULE_0__.defaultMediaStreamFactory)();}// make sure we allow `0` to be passed in so timeout can be disabled
+const iceGatheringTimeout=(options===null||options===void 0?void 0:options.iceGatheringTimeout)!==undefined?options===null||options===void 0?void 0:options.iceGatheringTimeout:5000;// merge passed factory options into default session description configuration
+const sessionDescriptionHandlerConfiguration={iceGatheringTimeout,peerConnectionConfiguration:Object.assign(Object.assign({},(0,_peer_connection_configuration_default__WEBPACK_IMPORTED_MODULE_1__.defaultPeerConnectionConfiguration)()),options===null||options===void 0?void 0:options.peerConnectionConfiguration)};const logger=session.userAgent.getLogger("sip.SessionDescriptionHandler");return new _session_description_handler__WEBPACK_IMPORTED_MODULE_2__.SessionDescriptionHandler(logger,mediaStreamFactory,sessionDescriptionHandlerConfiguration);}
+[2026-05-30T12:12:21.173Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · sessionDescriptionHandlerFactoryOptions: {"constraints":{"audio":{"noiseSuppression":false,"echoCancellation":true,"autoGainControl":true},"video":false},"sessionDescriptionHandlerModifiers":[null]}
+[2026-05-30T12:12:21.173Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · sipExtension100rel: "Unsupported"
+[2026-05-30T12:12:21.174Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · sipExtensionReplaces: "Unsupported"
+[2026-05-30T12:12:21.174Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · sipExtensionExtraSupported: []
+[2026-05-30T12:12:21.175Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · sipjsId: "bsqhm"
+[2026-05-30T12:12:21.175Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · transportConstructor: Transport
+[2026-05-30T12:12:21.176Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · transportOptions: {"server":"wss://[REDACTED]","traceSip":true,"reconnectionAttempts":0}
+[2026-05-30T12:12:21.177Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · uri: sip:[REDACTED]@[REDACTED]
+[2026-05-30T12:12:21.177Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · userAgentString: "SIP.js/0.20.0"
+[2026-05-30T12:12:21.178Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · viaHost: "192.0.2.252"
+[2026-05-30T12:12:21.178Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · registerOptions: {"expires":300}
+[2026-05-30T12:12:21.179Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · hackWssInTransport: true
+[2026-05-30T12:12:21.179Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: · stunServers: ["stun:stun.l.google.com:19302"]
+[2026-05-30T12:12:21.181Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: Starting sip:[REDACTED]@[REDACTED]
+[2026-05-30T12:12:21.181Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.UserAgent: Transitioned from Stopped to Started
+[2026-05-30T12:12:21.182Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Connecting wss://[REDACTED]
+[2026-05-30T12:12:21.183Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Transitioned from Disconnected to Connecting
+[2026-05-30T12:12:21.184Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: Configuration:
+[2026-05-30T12:12:21.185Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: · expires: 300
+[2026-05-30T12:12:21.185Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: · extraContactHeaderParams: []
+[2026-05-30T12:12:21.186Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: · extraHeaders: []
+[2026-05-30T12:12:21.186Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: · logConfiguration: true
+[2026-05-30T12:12:21.187Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: · instanceId: ""
+[2026-05-30T12:12:21.187Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: · params: {}
+[2026-05-30T12:12:21.188Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: · regId: 0
+[2026-05-30T12:12:21.188Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: · registrar: sip:siptrunkingpoc1m.voip.exotel.com
+[2026-05-30T12:12:21.189Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: · refreshFrequency: 80
+[2026-05-30T12:12:21.543Z] [LOG] fetchPublicIP: public ip =  "182.69.177.252"
+[2026-05-30T12:12:21.556Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: WebSocket opened wss://[REDACTED]
+[2026-05-30T12:12:21.558Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Transitioned from Connecting to Connected
+[2026-05-30T12:12:21.559Z] [LOG] sipjsphone: transportStateChangeListener: Transport state changed to: ["Connected"]
+[2026-05-30T12:12:21.560Z] [LOG] sipjsphone: transportStateChangeListener: WebSocket connected
+[2026-05-30T12:12:21.562Z] [LOG] sipjsphone: onUserAgentTransportConnected: Transport connected
+[2026-05-30T12:12:21.563Z] [LOG] delegationHandler: onCallStatSipJsTransportEvent
+[2026-05-30T12:12:21.564Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.565Z] [LOG] delegationHandler: eventType ["started"]
+[2026-05-30T12:12:21.566Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:12:21.567Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.568Z] [LOG] delegationHandler: eventType
+ "started"
+[2026-05-30T12:12:21.569Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:12:21.570Z] [LOG] ExWebClient: registerEventCallback: Received ---> started ["[REDACTED_AGENT]",null]
+[2026-05-30T12:12:21.571Z] [LOG] sipjsphone: uiOnConnectionEvent: Connection state changed: [true,false]
+[2026-05-30T12:12:21.572Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: Waiting toggled to true
+[2026-05-30T12:12:21.573Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Constructing non-INVITE client transaction with id z9hG4bK2193363.
+[2026-05-30T12:12:21.574Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.576Z] [LOG] delegationHandler: eventType ["sent_request"]
+[2026-05-30T12:12:21.577Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:12:21.577Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.578Z] [LOG] delegationHandler: eventType
+ "sent_request"
+[2026-05-30T12:12:21.579Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:12:21.580Z] [LOG] ExWebClient: registerEventCallback: Received ---> sent_request ["[REDACTED_AGENT]",null]
+[2026-05-30T12:12:21.581Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:12:21.582Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+REGISTER sip:siptrunkingpoc1m.voip.exotel.com SIP/2.0
+Via: SIP/2.0/WSS 192.0.2.252;branch=z9hG4bK2193363;rport
+To: <sip:[REDACTED]@[REDACTED]
+From: "[REDACTED_AGENT]" <sip:[REDACTED]@[REDACTED]
+CSeq: 2 REGISTER
+Call-ID: bsqhmqa5g4tlibb0p507
+Max-Forwards: 70
+Contact: <sip:[REDACTED]@[REDACTED]
+Allow: ACK,CANCEL,INVITE,MESSAGE,BYE,OPTIONS,INFO,NOTIFY,REFER
+Supported: outbound, path, gruu
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:12:21.583Z] [LOG] delegationHandler: onCallStatSipJsTransportEvent
+[2026-05-30T12:12:21.631Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:12:21.632Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+SIP/2.0 401 Unauthorized
+Via: SIP/2.0/WSS 192.0.2.252;received=151.186.177.146;branch=z9hG4bK2193363;rport=33876
+To: <sip:[REDACTED]@[REDACTED]
+From: "[REDACTED_AGENT]" <sip:[REDACTED]@[REDACTED]
+CSeq: 2 REGISTER
+Call-ID: bsqhmqa5g4tlibb0p507
+WWW-Authenticate: Digest realm="siptrunkingpoc1m.voip.exotel.com", nonce="ahrVUWoa1CWReRkyXIiVRSgLV4XmtRe6", qop="auth"
+Server: kamailio (5.7.0 (x86_64/linux))
+Content-Length: 0
+[2026-05-30T12:12:21.638Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: State change to "Completed" on non-INVITE client transaction with id z9hG4bK2193363.
+[2026-05-30T12:12:21.639Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Constructing non-INVITE client transaction with id z9hG4bK7733078.
+[2026-05-30T12:12:21.640Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.641Z] [LOG] delegationHandler: eventType ["sent_request"]
+[2026-05-30T12:12:21.642Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:12:21.643Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.643Z] [LOG] delegationHandler: eventType
+ "sent_request"
+[2026-05-30T12:12:21.644Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:12:21.645Z] [LOG] ExWebClient: registerEventCallback: Received ---> sent_request ["[REDACTED_AGENT]",null]
+[2026-05-30T12:12:21.646Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:12:21.646Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+REGISTER sip:siptrunkingpoc1m.voip.exotel.com SIP/2.0
+Via: SIP/2.0/WSS 192.0.2.252;branch=z9hG4bK7733078;rport
+To: <sip:[REDACTED]@[REDACTED]
+From: "[REDACTED_AGENT]" <sip:[REDACTED]@[REDACTED]
+CSeq: 3 REGISTER
+Call-ID: bsqhmqa5g4tlibb0p507
+Max-Forwards: 70
+Authorization: Digest algorithm=MD5, username="[REDACTED_AGENT]", realm="siptrunkingpoc1m.voip.exotel.com", nonce="ahrVUWoa1CWReRkyXIiVRSgLV4XmtRe6", uri="sip:siptrunkingpoc1m.voip.exotel.com", response="8083c32020792b2ff23b97d9a3aa29ce", qop=auth, cnonce="pi586qodfc4p", nc=00000001
+Contact: <sip:[REDACTED]@[REDACTED]
+Allow: ACK,CANCEL,INVITE,MESSAGE,BYE,OPTIONS,INFO,NOTIFY,REFER
+Supported: outbound, path, gruu
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:12:21.647Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Destroyed non-INVITE client transaction with id z9hG4bK2193363.
+[2026-05-30T12:12:21.648Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: State change to "Terminated" on non-INVITE client transaction with id z9hG4bK2193363.
+[2026-05-30T12:12:21.715Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:12:21.716Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+SIP/2.0 200 OK
+Via: SIP/2.0/WSS 192.0.2.252;received=151.186.177.146;branch=z9hG4bK7733078;rport=33876
+To: <sip:[REDACTED]@[REDACTED]
+From: "[REDACTED_AGENT]" <sip:[REDACTED]@[REDACTED]
+CSeq: 3 REGISTER
+Call-ID: bsqhmqa5g4tlibb0p507
+Contact: <sip:[REDACTED]@[REDACTED]"sip:151.186.177.146:33876;transport=ws"
+Server: kamailio (5.7.0 (x86_64/linux))
+Content-Length: 0
+[2026-05-30T12:12:21.720Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: State change to "Completed" on non-INVITE client transaction with id z9hG4bK7733078.
+[2026-05-30T12:12:21.721Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: Registration transitioned to state Registered
+[2026-05-30T12:12:21.722Z] [LOG] sipjsphone: registererStateEventListner: Registration state changed to: ["Registered"]
+[2026-05-30T12:12:21.722Z] [LOG] sipjsphone: registererStateEventListner: Registration successful
+[2026-05-30T12:12:21.723Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.724Z] [LOG] delegationHandler: eventType ["registered"]
+[2026-05-30T12:12:21.724Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:12:21.725Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.725Z] [LOG] delegationHandler: eventType
+ "registered"
+[2026-05-30T12:12:21.726Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:12:21.727Z] [LOG] ExWebClient: registerEventCallback: Received ---> registered ["[REDACTED_AGENT]",null]
+[2026-05-30T12:12:21.728Z] [LOG] ExWebClient: registerAudioDeviceChangeCallback: Entry
+[2026-05-30T12:12:21.729Z] [LOG] webrtcSIPPhone: registerAudioDeviceChangeCallback entry
+[2026-05-30T12:12:21.729Z] [LOG] sipjsphone: registerAudioDeviceChangeCallback: entry
+[2026-05-30T12:12:21.730Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringtone, value: 1
+[2026-05-30T12:12:21.731Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringtone" 1
+[2026-05-30T12:12:21.731Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:12:21.732Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:12:21.733Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringbacktone, value: 1
+[2026-05-30T12:12:21.733Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringbacktone" 1
+[2026-05-30T12:12:21.734Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:12:21.735Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:12:21.735Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: beeptone, value: 1
+[2026-05-30T12:12:21.736Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "beeptone" 1
+[2026-05-30T12:12:21.736Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:12:21.737Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:12:21.737Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: dtmftone, value: 1
+[2026-05-30T12:12:21.738Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "dtmftone" 1
+[2026-05-30T12:12:21.739Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:12:21.739Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:12:21.740Z] [LOG] sipjsphone: registererStateEventListner: Registration state changed to: ["Registered"]
+[2026-05-30T12:12:21.740Z] [LOG] sipjsphone: registererStateEventListner: Registration successful
+[2026-05-30T12:12:21.741Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.741Z] [LOG] delegationHandler: eventType ["registered"]
+[2026-05-30T12:12:21.742Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:12:21.743Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.743Z] [LOG] delegationHandler: eventType
+ "registered"
+[2026-05-30T12:12:21.744Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:12:21.744Z] [LOG] ExWebClient: registerEventCallback: Received ---> registered ["[REDACTED_AGENT]",null]
+[2026-05-30T12:12:21.745Z] [LOG] ExWebClient: registerAudioDeviceChangeCallback: Entry
+[2026-05-30T12:12:21.745Z] [LOG] webrtcSIPPhone: registerAudioDeviceChangeCallback entry
+[2026-05-30T12:12:21.746Z] [LOG] sipjsphone: registerAudioDeviceChangeCallback: entry
+[2026-05-30T12:12:21.746Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringtone, value: 1
+[2026-05-30T12:12:21.747Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringtone" 1
+[2026-05-30T12:12:21.747Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:12:21.748Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:12:21.749Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringbacktone, value: 1
+[2026-05-30T12:12:21.749Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringbacktone" 1
+[2026-05-30T12:12:21.750Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:12:21.750Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:12:21.751Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: beeptone, value: 1
+[2026-05-30T12:12:21.751Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "beeptone" 1
+[2026-05-30T12:12:21.751Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:12:21.752Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:12:21.752Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: dtmftone, value: 1
+[2026-05-30T12:12:21.753Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "dtmftone" 1
+[2026-05-30T12:12:21.753Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:12:21.754Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:12:21.754Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Registerer: Waiting toggled to false
+[2026-05-30T12:12:21.755Z] [LOG] sipjsphone: registererStateEventListner: Registration state changed to: ["Registered"]
+[2026-05-30T12:12:21.755Z] [LOG] sipjsphone: registererStateEventListner: Registration successful
+[2026-05-30T12:12:21.756Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.756Z] [LOG] delegationHandler: eventType ["registered"]
+[2026-05-30T12:12:21.757Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:12:21.757Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.758Z] [LOG] delegationHandler: eventType
+ "registered"
+[2026-05-30T12:12:21.758Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:12:21.759Z] [LOG] ExWebClient: registerEventCallback: Received ---> registered ["[REDACTED_AGENT]",null]
+[2026-05-30T12:12:21.760Z] [LOG] ExWebClient: registerAudioDeviceChangeCallback: Entry
+[2026-05-30T12:12:21.760Z] [LOG] webrtcSIPPhone: registerAudioDeviceChangeCallback entry
+[2026-05-30T12:12:21.761Z] [LOG] sipjsphone: registerAudioDeviceChangeCallback: entry
+[2026-05-30T12:12:21.761Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringtone, value: 1
+[2026-05-30T12:12:21.762Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringtone" 1
+[2026-05-30T12:12:21.762Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:12:21.762Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:12:21.763Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringbacktone, value: 1
+[2026-05-30T12:12:21.763Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringbacktone" 1
+[2026-05-30T12:12:21.764Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:12:21.764Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:12:21.765Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: beeptone, value: 1
+[2026-05-30T12:12:21.765Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "beeptone" 1
+[2026-05-30T12:12:21.766Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:12:21.766Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:12:21.767Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: dtmftone, value: 1
+[2026-05-30T12:12:21.767Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "dtmftone" 1
+[2026-05-30T12:12:21.768Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:12:21.768Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:12:21.769Z] [LOG] sipjsphone: registererStateEventListner: Registration state changed to: ["Registered"]
+[2026-05-30T12:12:21.769Z] [LOG] sipjsphone: registererStateEventListner: Registration successful
+[2026-05-30T12:12:21.770Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.770Z] [LOG] delegationHandler: eventType ["registered"]
+[2026-05-30T12:12:21.770Z] [LOG] delegationHandler: sipMethod ["CONNECTION"]
+[2026-05-30T12:12:21.771Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:21.771Z] [LOG] delegationHandler: eventType
+ "registered"
+[2026-05-30T12:12:21.772Z] [LOG] delegationHandler: sipMethod
+ "CONNECTION"
+[2026-05-30T12:12:21.772Z] [LOG] ExWebClient: registerEventCallback: Received ---> registered ["[REDACTED_AGENT]",null]
+[2026-05-30T12:12:21.773Z] [LOG] ExWebClient: registerAudioDeviceChangeCallback: Entry
+[2026-05-30T12:12:21.774Z] [LOG] webrtcSIPPhone: registerAudioDeviceChangeCallback entry
+[2026-05-30T12:12:21.774Z] [LOG] sipjsphone: registerAudioDeviceChangeCallback: entry
+[2026-05-30T12:12:21.775Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringtone, value: 1
+[2026-05-30T12:12:21.775Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringtone" 1
+[2026-05-30T12:12:21.775Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:12:21.776Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringtone volume set to 1
+[2026-05-30T12:12:21.776Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: ringbacktone, value: 1
+[2026-05-30T12:12:21.777Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "ringbacktone" 1
+[2026-05-30T12:12:21.777Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:12:21.778Z] [LOG] SIPJSPhone: setAudioOutputVolume: ringbacktone volume set to 1
+[2026-05-30T12:12:21.778Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: beeptone, value: 1
+[2026-05-30T12:12:21.779Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "beeptone" 1
+[2026-05-30T12:12:21.779Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:12:21.780Z] [LOG] SIPJSPhone: setAudioOutputVolume: beeptone volume set to 1
+[2026-05-30T12:12:21.780Z] [LOG] ExWebClient: setAudioOutputVolume: Entry, audioElementName: dtmftone, value: 1
+[2026-05-30T12:12:21.780Z] [LOG] WebrtcSIPPhone: setAudioOutputVolume:  "dtmftone" 1
+[2026-05-30T12:12:21.781Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:12:21.781Z] [LOG] SIPJSPhone: setAudioOutputVolume: dtmftone volume set to 1
+[2026-05-30T12:12:21.783Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Destroyed non-INVITE client transaction with id z9hG4bK7733078.
+[2026-05-30T12:12:21.783Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: State change to "Terminated" on non-INVITE client transaction with id z9hG4bK7733078.
+[2026-05-30T12:12:21.784Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.nict: Destroyed non-INVITE client transaction with id z9hG4bK7733078.
+[2026-05-30T12:12:28.544Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:12:28.547Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+INVITE sip:[REDACTED]@[REDACTED] SIP/2.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as18015876;did=cf.b95>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as18015876;did=cf.b95>
+Record-Route: <sip:13.202.254.216:443;transport=tls;lr;ftag=as18015876;did=cf.78a1;vsf=AAAAAAAAAA8EBQYFDggOBQMAAxoEGlwYGwZYQAIIABdUAQATHBluLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEShpRS290ZWwuY29t>
+Record-Route: <sip:13.204.59.185:443;transport=tls;lr;ftag=as18015876;did=cf.e3281>
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0;i=296b67
+Via: SIP/2.0/TLS 13.202.254.216:443;rport=43479;branch=z9hG4bKccfc.54eb51c2acb0762b000bd7b103d79efc.0;i=f5
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bKccfc.7368d4c521d9264cf3e236ec8f6a2ba0.0;i=83a83e
+Via: SIP/2.0/TLS 115.111.221.241:5061;received=115.111.221.241;branch=z9hG4bK368bc640;rport=51044
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.com
+CSeq: 102 INVITE
+User-Agent: Asterisk PBX 1.8.32.3
+Date: Sat, 30 May 2026 12:12:28 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO, PUBLISH, MESSAGE
+Supported: replaces
+X-Exotel-VN: +918047491920
+P-Asserted-Identity: <sip:[REDACTED]@[REDACTED]
+X-Exotel-LegSid: 99a3dfc0a82bd5ed598a82a958f21a5u
+X-Exotel-CallSid: b54d877bfd198f730cbb902ffa6b1a5u
+Content-Type: application/sdp
+Content-Length: 541
+Contact: <sip:[REDACTED]@[REDACTED]
+X-Exotel-TrunkSid: [REDACTED_AGENT]
+P-Early-Media: supported
+
+v=0
+o=root 2116381537 2116381537 IN IP4 144.24.101.99
+s=Asterisk PBX 1.8.32.3
+c=IN IP4 144.24.101.99
+t=0 0
+m=audio 37070 RTP/SAVP 96 97
+a=rtpmap:96 opus/48000/2
+a=rtpmap:97 telephone-event/48000
+a=fmtp:97 0-15
+a=sendrecv
+a=rtcp:37070
+a=rtcp-mux
+a=setup:actpass
+a=fingerprint:sha-256 33:C4:8E:91:47:BB:1D:65:A1:5F:27:38:82:86:C1:D7:C4:EE:D9:0E:5C:97:83:70:01:75:72:07:2D:14:C6:0E
+a=ptime:20
+a=ice-ufrag:WJx1jbvy
+a=ice-pwd:qE6FnlIKVYn9lhm6Pm7lgqivg8
+a=candidate:MOoMz9xNpe6e2PO6 1 UDP 2130706431 144.24.101.99 37070 typ host
+[2026-05-30T12:12:28.558Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Constructing INVITE server transaction with id z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0.
+[2026-05-30T12:12:28.561Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:12:28.562Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 100 Trying
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0;i=296b67
+Via: SIP/2.0/TLS 13.202.254.216:443;rport=43479;branch=z9hG4bKccfc.54eb51c2acb0762b000bd7b103d79efc.0;i=f5
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bKccfc.7368d4c521d9264cf3e236ec8f6a2ba0.0;i=83a83e
+Via: SIP/2.0/TLS 115.111.221.241:5061;received=115.111.221.241;branch=z9hG4bK368bc640;rport=51044
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:12:28.563Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:12:28.565Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.com3lv69g0eh6as18015876 constructed
+[2026-05-30T12:12:28.567Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:12:28.568Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0;i=296b67
+Via: SIP/2.0/TLS 13.202.254.216:443;rport=43479;branch=z9hG4bKccfc.54eb51c2acb0762b000bd7b103d79efc.0;i=f5
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bKccfc.7368d4c521d9264cf3e236ec8f6a2ba0.0;i=83a83e
+Via: SIP/2.0/TLS 115.111.221.241:5061;received=115.111.221.241;branch=z9hG4bK368bc640;rport=51044
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as18015876;did=cf.b95>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as18015876;did=cf.b95>
+Record-Route: <sip:13.202.254.216:443;transport=tls;lr;ftag=as18015876;did=cf.78a1;vsf=AAAAAAAAAA8EBQYFDggOBQMAAxoEGlwYGwZYQAIIABdUAQATHBluLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEShpRS290ZWwuY29t>
+Record-Route: <sip:13.204.59.185:443;transport=tls;lr;ftag=as18015876;did=cf.e3281>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:12:28.569Z] [LOG] onInvite called
+[2026-05-30T12:12:28.570Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:12:28.571Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:12:28.572Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0;i=296b67
+Via: SIP/2.0/TLS 13.202.254.216:443;rport=43479;branch=z9hG4bKccfc.54eb51c2acb0762b000bd7b103d79efc.0;i=f5
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bKccfc.7368d4c521d9264cf3e236ec8f6a2ba0.0;i=83a83e
+Via: SIP/2.0/TLS 115.111.221.241:5061;received=115.111.221.241;branch=z9hG4bK368bc640;rport=51044
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as18015876;did=cf.b95>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as18015876;did=cf.b95>
+Record-Route: <sip:13.202.254.216:443;transport=tls;lr;ftag=as18015876;did=cf.78a1;vsf=AAAAAAAAAA8EBQYFDggOBQMAAxoEGlwYGwZYQAIIABdUAQATHBluLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEShpRS290ZWwuY29t>
+Record-Route: <sip:13.204.59.185:443;transport=tls;lr;ftag=as18015876;did=cf.e3281>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:12:28.573Z] [LOG] DEBUG: Incoming call detected, about to start ring tone
+[2026-05-30T12:12:28.574Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "incoming"
+[2026-05-30T12:12:28.575Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:12:28.576Z] [LOG] DEBUG: startRingTone called, durationSec: 10
+[2026-05-30T12:12:28.577Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:28.578Z] [LOG] delegationHandler: eventType ["i_new_call"]
+[2026-05-30T12:12:28.578Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:12:28.579Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:28.580Z] [LOG] delegationHandler: eventType
+ "i_new_call"
+[2026-05-30T12:12:28.580Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:12:28.581Z] [LOG] ExWebClient: callEventCallback: Received ---> i_new_callparam sent....[object Object]for phone....null
+[2026-05-30T12:12:28.582Z] [LOG] CallListener: onIncomingCall {} null
+[2026-05-30T12:12:28.583Z] [LOG] audioDeviceManager:playUiTone: ringtone attempt 1
+[2026-05-30T12:12:28.586Z] [LOG] audioDeviceManager:playUiTone: ringtone playing
+[2026-05-30T12:12:29.082Z] [LOG] sipjsphone: sipCall: testing emit accept_reject
+[2026-05-30T12:12:29.082Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:29.084Z] [LOG] delegationHandler: eventType ["accept_reject"]
+[2026-05-30T12:12:29.085Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:12:29.086Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:29.087Z] [LOG] delegationHandler: eventType
+ "accept_reject"
+[2026-05-30T12:12:29.088Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:12:29.089Z] [LOG] ExWebClient: callEventCallback: Received ---> accept_rejectparam sent....[object Object]for phone....null
+[2026-05-30T12:12:29.090Z] [LOG] CallListener: onRinging {} null
+[2026-05-30T12:12:38.580Z] [LOG] sipjsphone: startRingTone: auto-stop after configured duration
+[2026-05-30T12:12:38.582Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:12:43.808Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:12:43.811Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+CANCEL sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0;i=296b67
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.com
+CSeq: 102 CANCEL
+Content-Length: 0
+[2026-05-30T12:12:43.818Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:12:43.819Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 200 OK
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0;i=296b67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 CANCEL
+Call-ID: 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:12:43.821Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation._onCancel
+[2026-05-30T12:12:43.822Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Completed" on INVITE server transaction with id z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0.
+[2026-05-30T12:12:43.823Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:12:43.825Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 487 Request Terminated
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0;i=296b67
+Via: SIP/2.0/TLS 13.202.254.216:443;rport=43479;branch=z9hG4bKccfc.54eb51c2acb0762b000bd7b103d79efc.0;i=f5
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bKccfc.7368d4c521d9264cf3e236ec8f6a2ba0.0;i=83a83e
+Via: SIP/2.0/TLS 115.111.221.241:5061;received=115.111.221.241;branch=z9hG4bK368bc640;rport=51044
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:12:43.826Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.comas18015876 transitioned to state Terminated
+[2026-05-30T12:12:43.827Z] [LOG] delegationHandler: stopCallStat
+[2026-05-30T12:12:43.829Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "terminated"
+[2026-05-30T12:12:43.831Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:12:43.832Z] [LOG] delegationHandler: playBeepTone
+[2026-05-30T12:12:43.833Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:43.834Z] [LOG] delegationHandler: eventType ["terminated"]
+[2026-05-30T12:12:43.835Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:12:43.836Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:43.837Z] [LOG] delegationHandler: eventType
+ "terminated"
+[2026-05-30T12:12:43.838Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:12:43.839Z] [LOG] ExWebClient: callEventCallback: Received ---> terminatedparam sent....[object Object]for phone....null
+[2026-05-30T12:12:43.840Z] [LOG] CallListener: onCallEnded {} null
+[2026-05-30T12:12:43.841Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:12:43.842Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.comas18015876 in state Terminated is being disposed
+[2026-05-30T12:12:43.920Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:12:43.920Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+ACK sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0;i=296b67
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.com
+CSeq: 102 ACK
+Content-Length: 0
+[2026-05-30T12:12:43.925Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Confirmed" on INVITE server transaction with id z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0.
+[2026-05-30T12:12:43.926Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Timer I expired for INVITE server transaction z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0.
+[2026-05-30T12:12:43.927Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0.
+[2026-05-30T12:12:43.928Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Terminated" on INVITE server transaction with id z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0.
+[2026-05-30T12:12:43.929Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 2c92c6880e63e0b354a55f5e5cdd0485@pstn.mum1.exotel.com3lv69g0eh6as18015876 destroyed
+[2026-05-30T12:12:43.930Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bKccfc.9a6eb1e81d0737a6cae1d948eddee3ae.0.
+[2026-05-30T12:12:51.747Z] [LOG] ExWebClient: setRingingDuration: 30
+[2026-05-30T12:12:51.747Z] [LOG] webrtcSIPPhone: setRingingDuration:  30
+[2026-05-30T12:12:51.748Z] [LOG] sipjsphone: setRingingDuration: 30 sec
+[2026-05-30T12:12:59.253Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:12:59.256Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+INVITE sip:[REDACTED]@[REDACTED] SIP/2.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as52b7f6d3;did=1cc.0c01>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as52b7f6d3;did=1cc.0c01>
+Record-Route: <sip:18.60.10.196:443;transport=tls;r2=on;lr;ftag=as52b7f6d3;did=1cc.f1c1;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwdFw9HCx8fGwZdQ00fHnRuLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJTRBpWeG90ZWwuY29t>
+Record-Route: <sip:18.60.10.196:444;transport=tls;r2=on;lr;ftag=as52b7f6d3;did=1cc.f1c1;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwdFw9HCx8fGwZdQ00fHnRuLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJTRBpWeG90ZWwuY29t>
+Record-Route: <sip:16.112.98.13:443;transport=tls;lr;ftag=as52b7f6d3;did=1cc.0e7a>
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0;i=b94677
+Via: SIP/2.0/TLS 18.60.10.196:443;rport=35807;branch=z9hG4bK19b3.f5e34f9e02d35eb8a470ae453875e8b8.0;i=1
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bK19b3.09b848b95b72c8625da16ba72f3f2d7f.0;i=e41712
+Via: SIP/2.0/TLS 14.143.65.86:5061;received=14.143.65.86;branch=z9hG4bK2971d0db;rport=39922
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.com
+CSeq: 102 INVITE
+User-Agent: Asterisk PBX 1.8.32.3
+Date: Sat, 30 May 2026 12:12:59 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO, PUBLISH, MESSAGE
+Supported: replaces
+X-Exotel-VN: +918047491920
+P-Asserted-Identity: <sip:[REDACTED]@[REDACTED]
+X-Exotel-LegSid: 75f0e89f33f939555729f22830101a5u
+X-Exotel-CallSid: 0e279f27add5919fd8eafd2997641a5u
+Content-Type: application/sdp
+Content-Length: 541
+Contact: <sip:[REDACTED]@[REDACTED]
+X-Exotel-TrunkSid: [REDACTED_AGENT]
+P-Early-Media: supported
+
+v=0
+o=root 1395985242 1395985242 IN IP4 144.24.101.99
+s=Asterisk PBX 1.8.32.3
+c=IN IP4 144.24.101.99
+t=0 0
+m=audio 30223 RTP/SAVP 96 97
+a=rtpmap:96 opus/48000/2
+a=rtpmap:97 telephone-event/48000
+a=fmtp:97 0-15
+a=sendrecv
+a=rtcp:30223
+a=rtcp-mux
+a=setup:actpass
+a=fingerprint:sha-256 33:C4:8E:91:47:BB:1D:65:A1:5F:27:38:82:86:C1:D7:C4:EE:D9:0E:5C:97:83:70:01:75:72:07:2D:14:C6:0E
+a=ptime:20
+a=ice-ufrag:AT4kBozw
+a=ice-pwd:ve7LdoMYttSgqRfwB9SiDkEtDv
+a=candidate:MOoMz9xNpe6e2PO6 1 UDP 2130706431 144.24.101.99 30223 typ host
+[2026-05-30T12:12:59.265Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Constructing INVITE server transaction with id z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0.
+[2026-05-30T12:12:59.267Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:12:59.268Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 100 Trying
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0;i=b94677
+Via: SIP/2.0/TLS 18.60.10.196:443;rport=35807;branch=z9hG4bK19b3.f5e34f9e02d35eb8a470ae453875e8b8.0;i=1
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bK19b3.09b848b95b72c8625da16ba72f3f2d7f.0;i=e41712
+Via: SIP/2.0/TLS 14.143.65.86:5061;received=14.143.65.86;branch=z9hG4bK2971d0db;rport=39922
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:12:59.269Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:12:59.271Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.comlansri1nq0as52b7f6d3 constructed
+[2026-05-30T12:12:59.273Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:12:59.274Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0;i=b94677
+Via: SIP/2.0/TLS 18.60.10.196:443;rport=35807;branch=z9hG4bK19b3.f5e34f9e02d35eb8a470ae453875e8b8.0;i=1
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bK19b3.09b848b95b72c8625da16ba72f3f2d7f.0;i=e41712
+Via: SIP/2.0/TLS 14.143.65.86:5061;received=14.143.65.86;branch=z9hG4bK2971d0db;rport=39922
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as52b7f6d3;did=1cc.0c01>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as52b7f6d3;did=1cc.0c01>
+Record-Route: <sip:18.60.10.196:443;transport=tls;r2=on;lr;ftag=as52b7f6d3;did=1cc.f1c1;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwdFw9HCx8fGwZdQ00fHnRuLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJTRBpWeG90ZWwuY29t>
+Record-Route: <sip:18.60.10.196:444;transport=tls;r2=on;lr;ftag=as52b7f6d3;did=1cc.f1c1;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwdFw9HCx8fGwZdQ00fHnRuLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJTRBpWeG90ZWwuY29t>
+Record-Route: <sip:16.112.98.13:443;transport=tls;lr;ftag=as52b7f6d3;did=1cc.0e7a>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:12:59.275Z] [LOG] onInvite called
+[2026-05-30T12:12:59.276Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:12:59.278Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:12:59.279Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0;i=b94677
+Via: SIP/2.0/TLS 18.60.10.196:443;rport=35807;branch=z9hG4bK19b3.f5e34f9e02d35eb8a470ae453875e8b8.0;i=1
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bK19b3.09b848b95b72c8625da16ba72f3f2d7f.0;i=e41712
+Via: SIP/2.0/TLS 14.143.65.86:5061;received=14.143.65.86;branch=z9hG4bK2971d0db;rport=39922
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as52b7f6d3;did=1cc.0c01>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as52b7f6d3;did=1cc.0c01>
+Record-Route: <sip:18.60.10.196:443;transport=tls;r2=on;lr;ftag=as52b7f6d3;did=1cc.f1c1;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwdFw9HCx8fGwZdQ00fHnRuLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJTRBpWeG90ZWwuY29t>
+Record-Route: <sip:18.60.10.196:444;transport=tls;r2=on;lr;ftag=as52b7f6d3;did=1cc.f1c1;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwdFw9HCx8fGwZdQ00fHnRuLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJTRBpWeG90ZWwuY29t>
+Record-Route: <sip:16.112.98.13:443;transport=tls;lr;ftag=as52b7f6d3;did=1cc.0e7a>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:12:59.279Z] [LOG] DEBUG: Incoming call detected, about to start ring tone
+[2026-05-30T12:12:59.280Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "incoming"
+[2026-05-30T12:12:59.282Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:12:59.284Z] [LOG] DEBUG: startRingTone called, durationSec: 30
+[2026-05-30T12:12:59.285Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:59.285Z] [LOG] delegationHandler: eventType ["i_new_call"]
+[2026-05-30T12:12:59.286Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:12:59.287Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:59.287Z] [LOG] delegationHandler: eventType
+ "i_new_call"
+[2026-05-30T12:12:59.288Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:12:59.289Z] [LOG] ExWebClient: callEventCallback: Received ---> i_new_callparam sent....[object Object]for phone....null
+[2026-05-30T12:12:59.290Z] [LOG] CallListener: onIncomingCall {} null
+[2026-05-30T12:12:59.291Z] [LOG] audioDeviceManager:playUiTone: ringtone attempt 1
+[2026-05-30T12:12:59.295Z] [LOG] audioDeviceManager:playUiTone: ringtone playing
+[2026-05-30T12:12:59.788Z] [LOG] sipjsphone: sipCall: testing emit accept_reject
+[2026-05-30T12:12:59.790Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:59.792Z] [LOG] delegationHandler: eventType ["accept_reject"]
+[2026-05-30T12:12:59.793Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:12:59.794Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:12:59.795Z] [LOG] delegationHandler: eventType
+ "accept_reject"
+[2026-05-30T12:12:59.796Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:12:59.797Z] [LOG] ExWebClient: callEventCallback: Received ---> accept_rejectparam sent....[object Object]for phone....null
+[2026-05-30T12:12:59.798Z] [LOG] CallListener: onRinging {} null
+[2026-05-30T12:13:00.064Z] [LOG] ExWebClient: stopRingTone
+[2026-05-30T12:13:00.066Z] [LOG] webrtcSIPPhone: stopRingTone
+[2026-05-30T12:13:00.067Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:13:02.598Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:13:02.600Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+CANCEL sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0;i=b94677
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.com
+CSeq: 102 CANCEL
+Content-Length: 0
+[2026-05-30T12:13:02.606Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:13:02.608Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 200 OK
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0;i=b94677
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 CANCEL
+Call-ID: 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:13:02.610Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation._onCancel
+[2026-05-30T12:13:02.612Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Completed" on INVITE server transaction with id z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0.
+[2026-05-30T12:13:02.613Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:13:02.615Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 487 Request Terminated
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0;i=b94677
+Via: SIP/2.0/TLS 18.60.10.196:443;rport=35807;branch=z9hG4bK19b3.f5e34f9e02d35eb8a470ae453875e8b8.0;i=1
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bK19b3.09b848b95b72c8625da16ba72f3f2d7f.0;i=e41712
+Via: SIP/2.0/TLS 14.143.65.86:5061;received=14.143.65.86;branch=z9hG4bK2971d0db;rport=39922
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:13:02.616Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.comas52b7f6d3 transitioned to state Terminated
+[2026-05-30T12:13:02.618Z] [LOG] delegationHandler: stopCallStat
+[2026-05-30T12:13:02.619Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "terminated"
+[2026-05-30T12:13:02.622Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:13:02.623Z] [LOG] delegationHandler: playBeepTone
+[2026-05-30T12:13:02.624Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:02.625Z] [LOG] delegationHandler: eventType ["terminated"]
+[2026-05-30T12:13:02.626Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:13:02.627Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:02.628Z] [LOG] delegationHandler: eventType
+ "terminated"
+[2026-05-30T12:13:02.628Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:13:02.629Z] [LOG] ExWebClient: callEventCallback: Received ---> terminatedparam sent....[object Object]for phone....null
+[2026-05-30T12:13:02.630Z] [LOG] CallListener: onCallEnded {} null
+[2026-05-30T12:13:02.632Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:13:02.633Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.comas52b7f6d3 in state Terminated is being disposed
+[2026-05-30T12:13:02.710Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:13:02.711Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+ACK sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0;i=b94677
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.com
+CSeq: 102 ACK
+Content-Length: 0
+[2026-05-30T12:13:02.715Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Confirmed" on INVITE server transaction with id z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0.
+[2026-05-30T12:13:02.716Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Timer I expired for INVITE server transaction z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0.
+[2026-05-30T12:13:02.717Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0.
+[2026-05-30T12:13:02.718Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Terminated" on INVITE server transaction with id z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0.
+[2026-05-30T12:13:02.719Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 31b659d704113f75452b7c1527f72309@tsep.hyd.exotel.comlansri1nq0as52b7f6d3 destroyed
+[2026-05-30T12:13:02.720Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bK19b3.131502ee17c6398d4e571b823a713496.0.
+[2026-05-30T12:13:10.013Z] [LOG] ExWebClient: setRingingDuration: 40
+[2026-05-30T12:13:10.013Z] [LOG] webrtcSIPPhone: setRingingDuration:  40
+[2026-05-30T12:13:10.014Z] [LOG] sipjsphone: setRingingDuration: 40 sec
+[2026-05-30T12:13:15.406Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:13:15.408Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+INVITE sip:[REDACTED]@[REDACTED] SIP/2.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as269ced78;did=d36.1452>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as269ced78;did=d36.1452>
+Record-Route: <sip:13.234.103.85:443;transport=tls;r2=on;lr;ftag=as269ced78;did=d36.817;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwYGwZYQAIIABdUAQATHBluLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEShpRS290ZWwuY29t>
+Record-Route: <sip:13.234.103.85:446;transport=tls;r2=on;lr;ftag=as269ced78;did=d36.817;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwYGwZYQAIIABdUAQATHBluLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEShpRS290ZWwuY29t>
+Record-Route: <sip:13.204.59.185:443;transport=tls;lr;ftag=as269ced78;did=d36.b3751>
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0;i=62cb67
+Via: SIP/2.0/TLS 13.234.103.85:443;rport=42689;branch=z9hG4bKc05f.38670703fc051d7d61415412503dd514.0;i=07
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bKc05f.3a2310b4e0f2d4314ac26405e8920e0e.0;i=4a984e
+Via: SIP/2.0/TLS 115.112.63.91:5061;received=115.112.63.91;branch=z9hG4bK6a35ed2d;rport=40704
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.com
+CSeq: 102 INVITE
+User-Agent: Asterisk PBX 1.8.32.3
+Date: Sat, 30 May 2026 12:13:15 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO, PUBLISH, MESSAGE
+Supported: replaces
+X-Exotel-VN: +918047491920
+P-Asserted-Identity: <sip:[REDACTED]@[REDACTED]
+X-Exotel-LegSid: e1e253d506164e8220c8821161b91a5u
+X-Exotel-CallSid: 27f54487c1fae69a6ab622baeb6a1a5u
+Content-Type: application/sdp
+Content-Length: 535
+Contact: <sip:[REDACTED]@[REDACTED]
+X-Exotel-TrunkSid: [REDACTED_AGENT]
+P-Early-Media: supported
+
+v=0
+o=root 5047501 5047501 IN IP4 144.24.101.99
+s=Asterisk PBX 1.8.32.3
+c=IN IP4 144.24.101.99
+t=0 0
+m=audio 10066 RTP/SAVP 96 97
+a=rtpmap:96 opus/48000/2
+a=rtpmap:97 telephone-event/48000
+a=fmtp:97 0-15
+a=sendrecv
+a=rtcp:10066
+a=rtcp-mux
+a=setup:actpass
+a=fingerprint:sha-256 33:C4:8E:91:47:BB:1D:65:A1:5F:27:38:82:86:C1:D7:C4:EE:D9:0E:5C:97:83:70:01:75:72:07:2D:14:C6:0E
+a=ptime:20
+a=ice-ufrag:YLoJYqVF
+a=ice-pwd:QNd6ZP20HbKDeGHQHljQUVT7en
+a=candidate:MOoMz9xNpe6e2PO6 1 UDP 2130706431 144.24.101.99 10066 typ host
+[2026-05-30T12:13:15.420Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Constructing INVITE server transaction with id z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0.
+[2026-05-30T12:13:15.422Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:13:15.424Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 100 Trying
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0;i=62cb67
+Via: SIP/2.0/TLS 13.234.103.85:443;rport=42689;branch=z9hG4bKc05f.38670703fc051d7d61415412503dd514.0;i=07
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bKc05f.3a2310b4e0f2d4314ac26405e8920e0e.0;i=4a984e
+Via: SIP/2.0/TLS 115.112.63.91:5061;received=115.112.63.91;branch=z9hG4bK6a35ed2d;rport=40704
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:13:15.426Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:13:15.427Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.com8o3io4ri6eas269ced78 constructed
+[2026-05-30T12:13:15.429Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:13:15.430Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0;i=62cb67
+Via: SIP/2.0/TLS 13.234.103.85:443;rport=42689;branch=z9hG4bKc05f.38670703fc051d7d61415412503dd514.0;i=07
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bKc05f.3a2310b4e0f2d4314ac26405e8920e0e.0;i=4a984e
+Via: SIP/2.0/TLS 115.112.63.91:5061;received=115.112.63.91;branch=z9hG4bK6a35ed2d;rport=40704
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as269ced78;did=d36.1452>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as269ced78;did=d36.1452>
+Record-Route: <sip:13.234.103.85:443;transport=tls;r2=on;lr;ftag=as269ced78;did=d36.817;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwYGwZYQAIIABdUAQATHBluLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEShpRS290ZWwuY29t>
+Record-Route: <sip:13.234.103.85:446;transport=tls;r2=on;lr;ftag=as269ced78;did=d36.817;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwYGwZYQAIIABdUAQATHBluLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEShpRS290ZWwuY29t>
+Record-Route: <sip:13.204.59.185:443;transport=tls;lr;ftag=as269ced78;did=d36.b3751>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:13:15.431Z] [LOG] onInvite called
+[2026-05-30T12:13:15.432Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:13:15.434Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:13:15.435Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0;i=62cb67
+Via: SIP/2.0/TLS 13.234.103.85:443;rport=42689;branch=z9hG4bKc05f.38670703fc051d7d61415412503dd514.0;i=07
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bKc05f.3a2310b4e0f2d4314ac26405e8920e0e.0;i=4a984e
+Via: SIP/2.0/TLS 115.112.63.91:5061;received=115.112.63.91;branch=z9hG4bK6a35ed2d;rport=40704
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as269ced78;did=d36.1452>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as269ced78;did=d36.1452>
+Record-Route: <sip:13.234.103.85:443;transport=tls;r2=on;lr;ftag=as269ced78;did=d36.817;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwYGwZYQAIIABdUAQATHBluLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEShpRS290ZWwuY29t>
+Record-Route: <sip:13.234.103.85:446;transport=tls;r2=on;lr;ftag=as269ced78;did=d36.817;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwYGwZYQAIIABdUAQATHBluLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEShpRS290ZWwuY29t>
+Record-Route: <sip:13.204.59.185:443;transport=tls;lr;ftag=as269ced78;did=d36.b3751>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:13:15.436Z] [LOG] DEBUG: Incoming call detected, about to start ring tone
+[2026-05-30T12:13:15.437Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "incoming"
+[2026-05-30T12:13:15.438Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:13:15.439Z] [LOG] DEBUG: startRingTone called, durationSec: 40
+[2026-05-30T12:13:15.440Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:15.441Z] [LOG] delegationHandler: eventType ["i_new_call"]
+[2026-05-30T12:13:15.442Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:13:15.443Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:15.443Z] [LOG] delegationHandler: eventType
+ "i_new_call"
+[2026-05-30T12:13:15.444Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:13:15.445Z] [LOG] ExWebClient: callEventCallback: Received ---> i_new_callparam sent....[object Object]for phone....null
+[2026-05-30T12:13:15.446Z] [LOG] CallListener: onIncomingCall {} null
+[2026-05-30T12:13:15.448Z] [LOG] audioDeviceManager:playUiTone: ringtone attempt 1
+[2026-05-30T12:13:15.451Z] [LOG] audioDeviceManager:playUiTone: ringtone playing
+[2026-05-30T12:13:15.942Z] [LOG] sipjsphone: sipCall: testing emit accept_reject
+[2026-05-30T12:13:15.945Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:15.947Z] [LOG] delegationHandler: eventType ["accept_reject"]
+[2026-05-30T12:13:15.948Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:13:15.950Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:15.951Z] [LOG] delegationHandler: eventType
+ "accept_reject"
+[2026-05-30T12:13:15.953Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:13:15.954Z] [LOG] ExWebClient: callEventCallback: Received ---> accept_rejectparam sent....[object Object]for phone....null
+[2026-05-30T12:13:15.956Z] [LOG] CallListener: onRinging {} null
+[2026-05-30T12:13:45.380Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:13:45.382Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+CANCEL sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0;i=62cb67
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.com
+CSeq: 102 CANCEL
+Content-Length: 0
+[2026-05-30T12:13:45.389Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:13:45.390Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 200 OK
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0;i=62cb67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 CANCEL
+Call-ID: 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:13:45.392Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation._onCancel
+[2026-05-30T12:13:45.393Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Completed" on INVITE server transaction with id z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0.
+[2026-05-30T12:13:45.394Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:13:45.395Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 487 Request Terminated
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0;i=62cb67
+Via: SIP/2.0/TLS 13.234.103.85:443;rport=42689;branch=z9hG4bKc05f.38670703fc051d7d61415412503dd514.0;i=07
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bKc05f.3a2310b4e0f2d4314ac26405e8920e0e.0;i=4a984e
+Via: SIP/2.0/TLS 115.112.63.91:5061;received=115.112.63.91;branch=z9hG4bK6a35ed2d;rport=40704
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:13:45.396Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.comas269ced78 transitioned to state Terminated
+[2026-05-30T12:13:45.397Z] [LOG] delegationHandler: stopCallStat
+[2026-05-30T12:13:45.398Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "terminated"
+[2026-05-30T12:13:45.400Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:13:45.400Z] [LOG] delegationHandler: playBeepTone
+[2026-05-30T12:13:45.401Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:45.401Z] [LOG] delegationHandler: eventType ["terminated"]
+[2026-05-30T12:13:45.402Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:13:45.403Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:45.403Z] [LOG] delegationHandler: eventType
+ "terminated"
+[2026-05-30T12:13:45.404Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:13:45.405Z] [LOG] ExWebClient: callEventCallback: Received ---> terminatedparam sent....[object Object]for phone....null
+[2026-05-30T12:13:45.406Z] [LOG] CallListener: onCallEnded {} null
+[2026-05-30T12:13:45.408Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:13:45.408Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.comas269ced78 in state Terminated is being disposed
+[2026-05-30T12:13:45.490Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:13:45.492Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+ACK sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0;i=62cb67
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.com
+CSeq: 102 ACK
+Content-Length: 0
+[2026-05-30T12:13:45.498Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Confirmed" on INVITE server transaction with id z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0.
+[2026-05-30T12:13:45.499Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Timer I expired for INVITE server transaction z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0.
+[2026-05-30T12:13:45.499Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0.
+[2026-05-30T12:13:45.500Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Terminated" on INVITE server transaction with id z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0.
+[2026-05-30T12:13:45.500Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 662123c826f3728e6d64907a69339bfc@tsep.mum1.exotel.com8o3io4ri6eas269ced78 destroyed
+[2026-05-30T12:13:45.501Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bKc05f.646be1a20f7ff6ecd44e62466da330a5.0.
+[2026-05-30T12:13:52.314Z] [LOG] ExWebClient: setRingingDuration: 45
+[2026-05-30T12:13:52.316Z] [LOG] webrtcSIPPhone: setRingingDuration:  45
+[2026-05-30T12:13:52.318Z] [LOG] sipjsphone: setRingingDuration: 45 sec
+[2026-05-30T12:13:58.520Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:13:58.523Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+INVITE sip:[REDACTED]@[REDACTED] SIP/2.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.227>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.227>
+Record-Route: <sip:13.204.153.1:443;transport=tls;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.9291;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:13.204.153.1:446;transport=tls;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.9291;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:13.126.162.13:443;transport=tls;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.71261>
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0;i=488c67
+Via: SIP/2.0/TLS 13.204.153.1:443;rport=39235;branch=z9hG4bK29e4.880572c3a1f21c62395d11a12a8f7edc.0;i=05
+Via: SIP/2.0/TLS 13.126.162.13:443;branch=z9hG4bK29e4.c3ea6fdf2ca719ce4dc4282ad94d1954.0;i=51a24e
+Via: SIP/2.0/TLS 172.40.1.77:5061;received=125.18.69.132;rport=45194;branch=z9hG4bKPj0bc7bd41-f51a-4501-9291-41476135a8cc;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 39c699ac-58fc-46bb-aa3f-811d9151636d
+CSeq: 14660 INVITE
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub, histinfo
+Session-Expires: 1800
+Min-SE: 90
+X-Exotel-UA: LegsPlatform
+X-Exotel-AccountSid: ameyo5m
+P-Asserted-Identity: "sip:07411179773" <sip:[REDACTED]@[REDACTED]
+X-Exotel-CallSid: 94583a16fe40ccd801e4a0daf26f1a5u
+X-Exotel-LegSid: 096d899fb49d59e379b733e14a411a5u
+X-Exotel-VN: 08047491920
+Max-Forwards: 67
+User-Agent: Asterisk PBX 18.15.0
+Content-Type: application/sdp
+Content-Length:   541
+Contact: <sip:[REDACTED]@[REDACTED]
+X-Exotel-TrunkSid: [REDACTED_AGENT]
+P-Early-Media: supported
+
+v=0
+o=- 1545775133 1545775133 IN IP4 80.225.231.27
+s=Asterisk
+c=IN IP4 80.225.231.27
+t=0 0
+m=audio 30127 RTP/SAVP 96 97
+a=maxptime:150
+a=rtpmap:96 opus/48000/2
+a=rtpmap:97 telephone-event/48000
+a=fmtp:97 0-15
+a=sendrecv
+a=rtcp:30127
+a=rtcp-mux
+a=setup:actpass
+a=fingerprint:sha-256 AA:1B:86:E8:29:74:90:90:B3:76:CA:91:C0:06:5C:5C:F8:14:66:22:80:03:54:1E:CE:22:3E:51:CD:DA:D1:79
+a=ptime:20
+a=ice-ufrag:mxC4nRhK
+a=ice-pwd:9lgyRz72lWj2YbtNMACdCoD7FW
+a=candidate:YhwoXsjx4raDljKA 1 UDP 2130706431 80.225.231.27 30127 typ host
+[2026-05-30T12:13:58.534Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Constructing INVITE server transaction with id z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0.
+[2026-05-30T12:13:58.537Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:13:58.538Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 100 Trying
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0;i=488c67
+Via: SIP/2.0/TLS 13.204.153.1:443;rport=39235;branch=z9hG4bK29e4.880572c3a1f21c62395d11a12a8f7edc.0;i=05
+Via: SIP/2.0/TLS 13.126.162.13:443;branch=z9hG4bK29e4.c3ea6fdf2ca719ce4dc4282ad94d1954.0;i=51a24e
+Via: SIP/2.0/TLS 172.40.1.77:5061;received=125.18.69.132;rport=45194;branch=z9hG4bKPj0bc7bd41-f51a-4501-9291-41476135a8cc;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 14660 INVITE
+Call-ID: 39c699ac-58fc-46bb-aa3f-811d9151636d
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:13:58.540Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:13:58.541Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 39c699ac-58fc-46bb-aa3f-811d9151636d8nnf84o0isaecd768f-1bbf-4650-a78d-2ca79a67b7f9 constructed
+[2026-05-30T12:13:58.543Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:13:58.545Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0;i=488c67
+Via: SIP/2.0/TLS 13.204.153.1:443;rport=39235;branch=z9hG4bK29e4.880572c3a1f21c62395d11a12a8f7edc.0;i=05
+Via: SIP/2.0/TLS 13.126.162.13:443;branch=z9hG4bK29e4.c3ea6fdf2ca719ce4dc4282ad94d1954.0;i=51a24e
+Via: SIP/2.0/TLS 172.40.1.77:5061;received=125.18.69.132;rport=45194;branch=z9hG4bKPj0bc7bd41-f51a-4501-9291-41476135a8cc;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 14660 INVITE
+Call-ID: 39c699ac-58fc-46bb-aa3f-811d9151636d
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.227>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.227>
+Record-Route: <sip:13.204.153.1:443;transport=tls;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.9291;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:13.204.153.1:446;transport=tls;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.9291;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:13.126.162.13:443;transport=tls;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.71261>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:13:58.546Z] [LOG] onInvite called
+[2026-05-30T12:13:58.547Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:13:58.548Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:13:58.549Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0;i=488c67
+Via: SIP/2.0/TLS 13.204.153.1:443;rport=39235;branch=z9hG4bK29e4.880572c3a1f21c62395d11a12a8f7edc.0;i=05
+Via: SIP/2.0/TLS 13.126.162.13:443;branch=z9hG4bK29e4.c3ea6fdf2ca719ce4dc4282ad94d1954.0;i=51a24e
+Via: SIP/2.0/TLS 172.40.1.77:5061;received=125.18.69.132;rport=45194;branch=z9hG4bKPj0bc7bd41-f51a-4501-9291-41476135a8cc;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 14660 INVITE
+Call-ID: 39c699ac-58fc-46bb-aa3f-811d9151636d
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.227>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.227>
+Record-Route: <sip:13.204.153.1:443;transport=tls;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.9291;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:13.204.153.1:446;transport=tls;r2=on;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.9291;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:13.126.162.13:443;transport=tls;lr;ftag=aecd768f-1bbf-4650-a78d-2ca79a67b7f9;did=212.71261>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:13:58.551Z] [LOG] DEBUG: Incoming call detected, about to start ring tone
+[2026-05-30T12:13:58.552Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "incoming"
+[2026-05-30T12:13:58.554Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:13:58.555Z] [LOG] DEBUG: startRingTone called, durationSec: 45
+[2026-05-30T12:13:58.556Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:58.556Z] [LOG] delegationHandler: eventType ["i_new_call"]
+[2026-05-30T12:13:58.557Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:13:58.558Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:58.559Z] [LOG] delegationHandler: eventType
+ "i_new_call"
+[2026-05-30T12:13:58.560Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:13:58.561Z] [LOG] ExWebClient: callEventCallback: Received ---> i_new_callparam sent....[object Object]for phone....null
+[2026-05-30T12:13:58.561Z] [LOG] CallListener: onIncomingCall {} null
+[2026-05-30T12:13:58.563Z] [LOG] audioDeviceManager:playUiTone: ringtone attempt 1
+[2026-05-30T12:13:58.567Z] [LOG] audioDeviceManager:playUiTone: ringtone playing
+[2026-05-30T12:13:59.059Z] [LOG] sipjsphone: sipCall: testing emit accept_reject
+[2026-05-30T12:13:59.061Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:59.063Z] [LOG] delegationHandler: eventType ["accept_reject"]
+[2026-05-30T12:13:59.065Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:13:59.066Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:13:59.067Z] [LOG] delegationHandler: eventType
+ "accept_reject"
+[2026-05-30T12:13:59.069Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:13:59.070Z] [LOG] ExWebClient: callEventCallback: Received ---> accept_rejectparam sent....[object Object]for phone....null
+[2026-05-30T12:13:59.072Z] [LOG] CallListener: onRinging {} null
+[2026-05-30T12:14:12.197Z] [LOG] ExWebClient: primeUiTones
+[2026-05-30T12:14:12.200Z] [LOG] webrtcSIPPhone: primeUiTones
+[2026-05-30T12:14:12.206Z] [LOG] audioDeviceManager:primeUiTones: primed tones "ringtone, ringbacktone, dtmftone, beeptone"
+[2026-05-30T12:14:13.564Z] [LOG] ExWebClient: playTestTone "ringtone"
+[2026-05-30T12:14:13.566Z] [LOG] webrtcSIPPhone: playTestTone "ringtone"
+[2026-05-30T12:14:13.567Z] [LOG] audioDeviceManager:playUiTone: ringtone attempt 1
+[2026-05-30T12:14:13.572Z] [LOG] audioDeviceManager:playUiTone: ringtone playing
+[2026-05-30T12:14:16.063Z] [LOG] ExWebClient: primeUiTones
+[2026-05-30T12:14:16.065Z] [LOG] webrtcSIPPhone: primeUiTones
+[2026-05-30T12:14:16.071Z] [LOG] audioDeviceManager:primeUiTones: primed tones "ringtone, ringbacktone, dtmftone, beeptone"
+[2026-05-30T12:14:19.830Z] [LOG] ExWebClient: stopRingTone
+[2026-05-30T12:14:19.833Z] [LOG] webrtcSIPPhone: stopRingTone
+[2026-05-30T12:14:19.835Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:14:20.746Z] [LOG] ExWebClient: setRingingDuration: 45
+[2026-05-30T12:14:20.749Z] [LOG] webrtcSIPPhone: setRingingDuration:  45
+[2026-05-30T12:14:20.750Z] [LOG] sipjsphone: setRingingDuration: 45 sec
+[2026-05-30T12:14:22.318Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:14:22.321Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+CANCEL sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0;i=488c67
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 39c699ac-58fc-46bb-aa3f-811d9151636d
+CSeq: 14660 CANCEL
+Max-Forwards: 67
+Content-Length: 0
+Reason: Q.850;cause=16
+[2026-05-30T12:14:22.328Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:22.330Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 200 OK
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0;i=488c67
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 14660 CANCEL
+Call-ID: 39c699ac-58fc-46bb-aa3f-811d9151636d
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:14:22.331Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation._onCancel
+[2026-05-30T12:14:22.333Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Completed" on INVITE server transaction with id z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0.
+[2026-05-30T12:14:22.335Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:22.336Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 487 Request Terminated
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0;i=488c67
+Via: SIP/2.0/TLS 13.204.153.1:443;rport=39235;branch=z9hG4bK29e4.880572c3a1f21c62395d11a12a8f7edc.0;i=05
+Via: SIP/2.0/TLS 13.126.162.13:443;branch=z9hG4bK29e4.c3ea6fdf2ca719ce4dc4282ad94d1954.0;i=51a24e
+Via: SIP/2.0/TLS 172.40.1.77:5061;received=125.18.69.132;rport=45194;branch=z9hG4bKPj0bc7bd41-f51a-4501-9291-41476135a8cc;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 14660 INVITE
+Call-ID: 39c699ac-58fc-46bb-aa3f-811d9151636d
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:14:22.337Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 39c699ac-58fc-46bb-aa3f-811d9151636daecd768f-1bbf-4650-a78d-2ca79a67b7f9 transitioned to state Terminated
+[2026-05-30T12:14:22.339Z] [LOG] delegationHandler: stopCallStat
+[2026-05-30T12:14:22.340Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "terminated"
+[2026-05-30T12:14:22.343Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:14:22.344Z] [LOG] delegationHandler: playBeepTone
+[2026-05-30T12:14:22.345Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:22.346Z] [LOG] delegationHandler: eventType ["terminated"]
+[2026-05-30T12:14:22.347Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:14:22.348Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:22.349Z] [LOG] delegationHandler: eventType
+ "terminated"
+[2026-05-30T12:14:22.350Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:14:22.351Z] [LOG] ExWebClient: callEventCallback: Received ---> terminatedparam sent....[object Object]for phone....null
+[2026-05-30T12:14:22.352Z] [LOG] CallListener: onCallEnded {} null
+[2026-05-30T12:14:22.355Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:14:22.356Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 39c699ac-58fc-46bb-aa3f-811d9151636daecd768f-1bbf-4650-a78d-2ca79a67b7f9 in state Terminated is being disposed
+[2026-05-30T12:14:22.429Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:14:22.430Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+ACK sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0;i=488c67
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 39c699ac-58fc-46bb-aa3f-811d9151636d
+CSeq: 14660 ACK
+Max-Forwards: 67
+Content-Length: 0
+[2026-05-30T12:14:22.434Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Confirmed" on INVITE server transaction with id z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0.
+[2026-05-30T12:14:22.435Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Timer I expired for INVITE server transaction z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0.
+[2026-05-30T12:14:22.437Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0.
+[2026-05-30T12:14:22.438Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Terminated" on INVITE server transaction with id z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0.
+[2026-05-30T12:14:22.438Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 39c699ac-58fc-46bb-aa3f-811d9151636d8nnf84o0isaecd768f-1bbf-4650-a78d-2ca79a67b7f9 destroyed
+[2026-05-30T12:14:22.439Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bK29e4.4baa66c7013c5a6a18d18ad0b91a0dc6.0.
+[2026-05-30T12:14:29.033Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:14:29.034Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+INVITE sip:[REDACTED]@[REDACTED] SIP/2.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.e191>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.e191>
+Record-Route: <sip:103.251.71.43:443;transport=tls;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.a7b2;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJpcC5leG90ZWwuY29t>
+Record-Route: <sip:103.251.71.43:444;transport=tls;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.a7b2;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJpcC5leG90ZWwuY29t>
+Record-Route: <sip:16.112.98.13:443;transport=tls;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.258b>
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0;i=667977
+Via: SIP/2.0/TLS 103.251.71.43:443;rport=39417;branch=z9hG4bKfc3.9a56039636f3533e15a08548400cc84c.0;i=95
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bKfc3.58711456a1ac1cb80c6dc820364675d0.0;i=721712
+Via: SIP/2.0/TLS 172.40.1.82:5061;received=125.18.69.137;rport=59831;branch=z9hG4bKPj5aa426b0-00da-4149-ab54-68bfe83b8f13;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c
+CSeq: 9296 INVITE
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub, histinfo
+Session-Expires: 1800
+Min-SE: 90
+X-Exotel-UA: LegsPlatform
+X-Exotel-AccountSid: ameyo5m
+P-Asserted-Identity: "sip:07411179773" <sip:[REDACTED]@[REDACTED]
+X-Exotel-CallSid: 8f65b236fd4eccf41e14e52c7caf1a5u
+X-Exotel-LegSid: c87cfc99df0e64219c1a3ae5b3ed1a5u
+X-Exotel-VN: 08047491920
+Max-Forwards: 67
+User-Agent: Asterisk PBX 18.15.0
+Content-Type: application/sdp
+Content-Length:   542
+Contact: <sip:[REDACTED]@[REDACTED]
+X-Exotel-TrunkSid: [REDACTED_AGENT]
+P-Early-Media: supported
+
+v=0
+o=- 175641514 175641514 IN IP4 141.148.205.58
+s=Asterisk
+c=IN IP4 141.148.205.58
+t=0 0
+m=audio 28986 RTP/SAVP 96 97
+a=maxptime:150
+a=rtpmap:96 opus/48000/2
+a=rtpmap:97 telephone-event/48000
+a=fmtp:97 0-15
+a=sendrecv
+a=rtcp:28986
+a=rtcp-mux
+a=setup:actpass
+a=fingerprint:sha-256 99:F9:F8:AD:58:B8:CF:EB:E1:62:39:80:52:C7:BD:A9:A6:FE:18:46:8C:34:A3:E0:AA:5F:57:C8:98:11:B4:C7
+a=ptime:20
+a=ice-ufrag:Yy1AcOAk
+a=ice-pwd:apubqF9IoXwa4uJyN64rcX0Y6v
+a=candidate:NWlLDdTmePr3xMv2 1 UDP 2130706431 141.148.205.58 28986 typ host
+[2026-05-30T12:14:29.039Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Constructing INVITE server transaction with id z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0.
+[2026-05-30T12:14:29.040Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:29.041Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 100 Trying
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0;i=667977
+Via: SIP/2.0/TLS 103.251.71.43:443;rport=39417;branch=z9hG4bKfc3.9a56039636f3533e15a08548400cc84c.0;i=95
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bKfc3.58711456a1ac1cb80c6dc820364675d0.0;i=721712
+Via: SIP/2.0/TLS 172.40.1.82:5061;received=125.18.69.137;rport=59831;branch=z9hG4bKPj5aa426b0-00da-4149-ab54-68bfe83b8f13;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 9296 INVITE
+Call-ID: 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:14:29.041Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:14:29.042Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c55e7e9fev0248c8b9d-0705-4a8f-8e16-de01fe378764 constructed
+[2026-05-30T12:14:29.043Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:29.043Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0;i=667977
+Via: SIP/2.0/TLS 103.251.71.43:443;rport=39417;branch=z9hG4bKfc3.9a56039636f3533e15a08548400cc84c.0;i=95
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bKfc3.58711456a1ac1cb80c6dc820364675d0.0;i=721712
+Via: SIP/2.0/TLS 172.40.1.82:5061;received=125.18.69.137;rport=59831;branch=z9hG4bKPj5aa426b0-00da-4149-ab54-68bfe83b8f13;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 9296 INVITE
+Call-ID: 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.e191>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.e191>
+Record-Route: <sip:103.251.71.43:443;transport=tls;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.a7b2;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJpcC5leG90ZWwuY29t>
+Record-Route: <sip:103.251.71.43:444;transport=tls;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.a7b2;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJpcC5leG90ZWwuY29t>
+Record-Route: <sip:16.112.98.13:443;transport=tls;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.258b>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:14:29.044Z] [LOG] onInvite called
+[2026-05-30T12:14:29.045Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:14:29.045Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:29.046Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0;i=667977
+Via: SIP/2.0/TLS 103.251.71.43:443;rport=39417;branch=z9hG4bKfc3.9a56039636f3533e15a08548400cc84c.0;i=95
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bKfc3.58711456a1ac1cb80c6dc820364675d0.0;i=721712
+Via: SIP/2.0/TLS 172.40.1.82:5061;received=125.18.69.137;rport=59831;branch=z9hG4bKPj5aa426b0-00da-4149-ab54-68bfe83b8f13;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 9296 INVITE
+Call-ID: 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.e191>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.e191>
+Record-Route: <sip:103.251.71.43:443;transport=tls;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.a7b2;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJpcC5leG90ZWwuY29t>
+Record-Route: <sip:103.251.71.43:444;transport=tls;r2=on;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.a7b2;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJpcC5leG90ZWwuY29t>
+Record-Route: <sip:16.112.98.13:443;transport=tls;lr;ftag=248c8b9d-0705-4a8f-8e16-de01fe378764;did=112.258b>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:14:29.047Z] [LOG] DEBUG: Incoming call detected, about to start ring tone
+[2026-05-30T12:14:29.048Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "incoming"
+[2026-05-30T12:14:29.049Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:14:29.050Z] [LOG] DEBUG: startRingTone called, durationSec: 45
+[2026-05-30T12:14:29.051Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:29.052Z] [LOG] delegationHandler: eventType ["i_new_call"]
+[2026-05-30T12:14:29.053Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:14:29.053Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:29.054Z] [LOG] delegationHandler: eventType
+ "i_new_call"
+[2026-05-30T12:14:29.055Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:14:29.055Z] [LOG] ExWebClient: callEventCallback: Received ---> i_new_callparam sent....[object Object]for phone....null
+[2026-05-30T12:14:29.056Z] [LOG] CallListener: onIncomingCall {} null
+[2026-05-30T12:14:29.058Z] [LOG] audioDeviceManager:playUiTone: ringtone attempt 1
+[2026-05-30T12:14:29.060Z] [LOG] audioDeviceManager:playUiTone: ringtone playing
+[2026-05-30T12:14:29.556Z] [LOG] sipjsphone: sipCall: testing emit accept_reject
+[2026-05-30T12:14:29.557Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:29.558Z] [LOG] delegationHandler: eventType ["accept_reject"]
+[2026-05-30T12:14:29.559Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:14:29.560Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:29.561Z] [LOG] delegationHandler: eventType
+ "accept_reject"
+[2026-05-30T12:14:29.562Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:14:29.562Z] [LOG] ExWebClient: callEventCallback: Received ---> accept_rejectparam sent....[object Object]for phone....null
+[2026-05-30T12:14:29.563Z] [LOG] CallListener: onRinging {} null
+[2026-05-30T12:14:41.458Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:14:41.461Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+CANCEL sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0;i=667977
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c
+CSeq: 9296 CANCEL
+Max-Forwards: 67
+Content-Length: 0
+Reason: Q.850;cause=16
+[2026-05-30T12:14:41.469Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:41.471Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 200 OK
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0;i=667977
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 9296 CANCEL
+Call-ID: 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:14:41.473Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation._onCancel
+[2026-05-30T12:14:41.475Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Completed" on INVITE server transaction with id z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0.
+[2026-05-30T12:14:41.477Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:41.479Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 487 Request Terminated
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0;i=667977
+Via: SIP/2.0/TLS 103.251.71.43:443;rport=39417;branch=z9hG4bKfc3.9a56039636f3533e15a08548400cc84c.0;i=95
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bKfc3.58711456a1ac1cb80c6dc820364675d0.0;i=721712
+Via: SIP/2.0/TLS 172.40.1.82:5061;received=125.18.69.137;rport=59831;branch=z9hG4bKPj5aa426b0-00da-4149-ab54-68bfe83b8f13;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 9296 INVITE
+Call-ID: 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:14:41.480Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c248c8b9d-0705-4a8f-8e16-de01fe378764 transitioned to state Terminated
+[2026-05-30T12:14:41.482Z] [LOG] delegationHandler: stopCallStat
+[2026-05-30T12:14:41.483Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "terminated"
+[2026-05-30T12:14:41.486Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:14:41.487Z] [LOG] delegationHandler: playBeepTone
+[2026-05-30T12:14:41.488Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:41.490Z] [LOG] delegationHandler: eventType ["terminated"]
+[2026-05-30T12:14:41.491Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:14:41.492Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:41.494Z] [LOG] delegationHandler: eventType
+ "terminated"
+[2026-05-30T12:14:41.495Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:14:41.497Z] [LOG] ExWebClient: callEventCallback: Received ---> terminatedparam sent....[object Object]for phone....null
+[2026-05-30T12:14:41.498Z] [LOG] CallListener: onCallEnded {} null
+[2026-05-30T12:14:41.501Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:14:41.502Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c248c8b9d-0705-4a8f-8e16-de01fe378764 in state Terminated is being disposed
+[2026-05-30T12:14:41.573Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:14:41.574Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+ACK sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0;i=667977
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c
+CSeq: 9296 ACK
+Max-Forwards: 67
+Content-Length: 0
+[2026-05-30T12:14:41.579Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Confirmed" on INVITE server transaction with id z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0.
+[2026-05-30T12:14:41.580Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Timer I expired for INVITE server transaction z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0.
+[2026-05-30T12:14:41.581Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0.
+[2026-05-30T12:14:41.582Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Terminated" on INVITE server transaction with id z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0.
+[2026-05-30T12:14:41.583Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 68d3cd20-74b8-4f5a-a84f-04cf21f5ba6c55e7e9fev0248c8b9d-0705-4a8f-8e16-de01fe378764 destroyed
+[2026-05-30T12:14:41.583Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bKfc3.d4c4578b4835e32bfad6ff0186f13254.0.
+[2026-05-30T12:14:47.337Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:14:47.340Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+INVITE sip:[REDACTED]@[REDACTED] SIP/2.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as5358303f;did=56e.01d2>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as5358303f;did=56e.01d2>
+Record-Route: <sip:40.192.74.68:443;transport=tls;lr;ftag=as5358303f;did=56e.6061;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwdFw9HCx8fGwZdQ00fHnRuLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJTRBpWeG90ZWwuY29t>
+Record-Route: <sip:16.112.98.13:443;transport=tls;lr;ftag=as5358303f;did=56e.bb2a>
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0;i=55e877
+Via: SIP/2.0/TLS 40.192.74.68:443;rport=37427;branch=z9hG4bK53d7.87a5d0da92e42cee25301ee1a9728b4a.0;i=74
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bK53d7.b091bc594c4773bbef993342101b08a5.0;i=dc3712
+Via: SIP/2.0/TLS 115.112.63.94:5061;received=115.112.63.94;branch=z9hG4bK2943411d;rport=41058
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.com
+CSeq: 102 INVITE
+User-Agent: Asterisk PBX 1.8.32.3
+Date: Sat, 30 May 2026 12:14:47 GMT
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, SUBSCRIBE, NOTIFY, INFO, PUBLISH, MESSAGE
+Supported: replaces
+X-Exotel-VN: +918047491920
+P-Asserted-Identity: <sip:[REDACTED]@[REDACTED]
+X-Exotel-LegSid: d02ce3b00b53014fde78d6af056e1a5u
+X-Exotel-CallSid: 8650f3a4437e933868ba4a59207e1a5u
+Content-Type: application/sdp
+Content-Length: 539
+Contact: <sip:[REDACTED]@[REDACTED]
+X-Exotel-TrunkSid: [REDACTED_AGENT]
+P-Early-Media: supported
+
+v=0
+o=root 411204181 411204181 IN IP4 144.24.101.99
+s=Asterisk PBX 1.8.32.3
+c=IN IP4 144.24.101.99
+t=0 0
+m=audio 34359 RTP/SAVP 96 97
+a=rtpmap:96 opus/48000/2
+a=rtpmap:97 telephone-event/48000
+a=fmtp:97 0-15
+a=sendrecv
+a=rtcp:34359
+a=rtcp-mux
+a=setup:actpass
+a=fingerprint:sha-256 33:C4:8E:91:47:BB:1D:65:A1:5F:27:38:82:86:C1:D7:C4:EE:D9:0E:5C:97:83:70:01:75:72:07:2D:14:C6:0E
+a=ptime:20
+a=ice-ufrag:5WvYezWu
+a=ice-pwd:3NyPqPQOVDdrDuobg31eXX7KcJ
+a=candidate:MOoMz9xNpe6e2PO6 1 UDP 2130706431 144.24.101.99 34359 typ host
+[2026-05-30T12:14:47.350Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Constructing INVITE server transaction with id z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0.
+[2026-05-30T12:14:47.353Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:47.354Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 100 Trying
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0;i=55e877
+Via: SIP/2.0/TLS 40.192.74.68:443;rport=37427;branch=z9hG4bK53d7.87a5d0da92e42cee25301ee1a9728b4a.0;i=74
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bK53d7.b091bc594c4773bbef993342101b08a5.0;i=dc3712
+Via: SIP/2.0/TLS 115.112.63.94:5061;received=115.112.63.94;branch=z9hG4bK2943411d;rport=41058
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:14:47.357Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:14:47.358Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.com2f2hdqlgi8as5358303f constructed
+[2026-05-30T12:14:47.360Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:47.361Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0;i=55e877
+Via: SIP/2.0/TLS 40.192.74.68:443;rport=37427;branch=z9hG4bK53d7.87a5d0da92e42cee25301ee1a9728b4a.0;i=74
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bK53d7.b091bc594c4773bbef993342101b08a5.0;i=dc3712
+Via: SIP/2.0/TLS 115.112.63.94:5061;received=115.112.63.94;branch=z9hG4bK2943411d;rport=41058
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as5358303f;did=56e.01d2>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as5358303f;did=56e.01d2>
+Record-Route: <sip:40.192.74.68:443;transport=tls;lr;ftag=as5358303f;did=56e.6061;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwdFw9HCx8fGwZdQ00fHnRuLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJTRBpWeG90ZWwuY29t>
+Record-Route: <sip:16.112.98.13:443;transport=tls;lr;ftag=as5358303f;did=56e.bb2a>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:14:47.362Z] [LOG] onInvite called
+[2026-05-30T12:14:47.364Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:14:47.365Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:47.366Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0;i=55e877
+Via: SIP/2.0/TLS 40.192.74.68:443;rport=37427;branch=z9hG4bK53d7.87a5d0da92e42cee25301ee1a9728b4a.0;i=74
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bK53d7.b091bc594c4773bbef993342101b08a5.0;i=dc3712
+Via: SIP/2.0/TLS 115.112.63.94:5061;received=115.112.63.94;branch=z9hG4bK2943411d;rport=41058
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=as5358303f;did=56e.01d2>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=as5358303f;did=56e.01d2>
+Record-Route: <sip:40.192.74.68:443;transport=tls;lr;ftag=as5358303f;did=56e.6061;vsf=AAAAAAAAAA8EBQYFDggOBQMABxoVBFwdFw9HCx8fGwZdQ00fHnRuLmV4b3RlbC5jb20-;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcHRcPRwsfHxsGXUNNGQJTRBpWeG90ZWwuY29t>
+Record-Route: <sip:16.112.98.13:443;transport=tls;lr;ftag=as5358303f;did=56e.bb2a>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:14:47.368Z] [LOG] DEBUG: Incoming call detected, about to start ring tone
+[2026-05-30T12:14:47.369Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "incoming"
+[2026-05-30T12:14:47.374Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:14:47.375Z] [LOG] DEBUG: startRingTone called, durationSec: 45
+[2026-05-30T12:14:47.377Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:47.378Z] [LOG] delegationHandler: eventType ["i_new_call"]
+[2026-05-30T12:14:47.379Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:14:47.380Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:47.381Z] [LOG] delegationHandler: eventType
+ "i_new_call"
+[2026-05-30T12:14:47.382Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:14:47.383Z] [LOG] ExWebClient: callEventCallback: Received ---> i_new_callparam sent....[object Object]for phone....null
+[2026-05-30T12:14:47.384Z] [LOG] CallListener: onIncomingCall {} null
+[2026-05-30T12:14:47.386Z] [LOG] audioDeviceManager:playUiTone: ringtone attempt 1
+[2026-05-30T12:14:47.389Z] [LOG] audioDeviceManager:playUiTone: ringtone playing
+[2026-05-30T12:14:47.882Z] [LOG] sipjsphone: sipCall: testing emit accept_reject
+[2026-05-30T12:14:47.885Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:47.887Z] [LOG] delegationHandler: eventType ["accept_reject"]
+[2026-05-30T12:14:47.889Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:14:47.891Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:47.893Z] [LOG] delegationHandler: eventType
+ "accept_reject"
+[2026-05-30T12:14:47.894Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:14:47.896Z] [LOG] ExWebClient: callEventCallback: Received ---> accept_rejectparam sent....[object Object]for phone....null
+[2026-05-30T12:14:47.897Z] [LOG] CallListener: onRinging {} null
+[2026-05-30T12:14:52.624Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:14:52.626Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+CANCEL sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0;i=55e877
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.com
+CSeq: 102 CANCEL
+Content-Length: 0
+[2026-05-30T12:14:52.633Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:52.635Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 200 OK
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0;i=55e877
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 CANCEL
+Call-ID: 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:14:52.637Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation._onCancel
+[2026-05-30T12:14:52.639Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Completed" on INVITE server transaction with id z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0.
+[2026-05-30T12:14:52.641Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:52.642Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 487 Request Terminated
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0;i=55e877
+Via: SIP/2.0/TLS 40.192.74.68:443;rport=37427;branch=z9hG4bK53d7.87a5d0da92e42cee25301ee1a9728b4a.0;i=74
+Via: SIP/2.0/TLS 16.112.98.13:443;branch=z9hG4bK53d7.b091bc594c4773bbef993342101b08a5.0;i=dc3712
+Via: SIP/2.0/TLS 115.112.63.94:5061;received=115.112.63.94;branch=z9hG4bK2943411d;rport=41058
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 102 INVITE
+Call-ID: 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.com
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:14:52.643Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.comas5358303f transitioned to state Terminated
+[2026-05-30T12:14:52.645Z] [LOG] delegationHandler: stopCallStat
+[2026-05-30T12:14:52.647Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "terminated"
+[2026-05-30T12:14:52.649Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:14:52.651Z] [LOG] delegationHandler: playBeepTone
+[2026-05-30T12:14:52.653Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:52.655Z] [LOG] delegationHandler: eventType ["terminated"]
+[2026-05-30T12:14:52.657Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:14:52.658Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:52.659Z] [LOG] delegationHandler: eventType
+ "terminated"
+[2026-05-30T12:14:52.660Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:14:52.661Z] [LOG] ExWebClient: callEventCallback: Received ---> terminatedparam sent....[object Object]for phone....null
+[2026-05-30T12:14:52.662Z] [LOG] CallListener: onCallEnded {} null
+[2026-05-30T12:14:52.665Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:14:52.666Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.comas5358303f in state Terminated is being disposed
+[2026-05-30T12:14:52.737Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:14:52.739Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+ACK sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0;i=55e877
+Max-Forwards: 67
+From: "+917411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.com
+CSeq: 102 ACK
+Content-Length: 0
+[2026-05-30T12:14:52.744Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Confirmed" on INVITE server transaction with id z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0.
+[2026-05-30T12:14:52.745Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Timer I expired for INVITE server transaction z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0.
+[2026-05-30T12:14:52.746Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0.
+[2026-05-30T12:14:52.747Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Terminated" on INVITE server transaction with id z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0.
+[2026-05-30T12:14:52.748Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog 2fa825f175f9af000db1a14f35138d4c@tsep.hyd.exotel.com2f2hdqlgi8as5358303f destroyed
+[2026-05-30T12:14:52.749Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bK53d7.b7696e91a13951a1800a2ee460dd7521.0.
+[2026-05-30T12:14:59.739Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:14:59.742Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+INVITE sip:[REDACTED]@[REDACTED] SIP/2.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.66c>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.66c>
+Record-Route: <sip:15.206.15.162:443;transport=tls;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.526;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:15.206.15.162:444;transport=tls;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.526;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:13.204.59.185:443;transport=tls;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.2f451>
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0;i=98fb67
+Via: SIP/2.0/TLS 15.206.15.162:443;rport=42387;branch=z9hG4bK0d37.68ebe7059ecb56efd62d07ccafee420c.0;i=c6
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bK0d37.295364b801c75f2f7483a60367990414.0;i=ea522e
+Via: SIP/2.0/TLS 172.40.1.108:5061;received=125.18.69.189;rport=53245;branch=z9hG4bKPj0b36d3cf-6086-4d9a-8f92-90e1babb276e;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: e567767e-b3f1-4e35-b10d-186089a9a079
+CSeq: 30338 INVITE
+Allow: OPTIONS, REGISTER, SUBSCRIBE, NOTIFY, PUBLISH, INVITE, ACK, BYE, CANCEL, UPDATE, PRACK, MESSAGE, REFER
+Supported: 100rel, timer, replaces, norefersub, histinfo
+Session-Expires: 1800
+Min-SE: 90
+X-Exotel-UA: LegsPlatform
+X-Exotel-AccountSid: ameyo5m
+P-Asserted-Identity: "sip:07411179773" <sip:[REDACTED]@[REDACTED]
+X-Exotel-CallSid: ab5794e21e122a8f016c9fe8b89c1a5u
+X-Exotel-LegSid: e69b8ac06bde30e8792a1e8e398e1a5u
+X-Exotel-VN: 08047491920
+Max-Forwards: 67
+User-Agent: Asterisk PBX 18.15.0
+Content-Type: application/sdp
+Content-Length:   541
+Contact: <sip:[REDACTED]@[REDACTED]
+X-Exotel-TrunkSid: [REDACTED_AGENT]
+P-Early-Media: supported
+
+v=0
+o=- 1239623779 1239623779 IN IP4 144.24.101.99
+s=Asterisk
+c=IN IP4 144.24.101.99
+t=0 0
+m=audio 37517 RTP/SAVP 96 97
+a=maxptime:150
+a=rtpmap:96 opus/48000/2
+a=rtpmap:97 telephone-event/48000
+a=fmtp:97 0-15
+a=sendrecv
+a=rtcp:37517
+a=rtcp-mux
+a=setup:actpass
+a=fingerprint:sha-256 33:C4:8E:91:47:BB:1D:65:A1:5F:27:38:82:86:C1:D7:C4:EE:D9:0E:5C:97:83:70:01:75:72:07:2D:14:C6:0E
+a=ptime:20
+a=ice-ufrag:ScjXZzYg
+a=ice-pwd:Kw2Ti7QZCzMllkhdWYos1X5h5O
+a=candidate:MOoMz9xNpe6e2PO6 1 UDP 2130706431 144.24.101.99 37517 typ host
+[2026-05-30T12:14:59.752Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Constructing INVITE server transaction with id z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0.
+[2026-05-30T12:14:59.754Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:59.756Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 100 Trying
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0;i=98fb67
+Via: SIP/2.0/TLS 15.206.15.162:443;rport=42387;branch=z9hG4bK0d37.68ebe7059ecb56efd62d07ccafee420c.0;i=c6
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bK0d37.295364b801c75f2f7483a60367990414.0;i=ea522e
+Via: SIP/2.0/TLS 172.40.1.108:5061;received=125.18.69.189;rport=53245;branch=z9hG4bKPj0b36d3cf-6086-4d9a-8f92-90e1babb276e;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 30338 INVITE
+Call-ID: e567767e-b3f1-4e35-b10d-186089a9a079
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:14:59.757Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:14:59.759Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog e567767e-b3f1-4e35-b10d-186089a9a079em6746mr17515fa574-6e0d-458a-8d34-f9711b415d62 constructed
+[2026-05-30T12:14:59.761Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:59.762Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0;i=98fb67
+Via: SIP/2.0/TLS 15.206.15.162:443;rport=42387;branch=z9hG4bK0d37.68ebe7059ecb56efd62d07ccafee420c.0;i=c6
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bK0d37.295364b801c75f2f7483a60367990414.0;i=ea522e
+Via: SIP/2.0/TLS 172.40.1.108:5061;received=125.18.69.189;rport=53245;branch=z9hG4bKPj0b36d3cf-6086-4d9a-8f92-90e1babb276e;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 30338 INVITE
+Call-ID: e567767e-b3f1-4e35-b10d-186089a9a079
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.66c>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.66c>
+Record-Route: <sip:15.206.15.162:443;transport=tls;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.526;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:15.206.15.162:444;transport=tls;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.526;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:13.204.59.185:443;transport=tls;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.2f451>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:14:59.764Z] [LOG] onInvite called
+[2026-05-30T12:14:59.765Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation.progress
+[2026-05-30T12:14:59.767Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:14:59.768Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0;i=98fb67
+Via: SIP/2.0/TLS 15.206.15.162:443;rport=42387;branch=z9hG4bK0d37.68ebe7059ecb56efd62d07ccafee420c.0;i=c6
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bK0d37.295364b801c75f2f7483a60367990414.0;i=ea522e
+Via: SIP/2.0/TLS 172.40.1.108:5061;received=125.18.69.189;rport=53245;branch=z9hG4bKPj0b36d3cf-6086-4d9a-8f92-90e1babb276e;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 30338 INVITE
+Call-ID: e567767e-b3f1-4e35-b10d-186089a9a079
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Record-Route: <sip:18.60.92.140:443;transport=ws;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.66c>
+Record-Route: <sip:18.60.92.140:443;transport=tls;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.66c>
+Record-Route: <sip:15.206.15.162:443;transport=tls;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.526;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:15.206.15.162:444;transport=tls;r2=on;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.526;vsf=AAAAAAAPBAUGBQ4IDgUDAAUMFRodGBsGWEAXAxsNHwhWHwcRAgAGFwJ0ZWwuY29t;vst=AAAAAAAAAAAAAAAAAAAAAAAAAAcaFQRcGBsGWEACCAAXVAEAFQAEcC5leG90ZWwuY29t>
+Record-Route: <sip:13.204.59.185:443;transport=tls;lr;ftag=515fa574-6e0d-458a-8d34-f9711b415d62;did=958.2f451>
+Contact: <sip:[REDACTED]@[REDACTED]
+Content-Length: 0
+[2026-05-30T12:14:59.769Z] [LOG] DEBUG: Incoming call detected, about to start ring tone
+[2026-05-30T12:14:59.771Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "incoming"
+[2026-05-30T12:14:59.774Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:14:59.775Z] [LOG] DEBUG: startRingTone called, durationSec: 45
+[2026-05-30T12:14:59.776Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:59.777Z] [LOG] delegationHandler: eventType ["i_new_call"]
+[2026-05-30T12:14:59.778Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:14:59.780Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:14:59.781Z] [LOG] delegationHandler: eventType
+ "i_new_call"
+[2026-05-30T12:14:59.782Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:14:59.783Z] [LOG] ExWebClient: callEventCallback: Received ---> i_new_callparam sent....[object Object]for phone....null
+[2026-05-30T12:14:59.785Z] [LOG] CallListener: onIncomingCall {} null
+[2026-05-30T12:14:59.787Z] [LOG] audioDeviceManager:playUiTone: ringtone attempt 1
+[2026-05-30T12:14:59.790Z] [LOG] audioDeviceManager:playUiTone: ringtone playing
+[2026-05-30T12:15:00.282Z] [LOG] sipjsphone: sipCall: testing emit accept_reject
+[2026-05-30T12:15:00.284Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:15:00.286Z] [LOG] delegationHandler: eventType ["accept_reject"]
+[2026-05-30T12:15:00.288Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:15:00.290Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:15:00.291Z] [LOG] delegationHandler: eventType
+ "accept_reject"
+[2026-05-30T12:15:00.293Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:15:00.294Z] [LOG] ExWebClient: callEventCallback: Received ---> accept_rejectparam sent....[object Object]for phone....null
+[2026-05-30T12:15:00.295Z] [LOG] CallListener: onRinging {} null
+[2026-05-30T12:15:29.734Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:15:29.736Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+CANCEL sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0;i=98fb67
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: e567767e-b3f1-4e35-b10d-186089a9a079
+CSeq: 30338 CANCEL
+Max-Forwards: 67
+Content-Length: 0
+Reason: Q.850;cause=16
+[2026-05-30T12:15:29.746Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:15:29.748Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 200 OK
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0;i=98fb67
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 30338 CANCEL
+Call-ID: e567767e-b3f1-4e35-b10d-186089a9a079
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:15:29.750Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Invitation._onCancel
+[2026-05-30T12:15:29.751Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Completed" on INVITE server transaction with id z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0.
+[2026-05-30T12:15:29.753Z] [LOG] delegationHandler: onCallStatSipSendCallback
+[2026-05-30T12:15:29.754Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Sending WebSocket message:
+
+SIP/2.0 487 Request Terminated
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0;i=98fb67
+Via: SIP/2.0/TLS 15.206.15.162:443;rport=42387;branch=z9hG4bK0d37.68ebe7059ecb56efd62d07ccafee420c.0;i=c6
+Via: SIP/2.0/TLS 13.204.59.185:443;branch=z9hG4bK0d37.295364b801c75f2f7483a60367990414.0;i=ea522e
+Via: SIP/2.0/TLS 172.40.1.108:5061;received=125.18.69.189;rport=53245;branch=z9hG4bKPj0b36d3cf-6086-4d9a-8f92-90e1babb276e;alias
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+CSeq: 30338 INVITE
+Call-ID: e567767e-b3f1-4e35-b10d-186089a9a079
+Supported: outbound
+User-Agent: SIP.js/0.20.0
+Content-Length: 0
+[2026-05-30T12:15:29.756Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session e567767e-b3f1-4e35-b10d-186089a9a079515fa574-6e0d-458a-8d34-f9711b415d62 transitioned to state Terminated
+[2026-05-30T12:15:29.758Z] [LOG] delegationHandler: stopCallStat
+[2026-05-30T12:15:29.759Z] [LOG] delegationHandler: onCallStatSipJsSessionEvent "terminated"
+[2026-05-30T12:15:29.761Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:15:29.763Z] [LOG] delegationHandler: playBeepTone
+[2026-05-30T12:15:29.764Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:15:29.765Z] [LOG] delegationHandler: eventType ["terminated"]
+[2026-05-30T12:15:29.766Z] [LOG] delegationHandler: sipMethod ["CALL"]
+[2026-05-30T12:15:29.767Z] [LOG] delegationHandler: sendWebRTCEventsToFSM
+[2026-05-30T12:15:29.769Z] [LOG] delegationHandler: eventType
+ "terminated"
+[2026-05-30T12:15:29.770Z] [LOG] delegationHandler: sipMethod
+ "CALL"
+[2026-05-30T12:15:29.771Z] [LOG] ExWebClient: callEventCallback: Received ---> terminatedparam sent....[object Object]for phone....null
+[2026-05-30T12:15:29.772Z] [LOG] CallListener: onCallEnded {} null
+[2026-05-30T12:15:29.775Z] [LOG] sipjsphone: stopRingTone: intervalID: 0
+[2026-05-30T12:15:29.776Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Invitation: Session e567767e-b3f1-4e35-b10d-186089a9a079515fa574-6e0d-458a-8d34-f9711b415d62 in state Terminated is being disposed
+[2026-05-30T12:15:29.849Z] [LOG] delegationHandler: onCallStatSipRecvCallback
+[2026-05-30T12:15:29.850Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.Transport: Received WebSocket text message:
+
+ACK sip:[REDACTED]@[REDACTED] SIP/2.0
+Via: SIP/2.0/WSS 18.60.92.140:443;branch=z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0;i=98fb67
+From: "07411179773" <sip:[REDACTED]@[REDACTED]
+To: <sip:[REDACTED]@[REDACTED]
+Call-ID: e567767e-b3f1-4e35-b10d-186089a9a079
+CSeq: 30338 ACK
+Max-Forwards: 67
+Content-Length: 0
+[2026-05-30T12:15:29.855Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Confirmed" on INVITE server transaction with id z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0.
+[2026-05-30T12:15:29.856Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Timer I expired for INVITE server transaction z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0.
+[2026-05-30T12:15:29.857Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0.
+[2026-05-30T12:15:29.857Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: State change to "Terminated" on INVITE server transaction with id z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0.
+[2026-05-30T12:15:29.858Z] [LOG] sipjsphone: sipPhoneLogger:log sipjslog: sip.invite-dialog: INVITE dialog e567767e-b3f1-4e35-b10d-186089a9a079em6746mr17515fa574-6e0d-458a-8d34-f9711b415d62 destroyed
+[2026-05-30T12:15:29.859Z] [LOG] sipjsphone: sipPhoneLogger:debug sipjslog: sip.transaction.ist: Destroyed INVITE server transaction with id z9hG4bK0d37.179a94096f92114cadc5ec49ea225fee.0.
+[2026-05-30T12:15:44.096Z] [LOG] ExWebClient: downloadLogs: Entry

@@ -52,14 +52,16 @@ Nodeflow and contact-center platforms configure agent ring timeout (typically **
 
 ---
 
-## Manual test (demo-non-npm) — before push
+## Manual test (demo-non-npm) — **Pass (May 30 2026)**
 
-1. Build SDK from this branch; `make deps` into sample app.
-2. After Go Online: `exWebClient.setRingingDuration(30)`.
-3. Trigger incoming call — ring ~30s (master control ~15s).
-4. Optional: `stopRingTone()` mid-ring — stops immediately.
+See [VST-1782-QA-EVIDENCE.md](./VST-1782-QA-EVIDENCE.md) and `docs/qa/evidence/VST-1782/`.
 
-**Pass criteria:** duration ±1s; answered-call audio unaffected.
+| Check | Result |
+|-------|--------|
+| `setRingingDuration(10/30/40/45)` | Pass |
+| 10s auto-stop | Pass (10.00s in logs) |
+| `stopRingTone()` early | Pass |
+| No ~15s SDK cap regression | Pass |
 
 ---
 
@@ -71,3 +73,6 @@ Nodeflow and contact-center platforms configure agent ring timeout (typically **
 | `webrtc-core-sdk/src/webrtcSIPPhone.js` | Delegates |
 | `webrtc-client-sdk/src/listeners/ExWebClient.js` | Public APIs |
 | `*/Changelog`, `*/package.json` | 3.0.13 |
+| `docs/VST-1782-FR-NFR.md` | This document |
+| `docs/VST-1782-QA-EVIDENCE.md` | Manual QA matrix |
+| `docs/qa/evidence/VST-1782/` | Sanitized test logs |
