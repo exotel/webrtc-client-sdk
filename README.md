@@ -3,7 +3,7 @@ This is a basic sample application to showcase Exotel VOIP Websdk API integratio
 
 ## Media resilience (SDK 3.0.12+)
 
-See [docs/MEDIA-RESILIENCE.md](docs/MEDIA-RESILIENCE.md) for integrator notes on automatic audio recovery, UI tones, and configurable incoming ring duration.
+See [docs/MEDIA-RESILIENCE.md](docs/MEDIA-RESILIENCE.md) for integrator notes on automatic audio recovery and `media_recovery_*` session events. Manual test steps: [docs/MEDIA-RESILIENCE-TEST-PLAN.md](docs/MEDIA-RESILIENCE-TEST-PLAN.md).
 
 # Exotel Voice WebSDK
 This sample application requires a websdk package to work. Contact us to get the credentials to download the node.js package of the websdk. Follow the instructions provided in Exotel-Voice-Websdk-Integration-Guide.pdf.

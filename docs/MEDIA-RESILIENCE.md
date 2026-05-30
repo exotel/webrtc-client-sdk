@@ -1,6 +1,6 @@
 # WebSDK media resilience (3.0.12+)
 
-Public integration notes for release **3.0.12**. For full API details see the Exotel Voice WebSDK integration guides linked from the repository README.
+Public integration notes for release **3.0.12** (PR1: media recovery only). For full API details see the Exotel Voice WebSDK integration guides linked from the repository README.
 
 ## What changed
 
@@ -10,7 +10,7 @@ The SDK automatically attempts to restore call audio after:
 - Inbound RTP byte stalls on an established session
 - Browser tab returning to the foreground
 
-Local UI tones (ring, ringback, DTMF, beep) use direct `<audio>` playback to improve reliability in embedded browsers.
+Recovery also attempts to restore outbound microphone tracks after network blips when the call is not on hold or muted.
 
 ## Integrator APIs
 
@@ -25,36 +25,27 @@ Subscribe via `SessionCallback`. Event names are prefixed with `media_recovery_`
 | `media_recovery_failed` | Retry budget exhausted (default: 3 attempts per 30s window) |
 | `media_recovery_degraded` | ICE or connection entered a degraded state |
 
-### UI tones
-
-Call once per session after a user gesture (for example “Go online”):
+Example handler:
 
 ```javascript
-await exWebClient.primeUiTones();
+function sessionCallback(eventName, callFromNumber) {
+  if (eventName.startsWith('media_recovery_')) {
+    // Show agent-facing "reconnecting audio" UI if desired
+    console.log(eventName, callFromNumber);
+  }
+}
 ```
-
-Optional test helper: `exWebClient.playTestTone('ringtone' | 'ringbacktone' | 'dtmftone' | 'beeptone')`.
-
-### Incoming ring duration
-
-Controls **local ringtone playback length** only. Set from your application configuration (for example your contact-center ring timeout):
-
-```javascript
-exWebClient.setRingingDuration(30);  // seconds; default 30
-exWebClient.getRingingDuration();
-exWebClient.stopRingTone();          // stop ring early
-```
-
-The application should pass the same duration your platform uses for agent ringing. The SDK does not read server-side routing configuration automatically.
 
 ## Recommended integration checklist
 
-1. Upgrade **webrtc-core-sdk** and **webrtc-client-sdk** to **3.0.12** or later.
-2. Call `primeUiTones()` after `initWebrtc()` on a user click.
-3. Call `setRingingDuration(seconds)` after init if your product default is not 30 seconds.
-4. Handle `media_recovery_*` session events if you want agent-facing “reconnecting audio” UI.
-5. Avoid heavy main-thread work in the host app during active calls.
+1. Upgrade **webrtc-core-sdk** and **webrtc-client-sdk** to **3.0.12** or later together.
+2. Handle `media_recovery_*` session events if you want agent-facing reconnect UI.
+3. Avoid heavy main-thread work in the host app during active calls.
 
-## Diagnostics (optional)
+## Manual test plan
 
-Set `window.ENABLE_WEBRTC_DIAGNOSTICS = true` before initializing the SDK for additional WebRTC stats logging during troubleshooting.
+See [MEDIA-RESILIENCE-TEST-PLAN.md](MEDIA-RESILIENCE-TEST-PLAN.md) for the reviewer test matrix.
+
+## Follow-up (separate PR)
+
+UI tone reliability (`primeUiTones`), configurable ring duration, and optional WebRTC diagnostics are deferred to a follow-up PR. See [VST-1775-PR2-SCOPE.md](VST-1775-PR2-SCOPE.md).
