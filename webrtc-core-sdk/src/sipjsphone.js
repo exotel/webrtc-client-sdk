@@ -1,5 +1,6 @@
 var SIP = require('./sip-0.20.0.js')
 import { audioDeviceManager } from './audioDeviceManager.js';
+import { attachMediaRecovery, detachMediaRecovery, ensureRemoteAudioPlaying } from './mediaRecovery.js';
 import coreSDKLogger from './coreSDKLogger.js';
 import WebrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 let logger = coreSDKLogger;
@@ -306,15 +307,14 @@ class SIPJSPhone {
 			newSess.delegate = {};
 
 			newSess.delegate.onSessionDescriptionHandler = (sdh, provisional) => {
-				let lastIceState = "unknown";
-
 				try {
-						let callId = this.ctxSip.callActiveID;
-						let username = this.ctxSip.config.authorizationUsername;
-					let pc = sdh._peerConnection;
-						this.webrtcSIPPhoneEventDelegate.initGetStats(pc, callId, username);
+					let pc = sdh._peerConnection || sdh.peerConnection;
+					if (pc) {
+						this._activeRecoveryPc = pc;
+						attachMediaRecovery(pc, newSess, this);
+					}
 				} catch (e) {
-					logger.log("sipjsphone: newSession: something went wrong while initing getstats");
+					logger.log("sipjsphone: newSession: something went wrong while initing media recovery");
 					logger.log(e);
 				}
 
@@ -1149,23 +1149,24 @@ destroySocketConnection() {
     // Set HTML audio element volume to 0 to prevent direct audio output
     element.volume = this.callAudioOutputVolume;
     
-    // Load and start playback of media.
-    element.play().catch((error) => {
-        logger.error("sipjsphone: assignStream: Failed to play media", error);
+    ensureRemoteAudioPlaying(element).then((played) => {
+        if (played) {
+            logger.log("sipjsphone: assignStream: remote audio play success");
+        } else {
+            logger.error("sipjsphone: assignStream: Failed to play media after retries");
+        }
     });
 
-    // If a track is added, load and restart playback of media.
     stream.onaddtrack = () => {
         element.load();
-        element.play().catch((error) => {
+        ensureRemoteAudioPlaying(element).catch((error) => {
             logger.error("sipjsphone: assignStream: Failed to play remote media on add track", error);
         });
     };
-    
-    // If a track is removed, load and restart playback of media.
+
     stream.onremovetrack = () => {
         element.load();
-        element.play().catch((error) => {
+        ensureRemoteAudioPlaying(element).catch((error) => {
             logger.error("sipjsphone: assignStream: Failed to play remote media on remove track", error);
         });
     };
@@ -1603,6 +1604,12 @@ destroySocketConnection() {
 		logger.log('onInvitationSessionAccepted: assigning remote stream to audioRemote');
 		this.assignStream(newSess.sessionDescriptionHandler.remoteMediaStream, this.audioRemote);
 		logger.log('onInvitationSessionAccepted: assignStream called');
+		const sdh = newSess.sessionDescriptionHandler;
+		const pc = sdh?.peerConnection || sdh?._peerConnection;
+		if (pc) {
+			this._activeRecoveryPc = pc;
+			attachMediaRecovery(pc, newSess, this);
+		}
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('accepted');
 			this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("connected", "CALL");
@@ -1622,6 +1629,10 @@ destroySocketConnection() {
 	}
 
 	onInvitationSessionTerminated() {
+		if (this._activeRecoveryPc) {
+			detachMediaRecovery(this._activeRecoveryPc);
+			this._activeRecoveryPc = null;
+		}
 		this.stopStreamTracks(this.ctxSip.Stream);
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.stopCallStat();
