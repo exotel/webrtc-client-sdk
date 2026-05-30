@@ -659,6 +659,24 @@ class ExotelWebClient {
         this.webrtcSIPPhone.setNoiseSuppression(enabled);
     }
 
+    async primeUiTones() {
+        logger.log("ExWebClient: primeUiTones");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: primeUiTones: webrtcSIPPhone not initialized");
+            return [];
+        }
+        return this.webrtcSIPPhone.primeUiTones();
+    }
+
+    async playTestTone(toneName) {
+        logger.log("ExWebClient: playTestTone", toneName);
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: playTestTone: webrtcSIPPhone not initialized");
+            return false;
+        }
+        return this.webrtcSIPPhone.playTestTone(toneName);
+    }
+
 }
 
 

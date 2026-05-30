@@ -1,5 +1,8 @@
 Change Log
 
+## v3.0.14 30 May, 2026
+-[VST-1783] UI tone playback reliability: direct audio path, webpack WAV bundling, primeUiTones/playTestTone for iframe autoplay
+
 ## v3.0.9 27 March, 2026
 -[VST-1577] Removed the same-device-ID guard from replaceSenderTrack.
 

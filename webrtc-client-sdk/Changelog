@@ -1,5 +1,8 @@
 Change Log
 
+## v3.0.14 30 May, 2026
+-[VST-1783] Expose primeUiTones and playTestTone on ExotelWebClient; depends on webrtc-core-sdk 3.0.14
+
 ## v3.0.10 01 April, 2026
 -[VST-1584]Updated webrtc-core-sdk to v3.0.10 with stack trace logging in error method
 

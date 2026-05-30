@@ -18,14 +18,21 @@ module.exports = {
   output: {
     filename:'[name].js',
     path: path.resolve(__dirname, 'dist'),
+    publicPath: 'auto',
     libraryTarget: 'umd',
     library: 'exotelSDK',
     globalObject: 'this',
-    assetModuleFilename: '[name][ext][query]'
+    assetModuleFilename: 'audio/[name][ext][query]'
   },
   module: {
     rules: [
-      { test: /\.wav$/, use: 'file-loader',type: 'asset/resource' },
+      {
+        test: /\.wav$/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'audio/[name][ext][query]'
+        }
+      },
       {
         test: /\.ts$/,
         exclude: /node_modules/,
