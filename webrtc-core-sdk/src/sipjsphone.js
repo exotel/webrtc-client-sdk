@@ -1687,8 +1687,13 @@ destroySocketConnection() {
 		}
 	}
 
-	_onDeviceChange(event) {
+	async _onDeviceChange(event) {
 		try {
+			if (await audioDeviceManager._isMicPermissionDenied()) {
+				logger.log("SIPJSPhone:ondevicechange skipped — mic permission denied");
+				return;
+			}
+
 			audioDeviceManager.enumerateDevices(() => {
 				if (this.onDeviceChangeCallback) {
 				logger.info("SIPJSPhone:ondevicechange relaying event to callback");

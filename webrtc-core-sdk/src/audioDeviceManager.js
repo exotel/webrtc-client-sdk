@@ -10,6 +10,15 @@ export const audioDeviceManager = {
     mediaDevices: [],
     enableAutoAudioDeviceChangeHandling: false,
     webAudioCtx : new AudioManagerCtx(),
+    async _isMicPermissionDenied() {
+    try {
+      if (navigator.permissions && navigator.permissions.query) {
+        const status = await navigator.permissions.query({ name: 'microphone' });
+        return status.state === 'denied';
+      }
+    } catch (e) { /* Permissions API not supported, fall through */ }
+    return false;
+  },
     // Method to set the resetInputDevice flag
     setResetInputDeviceFlag(value) {
         this.resetInputDevice = value;
@@ -23,6 +32,11 @@ export const audioDeviceManager = {
     async changeAudioInputDevice(deviceId, onSuccess, onError, forceDeviceChange) {
         logger.log(`SIPJSPhone:changeAudioInputDevice entry`);
         try {
+            if (await audioDeviceManager._isMicPermissionDenied()) {
+                logger.log(`SIPJSPhone:changeAudioInputDevice skipped — mic permission denied`);
+                if (onError) onError("mic_permission_denied");
+                return;
+            }
             if (this.enableAutoAudioDeviceChangeHandling && !forceDeviceChange) {
                 if (deviceId == audioDeviceManager.currentAudioInputDeviceId) {
                     logger.log(`SIPJSPhone:changeAudioInputDevice current input device is same as ${deviceId} hence not changing`);
