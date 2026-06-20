@@ -211,9 +211,16 @@ class SIPJSPhone {
 		Stream: null,
 		ringToneIntervalID: 0,
 		ringtoneCount: 30,
+		sipCallTimerId: null,
+		pendingIncomingSession: null,
+		pendingIncomingTimerId: null,
 
 			startRingTone: () => {
 			try {
+				if (this.ctxSip.ringToneIntervalID) {
+					clearInterval(this.ctxSip.ringToneIntervalID);
+					this.ctxSip.ringToneIntervalID = null;
+				}
 				var count = 0;
 				if (!this.ctxSip.ringtone) {
 					this.ctxSip.ringtone = this.ringtone;
@@ -222,6 +229,11 @@ class SIPJSPhone {
 				logger.log('DEBUG: startRingTone src:', this.ctxSip.ringtone.src);
 				this.ctxSip.ringtone.load();
 				this.ctxSip.ringToneIntervalID = setInterval(() => {
+					if (this.ctxSip.callActiveID == null) {
+						clearInterval(this.ctxSip.ringToneIntervalID);
+						this.ctxSip.ringToneIntervalID = null;
+						return;
+					}
 					this.ctxSip.ringtone.play()
 						.then(() => {
 							logger.log("DEBUG: startRingTone: Audio is playing...");
@@ -232,6 +244,7 @@ class SIPJSPhone {
 					count++;
 					if (count > this.ctxSip.ringtoneCount) {
 						clearInterval(this.ctxSip.ringToneIntervalID);
+						this.ctxSip.ringToneIntervalID = null;
 					}
 					}, 500);
 				} catch (e) {
@@ -241,13 +254,16 @@ class SIPJSPhone {
 
 			stopRingTone: () => {
 				try {
-
+					if (this.ctxSip.ringToneIntervalID) {
+						clearInterval(this.ctxSip.ringToneIntervalID);
+						logger.log("sipjsphone: stopRingTone: cleared intervalID:", this.ctxSip.ringToneIntervalID);
+						this.ctxSip.ringToneIntervalID = null;
+					}
 					if (!this.ctxSip.ringtone) {
 						this.ctxSip.ringtone = this.ringtone;
 					}
 					this.ctxSip.ringtone.pause();
-					logger.log("sipjsphone: stopRingTone: intervalID:", this.ctxSip.ringToneIntervalID);
-					clearInterval(this.ctxSip.ringToneIntervalID)
+					this.ctxSip.ringtone.currentTime = 0;
 			} catch (e) { logger.log("sipjsphone: stopRingTone: Exception:", e); }
 		},
 
@@ -346,9 +362,7 @@ class SIPJSPhone {
 					this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('incoming');
 				status = "Incoming: " + newSess.displayName;
 					this.ctxSip.startRingTone();
-				//sip call method was invoking after 500 ms because of race between server push and 
-				//webrtc websocket autoanswer
-					setTimeout(() => this.sipCall(), 500);
+					this.ctxSip.sipCallTimerId = setTimeout(() => this.sipCall(), 500);
 
 			}
 				this.ctxSip.setCallSessionStatus(status);
@@ -679,12 +693,32 @@ class SIPJSPhone {
 				delegate: {
 					onInvite: (incomingSession) => {
 						logger.log("onInvite called");
-						if (this.ctxSip.callActiveID == null) {
-							// Tell the PSTN/SIP proxy we are ringing so it doesn't CANCEL
-							incomingSession.progress({ statusCode: 180, reasonPhrase: "Ringing" });
-							incomingSession.direction = "incoming";
-							this.ctxSip.newSession(incomingSession);
-							this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL", incomingSession);
+						if (this.ctxSip.callActiveID == null && !this.ctxSip.pendingIncomingSession) {
+							var s = incomingSession;
+							s.direction = "incoming";
+
+							this.ctxSip.pendingIncomingSession = s;
+							this.ctxSip.pendingIncomingTimerId = setTimeout(() => {
+								if (s.state === SIP.SessionState.Initial ||
+									s.state === SIP.SessionState.Establishing) {
+									s.progress({ statusCode: 180, reasonPhrase: "Ringing" });
+									this.ctxSip.newSession(s);
+									this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL", s);
+								} else {
+									logger.log("[onInvite] Session terminated during grace period, suppressing phantom ring");
+								}
+								this.ctxSip.pendingIncomingSession = null;
+								this.ctxSip.pendingIncomingTimerId = null;
+							}, 200);
+
+							s.stateChange.addListener((newState) => {
+								if (newState === SIP.SessionState.Terminated && this.ctxSip.pendingIncomingTimerId) {
+									clearTimeout(this.ctxSip.pendingIncomingTimerId);
+									this.ctxSip.pendingIncomingSession = null;
+									this.ctxSip.pendingIncomingTimerId = null;
+									logger.log("[onInvite] CANCEL received during grace period - suppressed phantom ring");
+								}
+							});
 						} else {
 							incomingSession.reject({ statusCode: 486 });
 						}
@@ -1622,6 +1656,10 @@ destroySocketConnection() {
 	}
 
 	onInvitationSessionTerminated() {
+		if (this.ctxSip.sipCallTimerId) {
+			clearTimeout(this.ctxSip.sipCallTimerId);
+			this.ctxSip.sipCallTimerId = null;
+		}
 		this.stopStreamTracks(this.ctxSip.Stream);
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.stopCallStat();
