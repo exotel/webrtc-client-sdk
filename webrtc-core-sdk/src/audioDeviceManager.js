@@ -261,6 +261,27 @@ export const audioDeviceManager = {
         return false;
     },
 
+    stopUiTone(elementName) {
+        const audioElement = this.uiToneElements[elementName];
+        if (!audioElement) {
+            return false;
+        }
+        try {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+            return true;
+        } catch (error) {
+            logger.log(`audioDeviceManager:stopUiTone: ${elementName} failed`, error?.name, error?.message);
+            return false;
+        }
+    },
+
+    stopAllUiTones() {
+        Object.keys(this.uiToneElements).forEach((elementName) => {
+            this.stopUiTone(elementName);
+        });
+    },
+
     configureAudioGainNode(sourceNode) {
         logger.log("audioDeviceManager:configureAudioGainNode entry");
         let gainNode = this.webAudioCtx.createGain();

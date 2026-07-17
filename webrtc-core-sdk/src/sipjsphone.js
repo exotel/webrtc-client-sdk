@@ -23,6 +23,7 @@ class SIPJSPhone {
 
 	static toBeConfigure = true;
 	static audioElementNameVsAudioGainNodeMap = {};
+	static _testToneStopTimer = null;
 
 	static configure() {
 		logger.log("SIPJSPhone: configure: entry");
@@ -222,22 +223,30 @@ class SIPJSPhone {
 
 			startRingTone: () => {
 			try {
-				var count = 0;
 				if (!this.ctxSip.ringtone) {
 					this.ctxSip.ringtone = this.ringtone;
 				}
+				if (this.ctxSip.ringToneIntervalID) {
+					clearInterval(this.ctxSip.ringToneIntervalID);
+					this.ctxSip.ringToneIntervalID = 0;
+				}
 				logger.log('DEBUG: startRingTone called, audio element:', this.ctxSip.ringtone);
+				// ringtone.loop is true — play once and let <audio> loop smoothly.
+				// Re-calling playUiTone on an interval resets currentTime every 500ms and sounds choppy.
 				audioDeviceManager.playUiTone(this.ctxSip.ringtone, 'ringtone', { loadBeforePlay: false });
+				var count = 0;
 				this.ctxSip.ringToneIntervalID = setInterval(() => {
-					audioDeviceManager.playUiTone(this.ctxSip.ringtone, 'ringtone', { loadBeforePlay: false })
-						.catch(e => {
-							logger.log("DEBUG: startRingTone: Exception:", e);
-						});
 					count++;
 					if (count > this.ctxSip.ringtoneCount) {
 						clearInterval(this.ctxSip.ringToneIntervalID);
+						this.ctxSip.ringToneIntervalID = 0;
+						try {
+							this.ctxSip.ringtone.pause();
+							this.ctxSip.ringtone.currentTime = 0;
+						} catch (_) {}
+						logger.log("sipjsphone: startRingTone: ring duration elapsed, stopped");
 					}
-					}, 500);
+				}, 500);
 				} catch (e) {
 					logger.log("DEBUG: startRingTone: Exception:", e);
 				}
@@ -1424,6 +1433,15 @@ destroySocketConnection() {
 		return audioDeviceManager.primeUiTones();
 	}
 
+	stopTestTone() {
+		if (SIPJSPhone._testToneStopTimer) {
+			clearTimeout(SIPJSPhone._testToneStopTimer);
+			SIPJSPhone._testToneStopTimer = null;
+		}
+		audioDeviceManager.stopAllUiTones();
+		logger.log("sipjsphone: stopTestTone");
+	}
+
 	async playTestTone(toneName) {
 		const toneMap = {
 			ringtone: this.ringtone,
@@ -1436,7 +1454,18 @@ destroySocketConnection() {
 			logger.log("sipjsphone: playTestTone: unknown tone", toneName);
 			return false;
 		}
-		return audioDeviceManager.playUiTone(audioElement, toneName, { loadBeforePlay: false });
+		// Stop any previous QA playback before starting a new tone.
+		this.stopTestTone();
+		const ok = await audioDeviceManager.playUiTone(audioElement, toneName, { loadBeforePlay: false });
+		// ringtone/ringbacktone use loop=true for live calls; cap QA playback at 3s.
+		if (ok && (toneName === "ringtone" || toneName === "ringbacktone")) {
+			SIPJSPhone._testToneStopTimer = setTimeout(() => {
+				SIPJSPhone._testToneStopTimer = null;
+				audioDeviceManager.stopUiTone(toneName);
+				logger.log(`sipjsphone: playTestTone: auto-stopped ${toneName} after 3s`);
+			}, 3000);
+		}
+		return ok;
 	}
 
 	connect() {

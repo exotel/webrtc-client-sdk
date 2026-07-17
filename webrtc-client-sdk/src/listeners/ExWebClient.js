@@ -677,6 +677,15 @@ class ExotelWebClient {
         return this.webrtcSIPPhone.playTestTone(toneName);
     }
 
+    stopTestTone() {
+        logger.log("ExWebClient: stopTestTone");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: stopTestTone: webrtcSIPPhone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.stopTestTone();
+    }
+
 }
 
 

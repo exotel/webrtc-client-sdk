@@ -316,6 +316,14 @@ class WebrtcSIPPhone {
 		}
 		return this.phone.playTestTone(toneName);
 	}
+
+	stopTestTone() {
+		logger.log("webrtcSIPPhone: stopTestTone");
+		if (!this.phone || typeof this.phone.stopTestTone !== "function") {
+			return;
+		}
+		this.phone.stopTestTone();
+	}
 }
 
 export default WebrtcSIPPhone;

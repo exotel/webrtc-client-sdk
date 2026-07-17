@@ -17,7 +17,7 @@ Agents in CRM / Obelix iframe environments reported **silent local ring, ringbac
 | Layer | Change |
 |-------|--------|
 | Core | Bundle WAV via webpack; direct `<audio>` playback; `registerUiTone`, `playUiTone`, `primeUiTones` |
-| Client | `ExWebClient.primeUiTones()`, `playTestTone()` |
+| Client | `ExWebClient.primeUiTones()`, `playTestTone()`, `stopTestTone()` |
 | Integrator | Call `primeUiTones()` once after user click (Go Online) |
 
 ---
@@ -28,7 +28,7 @@ Agents in CRM / Obelix iframe environments reported **silent local ring, ringbac
 |----|-------------|----------------|
 | FR-1 | Ring, ringback, DTMF, beep use bundled WAV + direct `<audio>` | Webpack + `sipjsphone` tone paths |
 | FR-2 | `primeUiTones()` after user gesture satisfies autoplay | Silent play/pause priming |
-| FR-3 | `playTestTone(name)` for QA | `ExWebClient.playTestTone` |
+| FR-3 | `playTestTone(name)` for QA; looping tones auto-stop after 3s; `stopTestTone()` ends early | `ExWebClient.playTestTone` / `stopTestTone` |
 | FR-4 | Speaker routing via `setSinkId` when configured | `applyUiToneOutputRouting` |
 
 ---
