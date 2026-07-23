@@ -1,13 +1,7 @@
 Change Log
 
-## v3.0.14 30 May, 2026
--[VST-1783] Expose primeUiTones, playTestTone, and stopTestTone on ExotelWebClient; depends on webrtc-core-sdk 3.0.14
-
-## v3.0.13 30 May, 2026
--[VST-1782] Expose setRingingDuration, getRingingDuration, stopRingTone on ExotelWebClient (default ring 30 sec); depends on webrtc-core-sdk 3.0.13
-
-## v3.0.10 01 April, 2026
--[VST-1584]Updated webrtc-core-sdk to v3.0.10 with stack trace logging in error method
+## v3.0.10 23 July, 2026
+-[VST-1782][VST-1876][VST-1150][VST-1783]
 
 ## v3.0.9 27 March, 2026
 -[VST-1577] Removed the same-device-ID guard from replaceSenderTrack.

@@ -1,13 +1,8 @@
 Change Log
 
-## v3.0.14 30 May, 2026
--[VST-1783] UI tone playback reliability: direct audio path, webpack WAV bundling, primeUiTones/playTestTone/stopTestTone; looping test tones auto-stop after 3s
 
-## v3.0.13 30 May, 2026
--[VST-1782] Configurable incoming ring duration: setRingingDuration, getRingingDuration, stopRingTone (default 30 sec); replaces hardcoded ~15 sec interval cap
-
-## v3.0.9 27 March, 2026
--[VST-1577] Removed the same-device-ID guard from replaceSenderTrack.
+## v3.0.10 23 July, 2026
+-[VST-1782][VST-1876][VST-1150][VST-1783]
 
 ## v3.0.6 19 December, 2025
 -[VST-1269] fixing noise suppression bug and added wss transport in contact params
