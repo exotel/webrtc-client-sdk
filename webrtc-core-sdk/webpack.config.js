@@ -18,14 +18,21 @@ module.exports = {
   output: {
     filename:'[name].js',
     path: path.resolve(__dirname, 'dist'),
+    publicPath: 'auto',
     libraryTarget: 'umd',
     library: 'webrtcSDK',
     globalObject: 'this',
-    assetModuleFilename: '[name][ext][query]'
+    assetModuleFilename: 'audio/[name][ext][query]'
   },
   module: {
     rules: [
-      { test: /\.wav$/,exclude: /node_modules/, use: 'file-loader',type: 'asset/resource'
+      {
+        test: /\.wav$/,
+        exclude: /node_modules/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'audio/[name][ext][query]'
+        }
       },
       {
         test: /\.(js)$/,
