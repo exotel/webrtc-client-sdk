@@ -688,6 +688,12 @@ class SIPJSPhone {
 						} else {
 							incomingSession.reject({ statusCode: 486 });
 						}
+					},
+					onDisconnect: (error) => {
+						logger.log("onDisconnect called", error);
+						if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.onWebSocketDisconnect === 'function') {
+							this.webrtcSIPPhoneEventDelegate.onWebSocketDisconnect(error);
+						}
 					}
 				}
 			};
