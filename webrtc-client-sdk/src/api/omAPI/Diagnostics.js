@@ -271,12 +271,22 @@ export var ameyoWebRTCTroubleshooter = {
     //Enable this for tone loop - End     
   },
 
-  startMicTest: function () {
+  startMicTest: async function () {
     this.closeAudioTrack();
     this.addToTrobuleshootReport(
       "INFO",
       "Microphone device testing is inprogress"
     );
+    try {
+      if (navigator.permissions && navigator.permissions.query) {
+        const permStatus = await navigator.permissions.query({ name: 'microphone' });
+        if (permStatus.state === 'denied') {
+          this.addToTrobuleshootReport("WARNING", "Microphone permission denied, skipping mic test");
+          this.sendDeviceTestingEvent("MICROPHONE_TEST_FAIL");
+          return;
+        }
+      }
+    } catch (e) { /* Permissions API not supported, fall through */ }
     var constraints = { audio: true, video: false };
     var parent = this;
 

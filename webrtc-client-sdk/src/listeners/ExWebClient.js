@@ -545,7 +545,18 @@ class ExotelWebClient {
         intervalIDMap.set(userName, intervalId);
     };
 
-    checkClientStatus = (callback) => {
+    checkClientStatus = async (callback) => {
+        try {
+            if (navigator.permissions && navigator.permissions.query) {
+              const permStatus = await navigator.permissions.query({ name: 'microphone' });
+              if (permStatus.state === 'denied') {
+                logger.log("ExWebClient: checkClientStatus: mic permission denied, skipping getUserMedia");
+                callback("media_permission_denied");
+                return;
+              }
+            }
+        } catch (e) { /* Permissions API not supported, fall through to getUserMedia */ }
+
         var constraints = { audio: true, video: false };
         navigator.mediaDevices
             .getUserMedia(constraints)
