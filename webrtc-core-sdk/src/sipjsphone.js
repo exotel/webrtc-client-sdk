@@ -6,24 +6,35 @@ let logger = coreSDKLogger;
 
 var beeptone = document.createElement("audio");
 beeptone.src = require("./static/beep.wav");
+beeptone.preload = "auto";
 var ringtone = document.createElement("audio");
 ringtone.src = require("./static/ringtone.wav");
+ringtone.preload = "auto";
+ringtone.loop = true;
 var ringbacktone = document.createElement("audio");
 ringbacktone.src = require("./static/ringbacktone.wav");
+ringbacktone.preload = "auto";
+ringbacktone.loop = true;
 var dtmftone = document.createElement("audio");
 dtmftone.src = require("./static/dtmf.wav");
+dtmftone.preload = "auto";
 
 class SIPJSPhone {
 
 	static toBeConfigure = true;
 	static audioElementNameVsAudioGainNodeMap = {};
+	static _testToneStopTimer = null;
 
 	static configure() {
 		logger.log("SIPJSPhone: configure: entry");
-		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringtone"] = audioDeviceManager.createAndConfigureAudioGainNode(ringtone);
-		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringbacktone"] = audioDeviceManager.createAndConfigureAudioGainNode(ringbacktone);
-		SIPJSPhone.audioElementNameVsAudioGainNodeMap["dtmftone"] = audioDeviceManager.createAndConfigureAudioGainNode(dtmftone);
-		SIPJSPhone.audioElementNameVsAudioGainNodeMap["beeptone"] = audioDeviceManager.createAndConfigureAudioGainNode(beeptone);
+		audioDeviceManager.registerUiTone("ringtone", ringtone);
+		audioDeviceManager.registerUiTone("ringbacktone", ringbacktone);
+		audioDeviceManager.registerUiTone("dtmftone", dtmftone);
+		audioDeviceManager.registerUiTone("beeptone", beeptone);
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringtone"] = true;
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["ringbacktone"] = true;
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["dtmftone"] = true;
+		SIPJSPhone.audioElementNameVsAudioGainNodeMap["beeptone"] = true;
 	}
 	
 
@@ -152,8 +163,7 @@ class SIPJSPhone {
 			throw new Error(`Invalid audio element name: ${audioElementName}`);
 		}
 
-		let gainNode = SIPJSPhone.audioElementNameVsAudioGainNodeMap[audioElementName];
-		gainNode.gain.value = Math.max(0, Math.min(1, value));
+		audioDeviceManager.setUiToneVolume(audioElementName, value);
 		logger.log(`SIPJSPhone: setAudioOutputVolume: ${audioElementName} volume set to ${value}`);
 		return true;
 	
@@ -165,8 +175,7 @@ class SIPJSPhone {
 			logger.error(`SIPJSPhone: getAudioOutputVolume: Invalid audio element name: ${audioElementName}`);
 			throw new Error(`Invalid audio element name: ${audioElementName}`);
 		}
-		let gainNode = SIPJSPhone.audioElementNameVsAudioGainNodeMap[audioElementName];
-		return gainNode.gain.value;	
+		return audioDeviceManager.getUiToneVolume(audioElementName);	
 	}
 
 	attachGlobalDeviceChangeListener() {
@@ -214,26 +223,30 @@ class SIPJSPhone {
 
 			startRingTone: () => {
 			try {
-				var count = 0;
 				if (!this.ctxSip.ringtone) {
 					this.ctxSip.ringtone = this.ringtone;
 				}
+				if (this.ctxSip.ringToneIntervalID) {
+					clearInterval(this.ctxSip.ringToneIntervalID);
+					this.ctxSip.ringToneIntervalID = 0;
+				}
 				logger.log('DEBUG: startRingTone called, audio element:', this.ctxSip.ringtone);
-				logger.log('DEBUG: startRingTone src:', this.ctxSip.ringtone.src);
-				this.ctxSip.ringtone.load();
+				// ringtone.loop is true — play once and let <audio> loop smoothly.
+				// Re-calling playUiTone on an interval resets currentTime every 500ms and sounds choppy.
+				audioDeviceManager.playUiTone(this.ctxSip.ringtone, 'ringtone', { loadBeforePlay: false });
+				var count = 0;
 				this.ctxSip.ringToneIntervalID = setInterval(() => {
-					this.ctxSip.ringtone.play()
-						.then(() => {
-							logger.log("DEBUG: startRingTone: Audio is playing...");
-						})
-						.catch(e => {
-							logger.log("DEBUG: startRingTone: Exception:", e);
-						});
 					count++;
 					if (count > this.ctxSip.ringtoneCount) {
 						clearInterval(this.ctxSip.ringToneIntervalID);
+						this.ctxSip.ringToneIntervalID = 0;
+						try {
+							this.ctxSip.ringtone.pause();
+							this.ctxSip.ringtone.currentTime = 0;
+						} catch (_) {}
+						logger.log("sipjsphone: startRingTone: ring duration elapsed, stopped");
 					}
-					}, 500);
+				}, 500);
 				} catch (e) {
 					logger.log("DEBUG: startRingTone: Exception:", e);
 				}
@@ -246,6 +259,7 @@ class SIPJSPhone {
 						this.ctxSip.ringtone = this.ringtone;
 					}
 					this.ctxSip.ringtone.pause();
+					this.ctxSip.ringtone.currentTime = 0;
 					logger.log("sipjsphone: stopRingTone: intervalID:", this.ctxSip.ringToneIntervalID);
 					clearInterval(this.ctxSip.ringToneIntervalID)
 			} catch (e) { logger.log("sipjsphone: stopRingTone: Exception:", e); }
@@ -257,14 +271,7 @@ class SIPJSPhone {
 					this.ctxSip.ringbacktone = this.ringbacktone;
 				}
 				try {
-					this.ctxSip.ringbacktone.play()
-						.then(() => {
-							logger.log("sipjsphone: startRingbackTone: Audio is playing...");
-						})
-						.catch(e => {
-							logger.log("sipjsphone: startRingbackTone: Exception:", e);
-							// Optionally, prompt user to interact with the page to enable audio
-						});
+					audioDeviceManager.playUiTone(this.ctxSip.ringbacktone, 'ringbacktone');
 				} catch (e) { logger.log("sipjsphone: startRingbackTone: Exception:", e); }
 			},
 
@@ -423,8 +430,7 @@ class SIPJSPhone {
 				logger.log("sipSendDTMF: digit", digit);
 				try {
 					if (this.ctxSip && this.ctxSip.dtmfTone) {
-						this.ctxSip.dtmfTone.currentTime = 0;
-						this.ctxSip.dtmfTone.play();
+						audioDeviceManager.playUiTone(this.ctxSip.dtmfTone, 'dtmftone');
 					}
 				} catch (e) {
 					logger.log("sipSendDTMF: local DTMF tone exception:", e);
@@ -1405,7 +1411,7 @@ destroySocketConnection() {
 
 	playBeep() {
 		try {
-			this.ctxSip.beeptone.play();
+			audioDeviceManager.playUiTone(this.ctxSip.beeptone, 'beeptone');
 		} catch (e) {
 			logger.log("sipjsphone: playBeep: Exception:", e);
 		}
@@ -1423,8 +1429,48 @@ destroySocketConnection() {
 		}
 	}
 
+	async primeUiTones() {
+		return audioDeviceManager.primeUiTones();
+	}
+
+	stopTestTone() {
+		if (SIPJSPhone._testToneStopTimer) {
+			clearTimeout(SIPJSPhone._testToneStopTimer);
+			SIPJSPhone._testToneStopTimer = null;
+		}
+		audioDeviceManager.stopAllUiTones();
+		logger.log("sipjsphone: stopTestTone");
+	}
+
+	async playTestTone(toneName) {
+		const toneMap = {
+			ringtone: this.ringtone,
+			ringbacktone: this.ringbacktone,
+			dtmftone: this.dtmftone,
+			beeptone: this.beeptone
+		};
+		const audioElement = toneMap[toneName];
+		if (!audioElement) {
+			logger.log("sipjsphone: playTestTone: unknown tone", toneName);
+			return false;
+		}
+		// Stop any previous QA playback before starting a new tone.
+		this.stopTestTone();
+		const ok = await audioDeviceManager.playUiTone(audioElement, toneName, { loadBeforePlay: false });
+		// ringtone/ringbacktone use loop=true for live calls; cap QA playback at 3s.
+		if (ok && (toneName === "ringtone" || toneName === "ringbacktone")) {
+			SIPJSPhone._testToneStopTimer = setTimeout(() => {
+				SIPJSPhone._testToneStopTimer = null;
+				audioDeviceManager.stopUiTone(toneName);
+				logger.log(`sipjsphone: playTestTone: auto-stopped ${toneName} after 3s`);
+			}, 3000);
+		}
+		return ok;
+	}
+
 	connect() {
 		try {
+			audioDeviceManager.ensureAudioContextRunning();
 			this.sipRegister();
 		} catch (e) {
 		}

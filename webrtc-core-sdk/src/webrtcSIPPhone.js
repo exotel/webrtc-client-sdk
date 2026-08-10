@@ -300,6 +300,30 @@ class WebrtcSIPPhone {
         logger.log("webrtcSIPPhone: setNoiseSuppression: ", enabled);
         this.phone.setNoiseSuppression(enabled);
     }
+
+	async primeUiTones() {
+		logger.log("webrtcSIPPhone: primeUiTones");
+		if (!this.phone || typeof this.phone.primeUiTones !== "function") {
+			return [];
+		}
+		return this.phone.primeUiTones();
+	}
+
+	async playTestTone(toneName) {
+		logger.log("webrtcSIPPhone: playTestTone", toneName);
+		if (!this.phone || typeof this.phone.playTestTone !== "function") {
+			return false;
+		}
+		return this.phone.playTestTone(toneName);
+	}
+
+	stopTestTone() {
+		logger.log("webrtcSIPPhone: stopTestTone");
+		if (!this.phone || typeof this.phone.stopTestTone !== "function") {
+			return;
+		}
+		this.phone.stopTestTone();
+	}
 }
 
 export default WebrtcSIPPhone;
