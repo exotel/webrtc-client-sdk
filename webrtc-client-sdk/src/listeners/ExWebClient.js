@@ -177,10 +177,8 @@ class ExDelegationHandler {
     onSettingLocalDesc() {
         logger.log("delegationHandler: onSettingLocalDesc\n");
     }
-    onMediaRecoveryEvent(eventName, details) {
-        logger.log("delegationHandler: onMediaRecoveryEvent", eventName, details);
-        this.sessionCallback.initializeSession(`media_recovery_${eventName}`, this.exClient.callFromNumber);
-        this.sessionCallback.triggerSessionCallback();
+    initGetStats(pc, callid, username) {
+        logger.log("delegationHandler: initGetStats\n");
     }
     onRegisterWebRTCSIPEngine(engine) {
         logger.log("delegationHandler: onRegisterWebRTCSIPEngine, engine=\n", engine);

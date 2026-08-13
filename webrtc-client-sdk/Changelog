@@ -1,7 +1,7 @@
 Change Log
 
 ## v3.0.12 06 May, 2026
--[VST-1775] Media resilience release: SessionCallback media_recovery_* events (attempted, succeeded, degraded, failed, healthy); depends on webrtc-core-sdk 3.0.12
+-[VST-1775] ICE restart on iceConnectionState failed; resume audio on tab visible; SessionCallback events ice_restart_initiated and ice_connection_state_*
 
 ## v3.0.10 01 April, 2026
 -[VST-1584]Updated webrtc-core-sdk to v3.0.10 with stack trace logging in error method
