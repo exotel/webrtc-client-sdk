@@ -315,6 +315,11 @@ class WebrtcSIPPhone {
 		return this.phone.getRingingDuration();
 	}
 
+	startRingTone() {
+		logger.log("webrtcSIPPhone: startRingTone");
+		this.phone.startRingTone();
+	}
+
 	stopRingTone() {
 		logger.log("webrtcSIPPhone: stopRingTone");
 		this.phone.stopRingTone();

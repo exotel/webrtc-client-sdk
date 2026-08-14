@@ -129,22 +129,26 @@ class SIPJSPhone {
 	}
 
 	setRingingDuration(seconds) {
-		const parsed = Number(seconds);
-		if (!Number.isFinite(parsed) || parsed <= 0) {
+		if (!seconds || seconds <= 0) {
 			logger.error(`sipjsphone: setRingingDuration: invalid duration ${seconds}`);
 			return false;
 		}
-		this.ringingDurationSec = parsed;
+		this.ringingDurationSec = seconds;
 		if (this.ctxSip) {
-			this.ctxSip.ringingDurationSec = parsed;
 			this._resetRingToneAutoStopTimer();
 		}
-		logger.log(`sipjsphone: setRingingDuration: ${parsed} sec`);
+		logger.log(`sipjsphone: setRingingDuration: ${seconds} sec`);
 		return true;
 	}
 
 	getRingingDuration() {
 		return this.ringingDurationSec ?? DEFAULT_RINGING_DURATION_SEC;
+	}
+
+	startRingTone() {
+		if (this.ctxSip && typeof this.ctxSip.startRingTone === 'function') {
+			this.ctxSip.startRingTone();
+		}
 	}
 
 	stopRingTone() {
@@ -154,7 +158,7 @@ class SIPJSPhone {
 	}
 
 	_resetRingToneAutoStopTimer() {
-		if (!this.ctxSip || !this.ctxSip.ringToneIntervalID) {
+		if (!this.ctxSip || !this.ctxSip.ringToneTimeoutID) {
 			return;
 		}
 		clearTimeout(this.ctxSip.ringToneTimeoutID);
@@ -248,9 +252,7 @@ class SIPJSPhone {
 		callActiveID: null,
 		callVolume: 1,
 		Stream: null,
-		ringToneIntervalID: 0,
 		ringToneTimeoutID: 0,
-		ringingDurationSec: this.ringingDurationSec,
 
 			startRingTone: () => {
 			try {
@@ -258,23 +260,22 @@ class SIPJSPhone {
 				if (!this.ctxSip.ringtone) {
 					this.ctxSip.ringtone = this.ringtone;
 				}
-				logger.log('DEBUG: startRingTone called, durationSec:', this.ctxSip.ringingDurationSec);
-				this.ctxSip.ringtone.loop = true;
+				logger.log('sipjsphone: startRingTone: durationSec:', this.getRingingDuration());
 				this.ctxSip.ringtone.load();
+				this.ctxSip.ringtone.loop = true;
 				this.ctxSip.ringtone.play()
 					.then(() => {
-						logger.log("DEBUG: startRingTone: Audio is playing...");
+						logger.log("sipjsphone: startRingTone: Audio is playing...");
 					})
 					.catch(e => {
-						logger.log("DEBUG: startRingTone: Exception:", e);
+						logger.log("sipjsphone: startRingTone: Exception:", e);
 					});
-				this.ctxSip.ringToneIntervalID = 1;
 				this.ctxSip.ringToneTimeoutID = setTimeout(() => {
 					logger.log('sipjsphone: startRingTone: auto-stop after configured duration');
 					this.ctxSip.stopRingTone();
-				}, this.ctxSip.ringingDurationSec * 1000);
+				}, this.getRingingDuration() * 1000);
 				} catch (e) {
-					logger.log("DEBUG: startRingTone: Exception:", e);
+					logger.log("sipjsphone: startRingTone: Exception:", e);
 				}
 			},
 
@@ -287,10 +288,8 @@ class SIPJSPhone {
 					this.ctxSip.ringtone.pause();
 					this.ctxSip.ringtone.currentTime = 0;
 					this.ctxSip.ringtone.loop = false;
-					logger.log("sipjsphone: stopRingTone: intervalID:", this.ctxSip.ringToneIntervalID);
-					clearInterval(this.ctxSip.ringToneIntervalID);
+					logger.log("sipjsphone: stopRingTone: timeoutID:", this.ctxSip.ringToneTimeoutID);
 					clearTimeout(this.ctxSip.ringToneTimeoutID);
-					this.ctxSip.ringToneIntervalID = 0;
 					this.ctxSip.ringToneTimeoutID = 0;
 			} catch (e) { logger.log("sipjsphone: stopRingTone: Exception:", e); }
 		},
