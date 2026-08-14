@@ -2,6 +2,8 @@ Change Log
 
 ## v3.0.12 14 August, 2026
 -[VST-1150] Expose websocket close event to consumers.
+## v3.0.13 30 May, 2026
+-[VST-1782] Expose setRingingDuration, getRingingDuration, stopRingTone on ExotelWebClient (default ring 30 sec); depends on webrtc-core-sdk 3.0.13
 
 ## v3.0.10 01 April, 2026
 -[VST-1584]Updated webrtc-core-sdk to v3.0.10 with stack trace logging in error method
