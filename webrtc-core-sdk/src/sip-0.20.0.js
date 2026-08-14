@@ -10807,16 +10807,9 @@ class Transport {
         if (ws !== this._ws) {
             return;
         }
-        const disconnectEvent = {
-            code: ev?.code,
-            reason: ev?.reason,
-            wasClean: ev?.wasClean,
-            socketUrl: this.server,
-        };
         const message = `WebSocket closed ${this.server} (code: ${ev.code})`;
         const error = !this.disconnectPromise ? new Error(message) : undefined;
         if (error) {
-            error.disconnectEvent = disconnectEvent;
             this.logger.warn("WebSocket closed unexpectedly");
         }
         this.logger.log(message);

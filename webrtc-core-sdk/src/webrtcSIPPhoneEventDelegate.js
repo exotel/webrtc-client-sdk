@@ -71,7 +71,7 @@ class WebrtcSIPPhoneEventDelegate {
 	}
 
 	onWebSocketDisconnect(error) {
-		logger.log("delegationHandler: onWebSocketDisconnect", error);
+		logger.log("webrtcSIPPhoneEventDelegate: onWebSocketDisconnect:", error);
 		this.delegates.forEach(delegate => {
 			if (delegate && typeof delegate.onWebSocketDisconnect === 'function') {
 				delegate.onWebSocketDisconnect(error);

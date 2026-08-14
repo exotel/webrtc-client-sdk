@@ -690,9 +690,20 @@ class SIPJSPhone {
 						}
 					},
 					onDisconnect: (error) => {
-						logger.log("onDisconnect called", error);
+						logger.log("sipjsphone: onDisconnect: called", error);
+						let errorEvent = {
+							message: "",
+							code: ""
+						};
+						if (error) {
+							const match = error.message.match(/code:\s*(\d+)/);
+							if (match) {
+								errorEvent.code = match[1];
+								errorEvent.message = error.message;
+							}
+						}
 						if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.onWebSocketDisconnect === 'function') {
-							this.webrtcSIPPhoneEventDelegate.onWebSocketDisconnect(error);
+							this.webrtcSIPPhoneEventDelegate.onWebSocketDisconnect(errorEvent);
 						}
 					}
 				}
