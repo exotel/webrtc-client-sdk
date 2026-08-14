@@ -86,6 +86,11 @@ class ExDelegationHandler {
             this.exClient.callEventCallback(eventType, this.exClient.callFromNumber, this.exClient.call);
         }
     }
+    onWebSocketDisconnect(error) {
+        logger.log("ExWebClient: onWebSocketDisconnect:", error);
+        this.exClient.registerCallback.initializeRegister("websocket_disconnected", this.exClient.userName);
+        this.exClient.registerCallback.triggerRegisterCallback(error);
+    }
     playBeepTone() {
         logger.log("delegationHandler: playBeepTone\n");
     }

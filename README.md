@@ -4,6 +4,8 @@ This is a basic sample application to showcase Exotel VOIP Websdk API integratio
 # Exotel Voice WebSDK
 This sample application requires a websdk package to work. Contact us to get the credentials to download the node.js package of the websdk. Follow the instructions provided in Exotel-Voice-Websdk-Integration-Guide.pdf.
 
+Documentation:https://docs.exotel.com/voice-apis/client-websdk
+
 # Exotel Voice WebSDK Integration Guide and API documentation
 File: Exotel-Voice-Websdk-Integration-Guide.pdf
 
