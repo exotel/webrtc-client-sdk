@@ -316,7 +316,7 @@ class SIPJSPhone {
 					logger.log(e);
 				}
 
-				this._ensureVisibilityIceRecovery();
+				this._ensureOnlineIceRecovery();
 
 				sdh.peerConnectionDelegate = {
 					onnegotiationneeded: (event) => {
@@ -324,19 +324,27 @@ class SIPJSPhone {
 					},
 					onsignalingstatechange: (event) => {
 							this.webrtcSIPPhoneEventDelegate.onCallStatSignalingStateChange(event.target.signalingState);
-					},
-					onconnectionstatechange: (event) => {
-							const connectionState = event.target.connectionState;
-							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionConnectionStateChange(connectionState);
-							// Chrome often reaches PC failed while ICE stays disconnected — restart then too
-							if (connectionState === 'failed') {
+							if (event.target.signalingState === 'stable' && this._iceRestartQueued) {
+								this._iceRestartQueued = false;
 								this._attemptIceRestart(newSess);
 							}
+					},
+					onconnectionstatechange: (event) => {
+							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionConnectionStateChange(event.target.connectionState);
 					},
 					oniceconnectionstatechange: (event) => {
 							const iceState = event.target.iceConnectionState;
 							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionIceConnectionStateChange(iceState);
-							if (iceState === 'failed') {
+							if (iceState === 'connected' || iceState === 'completed') {
+								this._iceRestartQueued = false;
+								if (this.audioRemote) {
+									this.audioRemote.play().catch((error) => {
+										logger.log('sipjsphone: remote audio play failed', error?.name || error);
+									});
+								}
+								return;
+							}
+							if (iceState === 'disconnected' || iceState === 'failed') {
 								this._attemptIceRestart(newSess);
 							}
 					},
@@ -1185,26 +1193,78 @@ destroySocketConnection() {
 		return id ? (this.ctxSip.Sessions?.[id] ?? null) : null;
 	}
 
+	_queueIceRestart(reason) {
+		this._iceRestartQueued = true;
+		logger.log('sipjsphone: _attemptIceRestart: queue,', reason);
+	}
+
+	_onIceRestartSettled(session) {
+		if (session?.pendingReinvite) {
+			return;
+		}
+		this._iceRestartInFlight = false;
+		const pc = session?.sessionDescriptionHandler?.peerConnection
+			|| session?.sessionDescriptionHandler?._peerConnection;
+		const iceState = pc?.iceConnectionState;
+		if (this._iceRestartQueued || iceState === 'disconnected' || iceState === 'failed') {
+			this._iceRestartQueued = false;
+			this._attemptIceRestart(session);
+		}
+	}
+
 	_attemptIceRestart(session) {
 		const target = session || this._getActiveSession();
 		if (!target || typeof target.invite !== 'function') {
 			return;
 		}
-		if (this._iceRestartInFlight) {
-			logger.log('sipjsphone: _attemptIceRestart: already in flight, skip');
+		const pc = target.sessionDescriptionHandler?.peerConnection
+			|| target.sessionDescriptionHandler?._peerConnection;
+		const iceState = pc?.iceConnectionState;
+		if (iceState === 'connected' || iceState === 'completed' || iceState === 'closed') {
+			this._iceRestartQueued = false;
+			return;
+		}
+		if (this._iceRestartInFlight || target.pendingReinvite) {
+			this._queueIceRestart('already in flight');
+			return;
+		}
+		if (pc && pc.signalingState !== 'stable') {
+			this._queueIceRestart('signalingState=' + pc.signalingState);
+			return;
+		}
+		if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+			this._queueIceRestart('offline');
 			return;
 		}
 		this._iceRestartInFlight = true;
+		this._iceRestartQueued = false;
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('ice_restart_initiated');
 		}
 		logger.log('sipjsphone: _attemptIceRestart: sending re-INVITE with iceRestart');
 		target.invite({
-			sessionDescriptionHandlerOptions: { offerOptions: { iceRestart: true } }
+			sessionDescriptionHandlerOptions: { offerOptions: { iceRestart: true } },
+			requestDelegate: {
+				onAccept: () => this._onIceRestartSettled(target),
+				onReject: () => this._onIceRestartSettled(target)
+			}
 		}).catch((error) => {
 			logger.error('sipjsphone: _attemptIceRestart: failed', error);
-		}).finally(() => {
-			this._iceRestartInFlight = false;
+			this._onIceRestartSettled(target);
+		});
+	}
+
+	_ensureOnlineIceRecovery() {
+		if (this._onlineIceRecoveryAttached || typeof window === 'undefined') {
+			return;
+		}
+		this._onlineIceRecoveryAttached = true;
+		window.addEventListener('online', () => {
+			if (!this._getActiveSession()) {
+				return;
+			}
+			logger.log('sipjsphone: network online — flush queued ICE restart');
+			this._attemptIceRestart();
 		});
 	}
 
@@ -1232,7 +1292,7 @@ destroySocketConnection() {
 				|| session.sessionDescriptionHandler?._peerConnection;
 			const iceState = pc?.iceConnectionState;
 			if (iceState === 'failed' || iceState === 'disconnected') {
-				this._attemptIceRestart(session);
+				//this._attemptIceRestart(session);
 			}
 		});
 	}
@@ -1689,6 +1749,7 @@ destroySocketConnection() {
 
 	onInvitationSessionTerminated() {
 		this._iceRestartInFlight = false;
+		this._iceRestartQueued = false;
 		this.stopStreamTracks(this.ctxSip.Stream);
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.stopCallStat();
