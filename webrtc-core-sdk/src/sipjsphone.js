@@ -326,7 +326,12 @@ class SIPJSPhone {
 							this.webrtcSIPPhoneEventDelegate.onCallStatSignalingStateChange(event.target.signalingState);
 					},
 					onconnectionstatechange: (event) => {
-							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionConnectionStateChange(event.target.connectionState);
+							const connectionState = event.target.connectionState;
+							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionConnectionStateChange(connectionState);
+							// Chrome often reaches PC failed while ICE stays disconnected — restart then too
+							if (connectionState === 'failed') {
+								this._attemptIceRestart(newSess);
+							}
 					},
 					oniceconnectionstatechange: (event) => {
 							const iceState = event.target.iceConnectionState;
