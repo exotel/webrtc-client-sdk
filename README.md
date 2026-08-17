@@ -1,10 +1,9 @@
 # sample-app-sdk
 This is a basic sample application to showcase Exotel VOIP Websdk API integrations. Using this sample app you can have a demo of voip calling functionalities in the browser. This sample application works with exotel platform. Contact us to get an account.
 
-## Media resilience (SDK 3.0.12+ — [VST-1775](https://exotel.atlassian.net/browse/VST-1775))
+## ICE media resilience (SDK 3.0.12+ — [VST-1775](https://exotel.atlassian.net/browse/VST-1775))
 
-- Integrators: [docs/MEDIA-RESILIENCE.md](docs/MEDIA-RESILIENCE.md)
-- Code review (FR/NFR, scope, QA): [docs/VST-1775-FR-NFR.md](docs/VST-1775-FR-NFR.md)
+See [docs/MEDIA-RESILIENCE.md](docs/MEDIA-RESILIENCE.md) for ICE restart and session events.
 
 # Exotel Voice WebSDK
 This sample application requires a websdk package to work. Contact us to get the credentials to download the node.js package of the websdk. Follow the instructions provided in Exotel-Voice-Websdk-Integration-Guide.pdf.

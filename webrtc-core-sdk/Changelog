@@ -1,7 +1,7 @@
 Change Log
 
 ## v3.0.12 06 May, 2026
--[VST-1775] Media resilience: ICE/connection recovery FSM, inbound RTP watchdog (3s), visibility and network (online/offline/connection change) recovery; restore outbound mic after network blip; RTP-verified success; exponential backoff with healthy-RTP reset; ICE restart with Reinvite-busy retry
+-[VST-1775] ICE restart on iceConnectionState failed; AudioContext/remote play resume on tab visible; emit ice_restart_initiated via session events
 
 ## v3.0.9 27 March, 2026
 -[VST-1577] Removed the same-device-ID guard from replaceSenderTrack.

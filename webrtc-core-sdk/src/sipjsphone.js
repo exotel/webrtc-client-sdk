@@ -1,6 +1,5 @@
 var SIP = require('./sip-0.20.0.js')
 import { audioDeviceManager } from './audioDeviceManager.js';
-import { attachMediaRecovery, detachMediaRecovery, ensureRemoteAudioPlaying } from './mediaRecovery.js';
 import coreSDKLogger from './coreSDKLogger.js';
 import WebrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 let logger = coreSDKLogger;
@@ -308,15 +307,16 @@ class SIPJSPhone {
 
 			newSess.delegate.onSessionDescriptionHandler = (sdh, provisional) => {
 				try {
+						let callId = this.ctxSip.callActiveID;
+						let username = this.ctxSip.config.authorizationUsername;
 					let pc = sdh._peerConnection || sdh.peerConnection;
-					if (pc) {
-						this._activeRecoveryPc = pc;
-						attachMediaRecovery(pc, newSess, this);
-					}
+						this.webrtcSIPPhoneEventDelegate.initGetStats(pc, callId, username);
 				} catch (e) {
-					logger.log("sipjsphone: newSession: something went wrong while initing media recovery");
+					logger.log("sipjsphone: newSession: something went wrong while initing getstats");
 					logger.log(e);
 				}
+
+				this._ensureVisibilityIceRecovery();
 
 				sdh.peerConnectionDelegate = {
 					onnegotiationneeded: (event) => {
@@ -329,7 +329,11 @@ class SIPJSPhone {
 							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionConnectionStateChange(event.target.connectionState);
 					},
 					oniceconnectionstatechange: (event) => {
-							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionIceConnectionStateChange(event.target.iceConnectionState);
+							const iceState = event.target.iceConnectionState;
+							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionIceConnectionStateChange(iceState);
+							if (iceState === 'failed') {
+								this._attemptIceRestart(newSess);
+							}
 					},
 					onicegatheringstatechange: (event) => {
 							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionIceGatheringStateChange(event.target.iceGatheringState);
@@ -1149,28 +1153,84 @@ destroySocketConnection() {
     // Set HTML audio element volume to 0 to prevent direct audio output
     element.volume = this.callAudioOutputVolume;
     
-    ensureRemoteAudioPlaying(element).then((played) => {
-        if (played) {
-            logger.log("sipjsphone: assignStream: remote audio play success");
-        } else {
-            logger.error("sipjsphone: assignStream: Failed to play media after retries");
-        }
+    // Load and start playback of media.
+    element.play().catch((error) => {
+        logger.error("sipjsphone: assignStream: Failed to play media", error);
     });
 
+    // If a track is added, load and restart playback of media.
     stream.onaddtrack = () => {
         element.load();
-        ensureRemoteAudioPlaying(element).catch((error) => {
+        element.play().catch((error) => {
             logger.error("sipjsphone: assignStream: Failed to play remote media on add track", error);
         });
     };
-
+    
+    // If a track is removed, load and restart playback of media.
     stream.onremovetrack = () => {
         element.load();
-        ensureRemoteAudioPlaying(element).catch((error) => {
+        element.play().catch((error) => {
             logger.error("sipjsphone: assignStream: Failed to play remote media on remove track", error);
         });
     };
 }
+
+	_getActiveSession() {
+		const id = this.ctxSip?.callActiveID;
+		return id ? (this.ctxSip.Sessions?.[id] ?? null) : null;
+	}
+
+	_attemptIceRestart(session) {
+		const target = session || this._getActiveSession();
+		if (!target || typeof target.invite !== 'function') {
+			return;
+		}
+		if (this._iceRestartInFlight) {
+			logger.log('sipjsphone: _attemptIceRestart: already in flight, skip');
+			return;
+		}
+		this._iceRestartInFlight = true;
+		if (this.webrtcSIPPhoneEventDelegate) {
+			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('ice_restart_initiated');
+		}
+		logger.log('sipjsphone: _attemptIceRestart: sending re-INVITE with iceRestart');
+		target.invite({
+			sessionDescriptionHandlerOptions: { offerOptions: { iceRestart: true } }
+		}).catch((error) => {
+			logger.error('sipjsphone: _attemptIceRestart: failed', error);
+		}).finally(() => {
+			this._iceRestartInFlight = false;
+		});
+	}
+
+	_ensureVisibilityIceRecovery() {
+		if (this._visibilityIceRecoveryAttached || typeof document === 'undefined') {
+			return;
+		}
+		this._visibilityIceRecoveryAttached = true;
+		document.addEventListener('visibilitychange', () => {
+			if (document.visibilityState !== 'visible') {
+				return;
+			}
+			const session = this._getActiveSession();
+			if (!session) {
+				return;
+			}
+			logger.log('sipjsphone: tab visible — resume audio / check ICE');
+			audioDeviceManager.ensureAudioContextRunning?.();
+			if (this.audioRemote) {
+				this.audioRemote.play().catch((error) => {
+					logger.log('sipjsphone: tab visible: remote audio play failed', error?.name || error);
+				});
+			}
+			const pc = session.sessionDescriptionHandler?.peerConnection
+				|| session.sessionDescriptionHandler?._peerConnection;
+			const iceState = pc?.iceConnectionState;
+			if (iceState === 'failed' || iceState === 'disconnected') {
+				this._attemptIceRestart(session);
+			}
+		});
+	}
 
 	 onUserSessionAcceptFailed(e) {
 	if (e.name == "NotAllowedError" || e.name == "NotFoundError") {
@@ -1604,12 +1664,6 @@ destroySocketConnection() {
 		logger.log('onInvitationSessionAccepted: assigning remote stream to audioRemote');
 		this.assignStream(newSess.sessionDescriptionHandler.remoteMediaStream, this.audioRemote);
 		logger.log('onInvitationSessionAccepted: assignStream called');
-		const sdh = newSess.sessionDescriptionHandler;
-		const pc = sdh?.peerConnection || sdh?._peerConnection;
-		if (pc) {
-			this._activeRecoveryPc = pc;
-			attachMediaRecovery(pc, newSess, this);
-		}
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('accepted');
 			this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("connected", "CALL");
@@ -1629,10 +1683,7 @@ destroySocketConnection() {
 	}
 
 	onInvitationSessionTerminated() {
-		if (this._activeRecoveryPc) {
-			detachMediaRecovery(this._activeRecoveryPc);
-			this._activeRecoveryPc = null;
-		}
+		this._iceRestartInFlight = false;
 		this.stopStreamTracks(this.ctxSip.Stream);
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.stopCallStat();

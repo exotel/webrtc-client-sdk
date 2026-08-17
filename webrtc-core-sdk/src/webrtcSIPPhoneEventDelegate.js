@@ -242,14 +242,6 @@ class WebrtcSIPPhoneEventDelegate {
 		});
 	}
 
-	onMediaRecoveryEvent(eventName, details) {
-		this.delegates.forEach(delegate => {
-			if (delegate && typeof delegate.onMediaRecoveryEvent === 'function') {
-				delegate.onMediaRecoveryEvent(eventName, details);
-			}
-		});
-	}
-
 	onRegisterWebRTCSIPEngine(engine) {
 		this.emit("engine-selected", engine);
 	}
