@@ -127,7 +127,6 @@ class SIPJSPhone {
 		this.callAudioOutputVolume = 1;
 		this._iceRestartInFlight = false;
 		this._iceRestartAttempts = 0;
-		this._visibilityIceRecoveryAttached = false;
 		this._disconnectTimer = null;
 
 	}
@@ -314,8 +313,6 @@ class SIPJSPhone {
 
 			newSess.delegate.onSessionDescriptionHandler = (sdh, provisional) => {
 				this._initGetStats(sdh);
-
-				this._ensureVisibilityIceRecovery();
 
 				sdh.peerConnectionDelegate = {
 					onnegotiationneeded: (event) => {
@@ -1266,38 +1263,7 @@ destroySocketConnection() {
 		}
 	}
 
-	_ensureVisibilityIceRecovery() {
-		if (this._visibilityIceRecoveryAttached || typeof document === 'undefined') {
-			return;
-		}
-		this._visibilityIceRecoveryAttached = true;
-		document.addEventListener('visibilitychange', () => {
-			if (document.visibilityState !== 'visible') {
-				return;
-			}
-			const session = this._getActiveSession();
-			if (!session) {
-				return;
-			}
-			logger.log('sipjsphone: tab visible — resume audio / check ICE');
-			audioDeviceManager.ensureAudioContextRunning().then((running) => {
-				logger.log('sipjsphone: tab visible: audio context running =', running);
-			});
-			if (this.audioRemote && this.audioRemote.paused) {
-				this.audioRemote.play().catch((error) => {
-					logger.log('sipjsphone: tab visible: remote audio play failed', error?.name || error);
-				});
-			}
-			const pc = session.sessionDescriptionHandler?.peerConnection
-				|| session.sessionDescriptionHandler?._peerConnection;
-			const iceState = pc?.iceConnectionState;
-			if (iceState === 'failed' || iceState === 'disconnected') {
-				this._attemptIceRestart(session);
-			}
-		});
-	}
-
-	 onUserSessionAcceptFailed(e) {
+	onUserSessionAcceptFailed(e) {
 	if (e.name == "NotAllowedError" || e.name == "NotFoundError") {
 			this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("m_permission_refused", "CALL");
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('userMediaFailed');

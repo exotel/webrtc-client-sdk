@@ -141,21 +141,6 @@ export const audioDeviceManager = {
         if (callback) callback();
     },
 
-    async ensureAudioContextRunning() {
-        if (!this.webAudioCtx) {
-            return false;
-        }
-        if (this.webAudioCtx.state === "suspended") {
-            try {
-                await this.webAudioCtx.resume();
-                logger.log("audioDeviceManager:ensureAudioContextRunning: resumed, state=", this.webAudioCtx.state);
-            } catch (e) {
-                logger.log("audioDeviceManager:ensureAudioContextRunning: resume failed", e);
-            }
-        }
-        return this.webAudioCtx.state === "running";
-    },
-
     configureAudioGainNode(sourceNode) {
         logger.log("audioDeviceManager:configureAudioGainNode entry");
         let gainNode = this.webAudioCtx.createGain();
