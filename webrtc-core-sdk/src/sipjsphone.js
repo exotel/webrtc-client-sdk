@@ -312,7 +312,15 @@ class SIPJSPhone {
 			newSess.delegate = {};
 
 			newSess.delegate.onSessionDescriptionHandler = (sdh, provisional) => {
-				this._initGetStats(sdh);
+				try {
+						let callId = this.ctxSip.callActiveID;
+						let username = this.ctxSip.config.authorizationUsername;
+					let pc = sdh._peerConnection || sdh.peerConnection;
+						this.webrtcSIPPhoneEventDelegate.initGetStats(pc, callId, username);
+				} catch (e) {
+					logger.log("sipjsphone: newSession: something went wrong while initing getstats");
+					logger.log(e);
+				}
 
 				sdh.peerConnectionDelegate = {
 					onnegotiationneeded: (event) => {
@@ -322,16 +330,7 @@ class SIPJSPhone {
 							this.webrtcSIPPhoneEventDelegate.onCallStatSignalingStateChange(event.target.signalingState);
 					},
 					onconnectionstatechange: (event) => {
-							const connectionState = event.target.connectionState;
-							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionConnectionStateChange(connectionState);
-							if (connectionState === 'connected') {
-								this._iceRestartAttempts = 0;
-							}
-							// Chrome often reaches PC failed while ICE stays disconnected — restart then too
-							if (connectionState === 'failed') {
-								this._clearDisconnectTimer();
-								this._attemptIceRestart(newSess);
-							}
+							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionConnectionStateChange(event.target.connectionState);
 					},
 					oniceconnectionstatechange: (event) => {
 							const iceState = event.target.iceConnectionState;
@@ -1187,18 +1186,6 @@ destroySocketConnection() {
         });
     };
 }
-
-	_initGetStats(sdh) {
-		try {
-			let callId = this.ctxSip.callActiveID;
-			let username = this.ctxSip.config.authorizationUsername;
-			let pc = sdh._peerConnection || sdh.peerConnection;
-			this.webrtcSIPPhoneEventDelegate.initGetStats(pc, callId, username);
-		} catch (e) {
-			logger.log("sipjsphone: _initGetStats: something went wrong while initing getstats");
-			logger.log(e);
-		}
-	}
 
 	_getActiveSession() {
 		const id = this.ctxSip?.callActiveID;
