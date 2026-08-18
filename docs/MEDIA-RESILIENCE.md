@@ -4,8 +4,9 @@ Minimal ICE recovery for brief network / tab-background audio loss.
 
 ## Behavior
 
-1. On ICE `failed`, SDK sends a SIP re-INVITE with `iceRestart: true`.
-2. On tab return to foreground, SDK resumes `AudioContext`, retries remote `play()`, and ICE-restarts if ICE is still `failed` / `disconnected`.
+1. On ICE `failed`, SDK sends a SIP re-INVITE with `iceRestart: true` immediately (max 3 attempts per call, reset once ICE reconnects).
+2. On ICE `disconnected`, SDK waits 15s (grace period for transient loss); if still not reconnected, it sends the same ICE-restart re-INVITE.
+3. On tab return to foreground, SDK resumes `AudioContext`, retries remote `play()`, and ICE-restarts if ICE is still `failed` / `disconnected`.
 
 ## SessionCallback events
 
