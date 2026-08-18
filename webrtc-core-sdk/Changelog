@@ -1,5 +1,8 @@
 Change Log
 
+## v3.0.12 06 May, 2026
+-[VST-1775] ICE restart on iceConnectionState failed/disconnected (15s grace); emit ice_restart_initiated via session events
+
 ## v3.0.9 27 March, 2026
 -[VST-1577] Removed the same-device-ID guard from replaceSenderTrack.
 

@@ -4,6 +4,9 @@ import coreSDKLogger from './coreSDKLogger.js';
 import WebrtcSIPPhoneEventDelegate from './webrtcSIPPhoneEventDelegate';
 let logger = coreSDKLogger;
 
+const MAX_ICE_RESTART_ATTEMPTS = 3;
+const ICE_DISCONNECT_RECOVERY_MS = 15000;
+
 var beeptone = document.createElement("audio");
 beeptone.src = require("./static/beep.wav");
 var ringtone = document.createElement("audio");
@@ -122,7 +125,10 @@ class SIPJSPhone {
 		this.audioRemote.style.display = 'none';
 		document.body.appendChild(this.audioRemote);		
 		this.callAudioOutputVolume = 1;
-		
+		this._iceRestartInFlight = false;
+		this._iceRestartAttempts = 0;
+		this._disconnectTimer = null;
+
 	}
 
 
@@ -306,12 +312,10 @@ class SIPJSPhone {
 			newSess.delegate = {};
 
 			newSess.delegate.onSessionDescriptionHandler = (sdh, provisional) => {
-				let lastIceState = "unknown";
-
 				try {
 						let callId = this.ctxSip.callActiveID;
 						let username = this.ctxSip.config.authorizationUsername;
-					let pc = sdh._peerConnection;
+					let pc = sdh._peerConnection || sdh.peerConnection;
 						this.webrtcSIPPhoneEventDelegate.initGetStats(pc, callId, username);
 				} catch (e) {
 					logger.log("sipjsphone: newSession: something went wrong while initing getstats");
@@ -329,7 +333,19 @@ class SIPJSPhone {
 							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionConnectionStateChange(event.target.connectionState);
 					},
 					oniceconnectionstatechange: (event) => {
-							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionIceConnectionStateChange(event.target.iceConnectionState);
+							const iceState = event.target.iceConnectionState;
+							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionIceConnectionStateChange(iceState);
+							if (iceState === 'connected' || iceState === 'completed') {
+								this._iceRestartAttempts = 0;
+								this._clearDisconnectTimer();
+							} else if (iceState === 'disconnected') {
+								this._scheduleDisconnectRecovery(newSess);
+							} else if (iceState === 'failed') {
+								this._clearDisconnectTimer();
+								this._attemptIceRestart(newSess);
+							} else if (iceState === 'closed') {
+								this._clearDisconnectTimer();
+							}
 					},
 					onicegatheringstatechange: (event) => {
 							this.webrtcSIPPhoneEventDelegate.onStatPeerConnectionIceGatheringStateChange(event.target.iceGatheringState);
@@ -1171,7 +1187,70 @@ destroySocketConnection() {
     };
 }
 
-	 onUserSessionAcceptFailed(e) {
+	_getActiveSession() {
+		const id = this.ctxSip?.callActiveID;
+		return id ? (this.ctxSip.Sessions?.[id] ?? null) : null;
+	}
+
+	_attemptIceRestart(session) {
+		const target = session || this._getActiveSession();
+		if (!target || typeof target.invite !== 'function') {
+			return;
+		}
+		if (this._iceRestartInFlight) {
+			logger.log('sipjsphone: _attemptIceRestart: already in flight, skip');
+			return;
+		}
+		if (this._iceRestartAttempts >= MAX_ICE_RESTART_ATTEMPTS) {
+			logger.log(`sipjsphone: _attemptIceRestart: max attempts (${MAX_ICE_RESTART_ATTEMPTS}) reached, skip`);
+			return;
+		}
+		this._iceRestartInFlight = true;
+		this._iceRestartAttempts += 1;
+		if (this.webrtcSIPPhoneEventDelegate) {
+			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('ice_restart_initiated');
+		}
+		logger.log(`sipjsphone: _attemptIceRestart: sending re-INVITE with iceRestart (attempt ${this._iceRestartAttempts})`);
+		let invitePromise;
+		try {
+			invitePromise = target.invite({
+				sessionDescriptionHandlerOptions: { offerOptions: { iceRestart: true } }
+			});
+		} catch (error) {
+			this._iceRestartInFlight = false;
+			logger.error('sipjsphone: _attemptIceRestart: invite threw synchronously', error);
+			return;
+		}
+		invitePromise.catch((error) => {
+			logger.error('sipjsphone: _attemptIceRestart: failed', error);
+		}).finally(() => {
+			this._iceRestartInFlight = false;
+		});
+	}
+
+	_scheduleDisconnectRecovery(session) {
+		if (this._disconnectTimer) {
+			return;
+		}
+		logger.log(`sipjsphone: _scheduleDisconnectRecovery: ICE disconnected, will restart in ${ICE_DISCONNECT_RECOVERY_MS}ms if still disconnected`);
+		this._disconnectTimer = setTimeout(() => {
+			this._disconnectTimer = null;
+			const pc = session.sessionDescriptionHandler?.peerConnection
+				|| session.sessionDescriptionHandler?._peerConnection;
+			if (pc && pc.iceConnectionState !== 'connected' && pc.iceConnectionState !== 'completed') {
+				this._attemptIceRestart(session);
+			}
+		}, ICE_DISCONNECT_RECOVERY_MS);
+	}
+
+	_clearDisconnectTimer() {
+		if (this._disconnectTimer) {
+			clearTimeout(this._disconnectTimer);
+			this._disconnectTimer = null;
+		}
+	}
+
+	onUserSessionAcceptFailed(e) {
 	if (e.name == "NotAllowedError" || e.name == "NotFoundError") {
 			this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("m_permission_refused", "CALL");
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('userMediaFailed');
@@ -1622,6 +1701,9 @@ destroySocketConnection() {
 	}
 
 	onInvitationSessionTerminated() {
+		this._iceRestartInFlight = false;
+		this._iceRestartAttempts = 0;
+		this._clearDisconnectTimer();
 		this.stopStreamTracks(this.ctxSip.Stream);
 		if (this.webrtcSIPPhoneEventDelegate) {
 			this.webrtcSIPPhoneEventDelegate.stopCallStat();

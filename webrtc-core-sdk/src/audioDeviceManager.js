@@ -1,7 +1,9 @@
 import coreSDKLogger from "./coreSDKLogger";
 
 const logger = coreSDKLogger;
-const AudioManagerCtx = window.AudioContext || window.webkitAudioContext;
+const AudioManagerCtx = typeof window !== "undefined"
+    ? (window.AudioContext || window.webkitAudioContext)
+    : null;
 export const audioDeviceManager = {
     resetInputDevice: false,
     resetOutputDevice: false,
@@ -9,7 +11,7 @@ export const audioDeviceManager = {
     currentAudioOutputDeviceId: "default",
     mediaDevices: [],
     enableAutoAudioDeviceChangeHandling: false,
-    webAudioCtx : new AudioManagerCtx(),
+    webAudioCtx: AudioManagerCtx ? new AudioManagerCtx() : null,
     // Method to set the resetInputDevice flag
     setResetInputDeviceFlag(value) {
         this.resetInputDevice = value;
