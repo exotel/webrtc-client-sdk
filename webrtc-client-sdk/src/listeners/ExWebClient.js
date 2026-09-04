@@ -659,6 +659,42 @@ class ExotelWebClient {
         this.webrtcSIPPhone.setNoiseSuppression(enabled);
     }
 
+    setRingingDuration(seconds) {
+        logger.log(`ExWebClient: setRingingDuration: ${seconds}`);
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: setRingingDuration: webrtcSIPPhone not initialized");
+            return false;
+        }
+        return this.webrtcSIPPhone.setRingingDuration(seconds);
+    }
+
+    getRingingDuration() {
+        logger.log("ExWebClient: getRingingDuration");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: getRingingDuration: webrtcSIPPhone not initialized");
+            return 30;
+        }
+        return this.webrtcSIPPhone.getRingingDuration();
+    }
+
+    startRingTone() {
+        logger.log("ExWebClient: startRingTone");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: startRingTone: webrtcSIPPhone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.startRingTone();
+    }
+
+    stopRingTone() {
+        logger.log("ExWebClient: stopRingTone");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: stopRingTone: webrtcSIPPhone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.stopRingTone();
+    }
+
 }
 
 
