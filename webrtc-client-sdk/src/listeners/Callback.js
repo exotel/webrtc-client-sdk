@@ -50,10 +50,13 @@ export class RegisterCallback  {
         this.registerState = state;
         this.phone = phone;
     };
-    triggerRegisterCallback= function (error) {
+    triggerRegisterCallback= function () {
         const callbackFunc = this.registerCallbackHandler;
         const state = this.registerState
-        return callbackFunc(state, this.phone, error);
+        if (callbackFunc) {
+            return callbackFunc(state, this.phone);
+        }
+        logger.log("Register callback is null");
     };
 }
 /**
@@ -94,15 +97,17 @@ export class SessionCallback  {
     document= null;
     documentCallback= null;
     phone= '';
+    error= undefined;
     initializeSessionCallback= function (SessionCallback) {
         this.sessioncallback = SessionCallback;
     };
     intializeDocumentCallback= function (DocumentCallback) {
         this.documentCallback = DocumentCallback;
     };
-    initializeSession= function (state, phone) {
+    initializeSession= function (state, phone, error) {
         this.callState = state;
         this.phone = phone;
+        this.error = error;
     };
     initializeDocument= function (calldocument) {
         this.document = calldocument;
@@ -114,7 +119,7 @@ export class SessionCallback  {
     triggerSessionCallback= function () {
         const sessionCallBackFunc = this.sessioncallback;
         if (sessionCallBackFunc) {
-            return sessionCallBackFunc(this.callState, this.phone);
+            return sessionCallBackFunc(this.callState, this.phone, this.error);
         } else {
             logger.log("Session callback is null")
             return;

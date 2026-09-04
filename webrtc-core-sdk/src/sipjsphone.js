@@ -692,14 +692,13 @@ class SIPJSPhone {
 					onDisconnect: (error) => {
 						logger.log("sipjsphone: onDisconnect: called", error);
 						let errorEvent = {
-							message: "",
+							message: (error && error.message) || "",
 							code: ""
 						};
-						if (error) {
+						if (error && error.message) {
 							const match = error.message.match(/code:\s*(\d+)/);
 							if (match) {
-								errorEvent.code = match[1];
-								errorEvent.message = error.message;
+								errorEvent.code = Number(match[1]);
 							}
 						}
 						if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.onWebSocketDisconnect === 'function') {
