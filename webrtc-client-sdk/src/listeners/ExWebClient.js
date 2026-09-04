@@ -17,6 +17,7 @@ const phonePool = new Map();
 var intervalId;
 var intervalIDMap = new Map();
 const logger = getLogger();   
+const AUTO_RETRY_DELAY_MS = 5000;
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -207,6 +208,7 @@ class ExotelWebClient {
     callListener = null;
     callFromNumber = null;
     shouldAutoRetry = false;
+    autoRetryTimerId = null;
     unregisterInitiated = false;
     registrationInProgress = false;
     isReadyToRegister = true;
@@ -229,6 +231,7 @@ class ExotelWebClient {
         this.callListener = null;
         this.callFromNumber = null;
         this.shouldAutoRetry = false;
+        this.autoRetryTimerId = null;
         this.unregisterInitiated = false;
         this.registrationInProgress = false;
         this.currentSIPUserName = "";      
@@ -330,6 +333,39 @@ class ExotelWebClient {
         UnRegisterRL(this.sipAccountInfo, this)
     };
 
+    /**
+     * Re-registers after an unexpected transport failure. Retry goes through
+     * RegisterListener directly because DoRegister is gated on isReadyToRegister,
+     * which the application cannot reset on its own.
+     */
+    scheduleAutoRetry = () => {
+        if (!this.shouldAutoRetry) {
+            logger.log("ExWebClient: scheduleAutoRetry: auto retry disabled");
+            return;
+        }
+        if (this.autoRetryTimerId !== null) {
+            logger.log("ExWebClient: scheduleAutoRetry: retry already scheduled");
+            return;
+        }
+        logger.log("ExWebClient: scheduleAutoRetry: Autoretrying in " + AUTO_RETRY_DELAY_MS + "ms");
+        this.autoRetryTimerId = setTimeout(() => {
+            this.autoRetryTimerId = null;
+            if (!this.shouldAutoRetry) {
+                logger.log("ExWebClient: scheduleAutoRetry: auto retry cancelled before firing");
+                return;
+            }
+            DoRegisterRL(this.sipAccountInfo, this, 0);
+        }, AUTO_RETRY_DELAY_MS);
+    };
+
+    cancelAutoRetry = () => {
+        if (this.autoRetryTimerId !== null) {
+            logger.log("ExWebClient: cancelAutoRetry: clearing pending retry");
+            clearTimeout(this.autoRetryTimerId);
+            this.autoRetryTimerId = null;
+        }
+    };
+
     initDiagnostics = (saveDiagnosticsCallback, keyValueSetCallback) => {
         initDiagnosticsDL(saveDiagnosticsCallback, keyValueSetCallback)
     };
@@ -398,6 +434,7 @@ class ExotelWebClient {
         const lowerCaseEvent = event.toLowerCase();
 
         if (lowerCaseEvent === "registered") {
+            this.cancelAutoRetry();
             this.registrationInProgress = false;
             this.unregisterInitiated = false;
             this.isReadyToRegister = false;
@@ -407,6 +444,14 @@ class ExotelWebClient {
             this.unregisterInitiated = false;
             this.isReadyToRegister = true;
             this.eventListener.onRegistrationStateChanged("unregistered", phone);
+        } else if (lowerCaseEvent === "failed_to_start" || lowerCaseEvent === "transport_error") {
+            this.registrationInProgress = false;
+            this.isReadyToRegister = true;
+            if (this.unregisterInitiated) {
+                this.shouldAutoRetry = false;
+                this.unregisterInitiated = false;
+            }
+            this.scheduleAutoRetry();
         }
     };
     /**
@@ -448,6 +493,7 @@ class ExotelWebClient {
     unregister = (sipAccountInfo) => {
         logger.log("ExWebClient: unregister: Entry");
         this.shouldAutoRetry = false;
+        this.cancelAutoRetry();
         this.unregisterInitiated = true;
         if (!this.registrationInProgress) {
             setTimeout(() => {
