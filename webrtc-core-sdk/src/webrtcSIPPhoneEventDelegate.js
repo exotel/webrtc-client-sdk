@@ -70,6 +70,15 @@ class WebrtcSIPPhoneEventDelegate {
 		});
 	}
 
+	onWebSocketDisconnect(error) {
+		logger.log("webrtcSIPPhoneEventDelegate: onWebSocketDisconnect:", error);
+		this.delegates.forEach(delegate => {
+			if (delegate && typeof delegate.onWebSocketDisconnect === 'function') {
+				delegate.onWebSocketDisconnect(error);
+			}
+		});
+	}
+	
 	playBeepTone() {
 		this.delegates.forEach(delegate => {
 			if (delegate && typeof delegate.playBeepTone === 'function') {

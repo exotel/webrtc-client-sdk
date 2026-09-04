@@ -1,5 +1,8 @@
 Change Log
 
+## v3.0.11 14 August, 2026
+-[VST-1150] Expose websocket close event to consumers.
+
 ## v3.0.9 27 March, 2026
 -[VST-1577] Removed the same-device-ID guard from replaceSenderTrack.
 
