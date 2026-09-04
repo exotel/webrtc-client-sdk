@@ -50,10 +50,10 @@ export class RegisterCallback  {
         this.registerState = state;
         this.phone = phone;
     };
-    triggerRegisterCallback= function (error) {
+    triggerRegisterCallback= function () {
         const callbackFunc = this.registerCallbackHandler;
         const state = this.registerState
-        return callbackFunc(state, this.phone, error);
+        return callbackFunc(state, this.phone);
     };
 }
 /**

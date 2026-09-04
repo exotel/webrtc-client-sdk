@@ -129,7 +129,7 @@ class SIPJSPhone {
 	}
 
 	setRingingDuration(seconds) {
-		if (!seconds || seconds <= 0) {
+		if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds <= 0) {
 			logger.error(`sipjsphone: setRingingDuration: invalid duration ${seconds}`);
 			return false;
 		}
@@ -730,23 +730,6 @@ class SIPJSPhone {
 							this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL", incomingSession);
 						} else {
 							incomingSession.reject({ statusCode: 486 });
-						}
-					},
-					onDisconnect: (error) => {
-						logger.log("sipjsphone: onDisconnect: called", error);
-						let errorEvent = {
-							message: "",
-							code: ""
-						};
-						if (error) {
-							const match = error.message.match(/code:\s*(\d+)/);
-							if (match) {
-								errorEvent.code = match[1];
-								errorEvent.message = error.message;
-							}
-						}
-						if (this.webrtcSIPPhoneEventDelegate && typeof this.webrtcSIPPhoneEventDelegate.onWebSocketDisconnect === 'function') {
-							this.webrtcSIPPhoneEventDelegate.onWebSocketDisconnect(errorEvent);
 						}
 					}
 				}
