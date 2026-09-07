@@ -42,8 +42,9 @@ class WebrtcSIPPhone {
 		
 		// Preserve noise suppression setting from existing phone instance if it exists
 		const existingNoiseSuppression = this.phone?.enableNoiseSuppression;
-		const existingRingingDuration = this.phone?.ringingDurationSec;
-		
+		// The ringing duration is module-level state in sipjsphone, so it
+		// survives a new phone instance on its own.
+
 		switch (engine) {
 			case "sipjs":
 				this.phone = new SIPJSPhone(
@@ -53,9 +54,6 @@ class WebrtcSIPPhone {
 				// Restore noise suppression setting if it was set on the previous instance
 				if (existingNoiseSuppression) {
 					this.phone.setNoiseSuppression(existingNoiseSuppression);
-				}
-				if (existingRingingDuration) {
-					this.phone.setRingingDuration(existingRingingDuration);
 				}
 				break;
 			default:

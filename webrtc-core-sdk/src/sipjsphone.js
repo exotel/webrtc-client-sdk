@@ -16,6 +16,99 @@ dtmftone.src = require("./static/dtmf.wav");
 const DEFAULT_RINGING_DURATION_SEC = 30;
 const RING_TONE_PLAY_RETRY_MS = 500;
 
+// The ringtone element above is shared by every SIPJSPhone instance, so the
+// ring state is global too: one element, one ring, one configured duration.
+let ringingDurationSec = DEFAULT_RINGING_DURATION_SEC;
+let ringToneTimeoutID = 0;
+let ringTonePlayRetryID = 0;
+let ringToneStartedAt = 0;
+
+// Retries play() until it succeeds or the ring is stopped. The ring tone used
+// to be driven by a 500ms setInterval, which retried play() ~30 times as a
+// side effect; looping the audio element replaced that with a single attempt.
+// A first play() can still be rejected by the browser autoplay policy (no user
+// gesture yet) or a transient media error, and one attempt would leave the
+// agent with a completely silent incoming call. An armed ringToneTimeoutID is
+// what marks the ring as active, so it doubles as the retry's stop condition.
+function ringTonePlay() {
+	if (!ringToneTimeoutID) {
+		return;
+	}
+	ringtone.play()
+		.then(() => {
+			logger.log("sipjsphone: playRingTone: audio is playing");
+		})
+		.catch(e => {
+			logger.warn(`sipjsphone: playRingTone: play failed, retrying in ${RING_TONE_PLAY_RETRY_MS}ms:`, e);
+			if (ringToneTimeoutID) {
+				ringTonePlayRetryID = setTimeout(ringTonePlay, RING_TONE_PLAY_RETRY_MS);
+			}
+		});
+}
+
+function ringToneStart() {
+	try {
+		ringToneStop();
+		logger.log("sipjsphone: startRingTone: durationSec:", ringingDurationSec);
+		ringToneStartedAt = Date.now();
+		ringtone.load();
+		ringtone.loop = true;
+		ringToneTimeoutID = setTimeout(() => {
+			logger.log("sipjsphone: startRingTone: auto-stop after configured duration");
+			ringToneStop();
+		}, ringingDurationSec * 1000);
+		ringTonePlay();
+	} catch (e) {
+		logger.error("sipjsphone: startRingTone: Exception:", e);
+	}
+}
+
+function ringToneStop() {
+	try {
+		if (!ringToneTimeoutID) {
+			return;
+		}
+		logger.log("sipjsphone: stopRingTone: timeoutID:", ringToneTimeoutID);
+		clearTimeout(ringToneTimeoutID);
+		ringToneTimeoutID = 0;
+		clearTimeout(ringTonePlayRetryID);
+		ringTonePlayRetryID = 0;
+		ringtone.loop = false;
+		ringtone.pause();
+		ringtone.currentTime = 0;
+	} catch (e) {
+		logger.error("sipjsphone: stopRingTone: Exception:", e);
+	}
+}
+
+function ringToneSetDuration(seconds) {
+	// Numbers and numeric strings only: ring duration usually arrives from a
+	// contact-center config (Nodeflow, campaign settings) where numbers are
+	// commonly strings, so strings are coerced. Everything else is refused
+	// outright -- Number() would turn true into 1 and [5] into 5. Number()
+	// rejects "", null, undefined and non-numeric strings as NaN/0, which
+	// the guard below catches.
+	const duration = (typeof seconds === 'number' || typeof seconds === 'string') ? Number(seconds) : NaN;
+	if (!Number.isFinite(duration) || duration <= 0) {
+		logger.error(`sipjsphone: setRingingDuration: invalid duration ${seconds}`);
+		return false;
+	}
+	ringingDurationSec = duration;
+	logger.log(`sipjsphone: setRingingDuration: ${duration} sec`);
+	if (ringToneTimeoutID) {
+		// Reschedule against the time already spent ringing, so changing the
+		// duration mid-ring cannot extend the ring past the configured total.
+		clearTimeout(ringToneTimeoutID);
+		const remainingMs = duration * 1000 - (Date.now() - ringToneStartedAt);
+		if (remainingMs <= 0) {
+			ringToneStop();
+		} else {
+			ringToneTimeoutID = setTimeout(ringToneStop, remainingMs);
+		}
+	}
+	return true;
+}
+
 class SIPJSPhone {
 
 	static toBeConfigure = true;
@@ -125,76 +218,23 @@ class SIPJSPhone {
 		this.audioRemote.style.display = 'none';
 		document.body.appendChild(this.audioRemote);		
 		this.callAudioOutputVolume = 1;
-		this.ringingDurationSec = DEFAULT_RINGING_DURATION_SEC;
-		
+
 	}
 
 	setRingingDuration(seconds) {
-		// Coerced, not type-checked: ring duration usually arrives from a
-		// contact-center config (Nodeflow, campaign settings) where numbers
-		// are commonly strings. Number() rejects "", null, undefined and
-		// non-numeric strings as NaN/0, which the guard below catches.
-		const duration = Number(seconds);
-		if (!Number.isFinite(duration) || duration <= 0) {
-			logger.error(`sipjsphone: setRingingDuration: invalid duration ${seconds}`);
-			return false;
-		}
-		this.ringingDurationSec = duration;
-		this._resetRingToneAutoStopTimer();
-		logger.log(`sipjsphone: setRingingDuration: ${duration} sec`);
-		return true;
+		return ringToneSetDuration(seconds);
 	}
 
 	getRingingDuration() {
-		return this.ringingDurationSec ?? DEFAULT_RINGING_DURATION_SEC;
+		return ringingDurationSec;
 	}
 
 	startRingTone() {
-		if (this.ctxSip && typeof this.ctxSip.startRingTone === 'function') {
-			this.ctxSip.startRingTone();
-		}
+		ringToneStart();
 	}
 
 	stopRingTone() {
-		if (this.ctxSip && typeof this.ctxSip.stopRingTone === 'function') {
-			this.ctxSip.stopRingTone();
-		}
-	}
-
-	_resetRingToneAutoStopTimer() {
-		if (!this.ctxSip || !this.ctxSip.ringToneTimeoutID) {
-			return;
-		}
-		clearTimeout(this.ctxSip.ringToneTimeoutID);
-		this.ctxSip.ringToneTimeoutID = setTimeout(() => {
-			if (this.ctxSip) {
-				this.ctxSip.stopRingTone();
-			}
-		}, this.getRingingDuration() * 1000);
-	}
-
-	// Retries play() until it succeeds or the ring is stopped. The ring tone
-	// used to be driven by a 500ms setInterval, which retried play() ~30 times
-	// as a side effect; looping the audio element replaced that with a single
-	// attempt. A first play() can still be rejected by the browser autoplay
-	// policy (no user gesture yet) or a transient media error, and one attempt
-	// would leave the agent with a completely silent incoming call.
-	// An armed ringToneTimeoutID is what marks the ring as active, so it
-	// doubles as the retry's stop condition.
-	_playRingTone() {
-		if (!this.ctxSip || !this.ctxSip.ringtone || !this.ctxSip.ringToneTimeoutID) {
-			return;
-		}
-		this.ctxSip.ringtone.play()
-			.then(() => {
-				logger.log("sipjsphone: playRingTone: audio is playing");
-			})
-			.catch(e => {
-				logger.warn(`sipjsphone: playRingTone: play failed, retrying in ${RING_TONE_PLAY_RETRY_MS}ms:`, e);
-				if (this.ctxSip && this.ctxSip.ringToneTimeoutID) {
-					this.ctxSip.ringTonePlayRetryID = setTimeout(() => this._playRingTone(), RING_TONE_PLAY_RETRY_MS);
-				}
-			});
+		ringToneStop();
 	}
 
 	setCallAudioOutputVolume(value) {
@@ -280,55 +320,6 @@ class SIPJSPhone {
 		callActiveID: null,
 		callVolume: 1,
 		Stream: null,
-		ringToneTimeoutID: 0,
-		ringTonePlayRetryID: 0,
-
-			startRingTone: () => {
-			try {
-				this.ctxSip.stopRingTone();
-				if (!this.ctxSip.ringtone) {
-					this.ctxSip.ringtone = this.ringtone;
-				}
-				logger.log('sipjsphone: startRingTone: durationSec:', this.getRingingDuration());
-				this.ctxSip.ringtone.load();
-				this.ctxSip.ringtone.loop = true;
-				// Arm the auto-stop before playing: an armed ringToneTimeoutID
-				// is what marks this instance as owner of the shared ringtone
-				// element, and _playRingTone() uses it as its stop condition.
-				this.ctxSip.ringToneTimeoutID = setTimeout(() => {
-					logger.log('sipjsphone: startRingTone: auto-stop after configured duration');
-					this.ctxSip.stopRingTone();
-				}, this.getRingingDuration() * 1000);
-				this._playRingTone();
-				} catch (e) {
-					logger.error("sipjsphone: startRingTone: Exception:", e);
-				}
-			},
-
-			stopRingTone: () => {
-				try {
-					// The ringtone element is module-level and shared by every
-					// SIPJSPhone instance, so only the instance that started
-					// the tone may stop it -- otherwise an unrelated phone's
-					// call teardown silences a live incoming ring. An armed
-					// ringToneTimeoutID marks ownership; when it is 0 the tone
-					// is already stopped and there is nothing to do.
-					if (!this.ctxSip.ringToneTimeoutID) {
-						return;
-					}
-					if (!this.ctxSip.ringtone) {
-						this.ctxSip.ringtone = this.ringtone;
-					}
-					logger.log("sipjsphone: stopRingTone: timeoutID:", this.ctxSip.ringToneTimeoutID);
-					clearTimeout(this.ctxSip.ringToneTimeoutID);
-					this.ctxSip.ringToneTimeoutID = 0;
-					clearTimeout(this.ctxSip.ringTonePlayRetryID);
-					this.ctxSip.ringTonePlayRetryID = 0;
-					this.ctxSip.ringtone.loop = false;
-					this.ctxSip.ringtone.pause();
-					this.ctxSip.ringtone.currentTime = 0;
-			} catch (e) { logger.error("sipjsphone: stopRingTone: Exception:", e); }
-		},
 
 			// Update the startRingbackTone method (around line 223) to use Web Audio:
 			startRingbackTone: () => {
@@ -424,7 +415,7 @@ class SIPJSPhone {
 					logger.log('DEBUG: Incoming call detected, about to start ring tone');
 					this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('incoming');
 				status = "Incoming: " + newSess.displayName;
-					this.ctxSip.startRingTone();
+					ringToneStart();
 				//sip call method was invoking after 500 ms because of race between server push and 
 				//webrtc websocket autoanswer
 					setTimeout(() => this.sipCall(), 500);
@@ -1598,7 +1589,12 @@ destroySocketConnection() {
 		try {
 			for (i = 0; i < additionalAudioElements.length; i++) {
 				elem = additionalAudioElements[i];
-				elem.load();
+				// load() aborts playback; an element that is already playing
+				// (a live ring tone) only needs its sink switched, which works
+				// during playback.
+				if (elem.paused) {
+					elem.load();
+				}
 				elem.setSinkId(deviceId);
 			}
 		} catch (e) {
@@ -1656,7 +1652,7 @@ destroySocketConnection() {
 	uiCallTerminated(s_description) {
 		if (window.btnBFCP)
 			window.btnBFCP.disabled = true;
-		this.ctxSip.stopRingTone();
+		ringToneStop();
 		this.ctxSip.stopRingbackTone();
 		if (this.callBackHandler && this.callBackHandler.onResponse)
 			this.callBackHandler.onResponse("disconnected");
@@ -1691,7 +1687,7 @@ destroySocketConnection() {
 			this.ctxSip.phoneHoldButtonPressed(this.ctxSip.callActiveID);
 		}
 		this.ctxSip.stopRingbackTone();
-		this.ctxSip.stopRingTone();
+		ringToneStop();
 		this.ctxSip.setCallSessionStatus('Answered');
 		this.ctxSip.logCall(newSess, 'answered');
 		this.ctxSip.callActiveID = newSess.ctxid;
@@ -1706,7 +1702,7 @@ destroySocketConnection() {
 			this.webrtcSIPPhoneEventDelegate.stopCallStat();
 			this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('terminated');
 		}
-		this.ctxSip.stopRingTone();
+		ringToneStop();
 		this.ctxSip.stopRingbackTone();
 		this.ctxSip.setCallSessionStatus("");
 		this.ctxSip.callActiveID = null;
