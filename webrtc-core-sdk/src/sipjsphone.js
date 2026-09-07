@@ -285,12 +285,12 @@ class SIPJSPhone {
 					if (!this.ctxSip.ringtone) {
 						this.ctxSip.ringtone = this.ringtone;
 					}
-					this.ctxSip.ringtone.pause();
-					this.ctxSip.ringtone.currentTime = 0;
-					this.ctxSip.ringtone.loop = false;
 					logger.log("sipjsphone: stopRingTone: timeoutID:", this.ctxSip.ringToneTimeoutID);
 					clearTimeout(this.ctxSip.ringToneTimeoutID);
 					this.ctxSip.ringToneTimeoutID = 0;
+					this.ctxSip.ringtone.loop = false;
+					this.ctxSip.ringtone.pause();
+					this.ctxSip.ringtone.currentTime = 0;
 			} catch (e) { logger.log("sipjsphone: stopRingTone: Exception:", e); }
 		},
 
