@@ -142,34 +142,26 @@ class ExDelegationHandler {
     }
     onRecieveInvite(incomingSession) {
         logger.log("delegationHandler: onRecieveInvite\n");
-        const message = incomingSession?.incomingInviteRequest?.message;
-        if (!message) {
-            logger.warn("delegationHandler: onRecieveInvite: no invite message");
-            return;
-        }
-
-        // The From display name is often absent on agent-leg INVITEs, so fall back to the
-        // user part of the URI -- the same pair core uses for its own display name.
-        this.exClient.callFromNumber = message.from?.displayName || message.from?.uri?.user || '';
-
-        // sipHeaders carries every header, custom X-* ones included. Note SIP.js stores
-        // keys headerized, so the wire's X-Exotel-CallSid is keyed X-Exotel-Callsid here.
-        const sipHeaders = {};
-        for (const name of Object.keys(message.headers)) {
-            const values = message.getHeaders(name);
-            sipHeaders[name] = values.length > 1 ? values : values[0];
-        }
-
-        // Assign unconditionally: a call whose INVITE omits a header must not inherit the
-        // previous call's value. getHeader() normalises the lookup the same way SIP.js
-        // normalises the stored key, so casing on the wire does not matter.
-        CallDetails.callId = message.getHeader('Call-ID') || '';
+        const message = incomingSession.incomingInviteRequest.message;
+        const obj = message.headers;
+        this.exClient.callFromNumber = message.from.displayName;
+        // Assigned unconditionally so a call whose INVITE omits a header reports empty
+        // rather than inheriting the previous call's value. getHeader() normalises the
+        // lookup the way SIP.js normalises the stored key, so wire casing does not matter.
         CallDetails.callSid = message.getHeader('X-Exotel-CallSid') || '';
-        CallDetails.legSid = message.getHeader('X-Exotel-LegSid') || message.getHeader('LegSid') || '';
-        CallDetails.remoteId = message.from?.uri?.user || '';
-        CallDetails.remoteDisplayName = message.from?.displayName || '';
-        CallDetails.callDirection = 'incoming';
-        CallDetails.sipHeaders = sipHeaders;
+        CallDetails.callId = message.getHeader('Call-ID') || '';
+        CallDetails.legSid = message.getHeader('X-Exotel-LegSid') || '';
+        const result = {};
+        for (let key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                if (obj[key].length == 1) {
+                    result[key] = obj[key][0].raw;
+                } else if (obj[key].length > 1) {
+                    result[key] = obj[key].map(item => item.raw);
+                }
+            }
+        }
+        CallDetails.sipHeaders = result;
     }
     onPickCall() {
         logger.log("delegationHandler: onPickCall\n");
@@ -423,6 +415,9 @@ class ExotelWebClient {
      */
     callEventCallback = (event, phone, param) => {
         logger.log("ExWebClient: callEventCallback: Received ---> " + event + 'param sent....' + param + 'for phone....' + phone)
+        // [VST-2017] Copy the details onto the call object so they survive JSON.stringify.
+        // Call only carries methods, so without this the consumer sees {}.
+        if (param) Object.assign(param, CallDetails.getCallDetails());
         if (event === "i_new_call") {
             if (!this.call) {
                 this.call = new Call(param); // param is the session
