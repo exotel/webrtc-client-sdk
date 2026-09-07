@@ -792,7 +792,11 @@ class SIPJSPhone {
 							incomingSession.progress({ statusCode: 180, reasonPhrase: "Ringing" });
 							incomingSession.direction = "incoming";
 							this.ctxSip.newSession(incomingSession);
-							this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL", incomingSession);
+							// [VST-2017] Hand the INVITE to the delegate so the client SDK can read
+							// its headers. This call was dropped in v3.0.0; sendWebRTCEventsToFSM
+							// only forwards two arguments, so the session never reached the client.
+							this.webrtcSIPPhoneEventDelegate.onRecieveInvite(incomingSession);
+							this.webrtcSIPPhoneEventDelegate.sendWebRTCEventsToFSM("i_new_call", "CALL");
 						} else {
 							incomingSession.reject({ statusCode: 486 });
 						}

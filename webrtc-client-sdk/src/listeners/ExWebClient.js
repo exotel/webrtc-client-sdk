@@ -142,28 +142,38 @@ class ExDelegationHandler {
     }
     onRecieveInvite(incomingSession) {
         logger.log("delegationHandler: onRecieveInvite\n");
-        const obj = incomingSession.incomingInviteRequest.message.headers;
-        this.exClient.callFromNumber = incomingSession.incomingInviteRequest.message.from.displayName;
-        if (obj.hasOwnProperty("X-Exotel-Callsid")) {
-            CallDetails.callSid = obj['X-Exotel-Callsid'][0].raw;
+        const message = incomingSession?.incomingInviteRequest?.message;
+        if (!message) {
+            logger.warn("delegationHandler: onRecieveInvite: no invite message");
+            return;
         }
-        if (obj.hasOwnProperty("Call-ID")) {
-            CallDetails.callId = obj['Call-ID'][0].raw;
-        }
-        if (obj.hasOwnProperty("LegSid")) {
-            CallDetails.legSid = obj['LegSid'][0].raw;
-        }
-        const result = {};
-        for (let key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                if (obj[key].length == 1) {
-                    result[key] = obj[key][0].raw;
-                } else if (obj[key].length > 1) {
-                    result[key] = obj[key].map(item => item.raw);
-                }
+
+        // The From display name is often absent on agent-leg INVITEs, so fall back to the
+        // user part of the URI -- the same pair core uses for its own display name.
+        this.exClient.callFromNumber = message.from?.displayName || message.from?.uri?.user || '';
+
+        const sipHeaders = {};
+        const customHeaders = {};
+        for (const name of Object.keys(message.headers)) {
+            const values = message.getHeaders(name);
+            const value = values.length > 1 ? values : values[0];
+            sipHeaders[name] = value;
+            if (name.toLowerCase().startsWith('x-')) {
+                customHeaders[name] = value;
             }
         }
-        CallDetails.sipHeaders = result;
+
+        // Assign unconditionally: a call whose INVITE omits a header must not inherit the
+        // previous call's value. getHeader() normalises the lookup the same way SIP.js
+        // normalises the stored key, so casing on the wire does not matter.
+        CallDetails.callId = message.getHeader('Call-ID') || '';
+        CallDetails.callSid = message.getHeader('X-Exotel-CallSid') || '';
+        CallDetails.legSid = message.getHeader('X-Exotel-LegSid') || message.getHeader('LegSid') || '';
+        CallDetails.remoteId = message.from?.uri?.user || '';
+        CallDetails.remoteDisplayName = message.from?.displayName || '';
+        CallDetails.callDirection = 'incoming';
+        CallDetails.sipHeaders = sipHeaders;
+        CallDetails.customHeaders = customHeaders;
     }
     onPickCall() {
         logger.log("delegationHandler: onPickCall\n");

@@ -1,5 +1,12 @@
 Change Log
 
+## v3.0.15 8 September, 2026
+-[VST-2017] Call events now carry the call details on callObj itself (callSid, legSid, phone, eventType, callState, sipHeaders, customHeaders), so JSON.stringify(callObj) is no longer "{}". callObj.callDetails() is unchanged and returns the same fields
+-[VST-2017] Added customHeaders to the call details: the X-* subset of the incoming INVITE headers. sipHeaders still carries every header
+-[VST-2017] Fixed legSid: it is read from X-Exotel-LegSid (the previous lookup used a header name SIP.js never stores) and is now returned by callDetails()
+-[VST-2017] Fixed the phone / caller number arriving as null in the call and session callbacks; falls back to the From URI user when the INVITE carries no display name
+-[VST-2017] Call details no longer leak between calls: a call whose INVITE omits a header reports an empty value instead of the previous call's
+
 ## v3.0.13 14 August, 2026
 -[VST-1782] Expose setRingingDuration, getRingingDuration on ExotelWebClient (default ring 30 sec)
 -[VST-2016] Expose startRingTone and stopRingTone on ExotelWebClient
