@@ -659,13 +659,70 @@ class ExotelWebClient {
         this.webrtcSIPPhone.setNoiseSuppression(enabled);
     }
 
+    setRingingDuration(seconds) {
+        logger.log(`ExWebClient: setRingingDuration: ${seconds}`);
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: setRingingDuration: webrtcSIPPhone not initialized");
+            return false;
+        }
+        return this.webrtcSIPPhone.setRingingDuration(seconds);
+    }
+
+    getRingingDuration() {
+        logger.log("ExWebClient: getRingingDuration");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: getRingingDuration: webrtcSIPPhone not initialized");
+            return 30;
+        }
+        return this.webrtcSIPPhone.getRingingDuration();
+    }
+
+    setRingToneAutoStart(enabled) {
+        logger.log(`ExWebClient: setRingToneAutoStart: ${enabled}`);
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: setRingToneAutoStart: webrtcSIPPhone not initialized");
+            return false;
+        }
+        return this.webrtcSIPPhone.setRingToneAutoStart(enabled);
+    }
+
+    getRingToneAutoStart() {
+        logger.log("ExWebClient: getRingToneAutoStart");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: getRingToneAutoStart: webrtcSIPPhone not initialized");
+            return true;
+        }
+        return this.webrtcSIPPhone.getRingToneAutoStart();
+    }
+
+    startRingTone() {
+        logger.log("ExWebClient: startRingTone");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: startRingTone: webrtcSIPPhone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.startRingTone();
+    }
+
+    stopRingTone() {
+        logger.log("ExWebClient: stopRingTone");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: stopRingTone: webrtcSIPPhone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.stopRingTone();
+    }
+
 }
 
 
 logger.registerLoggerCallback((type, message, args) => {
     LogManager.onLog(type, message, args);
     if (ExotelWebClient.clientSDKLoggerCallback) {
-        ExotelWebClient.clientSDKLoggerCallback("log", message, args);
+        // Forward the real severity. This used to be hardcoded to "log", which
+        // meant an integrator's callback could not tell an SDK error from an
+        // ordinary log line and so could not filter or alert on failures.
+        ExotelWebClient.clientSDKLoggerCallback(type, message, args);
     }
 });
 
