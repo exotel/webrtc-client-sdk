@@ -701,7 +701,10 @@ class ExotelWebClient {
 logger.registerLoggerCallback((type, message, args) => {
     LogManager.onLog(type, message, args);
     if (ExotelWebClient.clientSDKLoggerCallback) {
-        ExotelWebClient.clientSDKLoggerCallback("log", message, args);
+        // Forward the real severity. This used to be hardcoded to "log", which
+        // meant an integrator's callback could not tell an SDK error from an
+        // ordinary log line and so could not filter or alert on failures.
+        ExotelWebClient.clientSDKLoggerCallback(type, message, args);
     }
 });
 
