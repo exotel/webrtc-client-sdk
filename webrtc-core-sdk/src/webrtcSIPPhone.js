@@ -313,6 +313,16 @@ class WebrtcSIPPhone {
 		return this.phone.getRingingDuration();
 	}
 
+	setRingToneAutoStart(enabled) {
+		logger.log("webrtcSIPPhone: setRingToneAutoStart: ", enabled);
+		return this.phone.setRingToneAutoStart(enabled);
+	}
+
+	getRingToneAutoStart() {
+		logger.log("webrtcSIPPhone: getRingToneAutoStart");
+		return this.phone.getRingToneAutoStart();
+	}
+
 	startRingTone() {
 		logger.log("webrtcSIPPhone: startRingTone");
 		this.phone.startRingTone();

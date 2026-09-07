@@ -677,6 +677,24 @@ class ExotelWebClient {
         return this.webrtcSIPPhone.getRingingDuration();
     }
 
+    setRingToneAutoStart(enabled) {
+        logger.log(`ExWebClient: setRingToneAutoStart: ${enabled}`);
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: setRingToneAutoStart: webrtcSIPPhone not initialized");
+            return false;
+        }
+        return this.webrtcSIPPhone.setRingToneAutoStart(enabled);
+    }
+
+    getRingToneAutoStart() {
+        logger.log("ExWebClient: getRingToneAutoStart");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: getRingToneAutoStart: webrtcSIPPhone not initialized");
+            return true;
+        }
+        return this.webrtcSIPPhone.getRingToneAutoStart();
+    }
+
     startRingTone() {
         logger.log("ExWebClient: startRingTone");
         if (!this.webrtcSIPPhone) {

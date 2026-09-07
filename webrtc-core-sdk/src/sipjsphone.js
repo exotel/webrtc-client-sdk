@@ -23,6 +23,14 @@ let ringToneTimeoutID = 0;
 let ringTonePlayRetryID = 0;
 let ringToneStartedAt = 0;
 
+// Whether the SDK starts the ring tone by itself on an incoming session.
+// Enabled by default, so integrators that never touch this keep the existing
+// behaviour. An app that gates ringing on its own state -- e.g. waiting for
+// push and SIP to agree on the same AppServer call -- turns this off and
+// calls startRingTone() when it is ready. It never blocks an explicit
+// startRingTone(); it governs only the automatic start.
+let ringToneAutoStart = true;
+
 // Retries play() until it succeeds or the ring is stopped. The ring tone used
 // to be driven by a 500ms setInterval, which retried play() ~30 times as a
 // side effect; looping the audio element replaced that with a single attempt.
@@ -79,6 +87,24 @@ function ringToneStop() {
 	} catch (e) {
 		logger.error("sipjsphone: stopRingTone: Exception:", e);
 	}
+}
+
+function ringToneSetAutoStart(enabled) {
+	// Booleans, and the strings a config layer would supply. Boolean(seconds)
+	// is deliberately not used: Boolean("false") is true, which would turn the
+	// gate on when the config plainly said to turn it off.
+	let flag;
+	if (typeof enabled === 'boolean') {
+		flag = enabled;
+	} else if (typeof enabled === 'string' && /^\s*(true|false)\s*$/i.test(enabled)) {
+		flag = enabled.trim().toLowerCase() === 'true';
+	} else {
+		logger.error(`sipjsphone: setRingToneAutoStart: invalid value ${enabled}`);
+		return false;
+	}
+	ringToneAutoStart = flag;
+	logger.log(`sipjsphone: setRingToneAutoStart: ${flag}`);
+	return true;
 }
 
 function ringToneSetDuration(seconds) {
@@ -227,6 +253,14 @@ class SIPJSPhone {
 
 	getRingingDuration() {
 		return ringingDurationSec;
+	}
+
+	setRingToneAutoStart(enabled) {
+		return ringToneSetAutoStart(enabled);
+	}
+
+	getRingToneAutoStart() {
+		return ringToneAutoStart;
 	}
 
 	startRingTone() {
@@ -415,7 +449,11 @@ class SIPJSPhone {
 					logger.log('DEBUG: Incoming call detected, about to start ring tone');
 					this.webrtcSIPPhoneEventDelegate.onCallStatSipJsSessionEvent('incoming');
 				status = "Incoming: " + newSess.displayName;
-					ringToneStart();
+					if (ringToneAutoStart) {
+						ringToneStart();
+					} else {
+						logger.log('sipjsphone: incoming: auto ring tone suppressed, ringtone disabled');
+					}
 				//sip call method was invoking after 500 ms because of race between server push and 
 				//webrtc websocket autoanswer
 					setTimeout(() => this.sipCall(), 500);
