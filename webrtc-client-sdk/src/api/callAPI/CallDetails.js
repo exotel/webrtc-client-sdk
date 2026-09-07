@@ -14,7 +14,6 @@ export var CallDetails = {
     callSid: '',
     legSid: '',
     sipHeaders: {},
-    customHeaders: {},
     eventType: '',
     phone: '',
 
@@ -77,7 +76,6 @@ export var CallDetails = {
             callSid: this.callSid,
             legSid: this.legSid,
             sipHeaders: this.sipHeaders,
-            customHeaders: this.customHeaders,
             eventType: this.eventType,
             phone: this.phone
         }

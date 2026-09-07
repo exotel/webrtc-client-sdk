@@ -152,15 +152,12 @@ class ExDelegationHandler {
         // user part of the URI -- the same pair core uses for its own display name.
         this.exClient.callFromNumber = message.from?.displayName || message.from?.uri?.user || '';
 
+        // sipHeaders carries every header, custom X-* ones included. Note SIP.js stores
+        // keys headerized, so the wire's X-Exotel-CallSid is keyed X-Exotel-Callsid here.
         const sipHeaders = {};
-        const customHeaders = {};
         for (const name of Object.keys(message.headers)) {
             const values = message.getHeaders(name);
-            const value = values.length > 1 ? values : values[0];
-            sipHeaders[name] = value;
-            if (name.toLowerCase().startsWith('x-')) {
-                customHeaders[name] = value;
-            }
+            sipHeaders[name] = values.length > 1 ? values : values[0];
         }
 
         // Assign unconditionally: a call whose INVITE omits a header must not inherit the
@@ -173,7 +170,6 @@ class ExDelegationHandler {
         CallDetails.remoteDisplayName = message.from?.displayName || '';
         CallDetails.callDirection = 'incoming';
         CallDetails.sipHeaders = sipHeaders;
-        CallDetails.customHeaders = customHeaders;
     }
     onPickCall() {
         logger.log("delegationHandler: onPickCall\n");
