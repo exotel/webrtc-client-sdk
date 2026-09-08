@@ -1,7 +1,15 @@
 Change Log
 
-## v3.0.11 14 August, 2026
--[VST-1150] Expose websocket close event to consumers.
+## v3.0.14 8 September, 2026
+-[VST-1150] Refactor callback handling in webrtc-client-sdk to include error parameter in session callbacks. Update ExWebClient to trigger session callbacks with error information on WebSocket disconnect. Modify SIPJSPhone to improve error message handling during disconnection events.
+
+## v3.0.13 8 September, 2026
+-[VST-2017] Restored the onRecieveInvite delegate callback on an incoming INVITE. It was dropped in v3.0.0, which left the client SDK with no access to the INVITE headers and broke callSid, sipHeaders and the caller number
+
+## v3.0.12 14 August, 2026
+-[VST-1782] Configurable incoming ring duration: setRingingDuration, getRingingDuration (default 30 sec); replaces hardcoded ~15 sec interval cap
+-[VST-2016] Expose startRingTone and stopRingTone
+-[VST-2016] Expose setRingToneAutoStart, getRingToneAutoStart; enabled by default. When disabled, the SDK does not auto-play the ring tone on an incoming session; an explicit startRingTone() still plays
 
 ## v3.0.9 27 March, 2026
 -[VST-1577] Removed the same-device-ID guard from replaceSenderTrack.

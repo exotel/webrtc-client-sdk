@@ -42,7 +42,9 @@ class WebrtcSIPPhone {
 		
 		// Preserve noise suppression setting from existing phone instance if it exists
 		const existingNoiseSuppression = this.phone?.enableNoiseSuppression;
-		
+		// The ringing duration is module-level state in sipjsphone, so it
+		// survives a new phone instance on its own.
+
 		switch (engine) {
 			case "sipjs":
 				this.phone = new SIPJSPhone(
@@ -300,6 +302,36 @@ class WebrtcSIPPhone {
         logger.log("webrtcSIPPhone: setNoiseSuppression: ", enabled);
         this.phone.setNoiseSuppression(enabled);
     }
+
+	setRingingDuration(seconds) {
+		logger.log("webrtcSIPPhone: setRingingDuration: ", seconds);
+		return this.phone.setRingingDuration(seconds);
+	}
+
+	getRingingDuration() {
+		logger.log("webrtcSIPPhone: getRingingDuration");
+		return this.phone.getRingingDuration();
+	}
+
+	setRingToneAutoStart(enabled) {
+		logger.log("webrtcSIPPhone: setRingToneAutoStart: ", enabled);
+		return this.phone.setRingToneAutoStart(enabled);
+	}
+
+	getRingToneAutoStart() {
+		logger.log("webrtcSIPPhone: getRingToneAutoStart");
+		return this.phone.getRingToneAutoStart();
+	}
+
+	startRingTone() {
+		logger.log("webrtcSIPPhone: startRingTone");
+		this.phone.startRingTone();
+	}
+
+	stopRingTone() {
+		logger.log("webrtcSIPPhone: stopRingTone");
+		this.phone.stopRingTone();
+	}
 }
 
 export default WebrtcSIPPhone;

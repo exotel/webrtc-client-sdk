@@ -53,10 +53,7 @@ export class RegisterCallback  {
     triggerRegisterCallback= function () {
         const callbackFunc = this.registerCallbackHandler;
         const state = this.registerState
-        if (callbackFunc) {
-            return callbackFunc(state, this.phone);
-        }
-        logger.log("Register callback is null");
+        return callbackFunc(state, this.phone);
     };
 }
 /**

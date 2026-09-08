@@ -147,17 +147,15 @@ class ExDelegationHandler {
     }
     onRecieveInvite(incomingSession) {
         logger.log("delegationHandler: onRecieveInvite\n");
-        const obj = incomingSession.incomingInviteRequest.message.headers;
-        this.exClient.callFromNumber = incomingSession.incomingInviteRequest.message.from.displayName;
-        if (obj.hasOwnProperty("X-Exotel-Callsid")) {
-            CallDetails.callSid = obj['X-Exotel-Callsid'][0].raw;
-        }
-        if (obj.hasOwnProperty("Call-ID")) {
-            CallDetails.callId = obj['Call-ID'][0].raw;
-        }
-        if (obj.hasOwnProperty("LegSid")) {
-            CallDetails.legSid = obj['LegSid'][0].raw;
-        }
+        const message = incomingSession.incomingInviteRequest.message;
+        const obj = message.headers;
+        this.exClient.callFromNumber = message.from.displayName;
+        // Assigned unconditionally so a call whose INVITE omits a header reports empty
+        // rather than inheriting the previous call's value. getHeader() normalises the
+        // lookup the way SIP.js normalises the stored key, so wire casing does not matter.
+        CallDetails.callSid = message.getHeader('X-Exotel-CallSid') || '';
+        CallDetails.callId = message.getHeader('Call-ID') || '';
+        CallDetails.legSid = message.getHeader('X-Exotel-LegSid') || '';
         const result = {};
         for (let key in obj) {
             if (obj.hasOwnProperty(key)) {
@@ -422,6 +420,9 @@ class ExotelWebClient {
      */
     callEventCallback = (event, phone, param) => {
         logger.log("ExWebClient: callEventCallback: Received ---> " + event + 'param sent....' + param + 'for phone....' + phone)
+        // [VST-2017] Copy the details onto the call object so they survive JSON.stringify.
+        // Call only carries methods, so without this the consumer sees {}.
+        if (param) Object.assign(param, CallDetails.getCallDetails());
         if (event === "i_new_call") {
             if (!this.call) {
                 this.call = new Call(param); // param is the session
@@ -664,13 +665,70 @@ class ExotelWebClient {
         this.webrtcSIPPhone.setNoiseSuppression(enabled);
     }
 
+    setRingingDuration(seconds) {
+        logger.log(`ExWebClient: setRingingDuration: ${seconds}`);
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: setRingingDuration: webrtcSIPPhone not initialized");
+            return false;
+        }
+        return this.webrtcSIPPhone.setRingingDuration(seconds);
+    }
+
+    getRingingDuration() {
+        logger.log("ExWebClient: getRingingDuration");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: getRingingDuration: webrtcSIPPhone not initialized");
+            return 30;
+        }
+        return this.webrtcSIPPhone.getRingingDuration();
+    }
+
+    setRingToneAutoStart(enabled) {
+        logger.log(`ExWebClient: setRingToneAutoStart: ${enabled}`);
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: setRingToneAutoStart: webrtcSIPPhone not initialized");
+            return false;
+        }
+        return this.webrtcSIPPhone.setRingToneAutoStart(enabled);
+    }
+
+    getRingToneAutoStart() {
+        logger.log("ExWebClient: getRingToneAutoStart");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: getRingToneAutoStart: webrtcSIPPhone not initialized");
+            return true;
+        }
+        return this.webrtcSIPPhone.getRingToneAutoStart();
+    }
+
+    startRingTone() {
+        logger.log("ExWebClient: startRingTone");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: startRingTone: webrtcSIPPhone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.startRingTone();
+    }
+
+    stopRingTone() {
+        logger.log("ExWebClient: stopRingTone");
+        if (!this.webrtcSIPPhone) {
+            logger.warn("ExWebClient: stopRingTone: webrtcSIPPhone not initialized");
+            return;
+        }
+        this.webrtcSIPPhone.stopRingTone();
+    }
+
 }
 
 
 logger.registerLoggerCallback((type, message, args) => {
     LogManager.onLog(type, message, args);
     if (ExotelWebClient.clientSDKLoggerCallback) {
-        ExotelWebClient.clientSDKLoggerCallback("log", message, args);
+        // Forward the real severity. This used to be hardcoded to "log", which
+        // meant an integrator's callback could not tell an SDK error from an
+        // ordinary log line and so could not filter or alert on failures.
+        ExotelWebClient.clientSDKLoggerCallback(type, message, args);
     }
 });
 
