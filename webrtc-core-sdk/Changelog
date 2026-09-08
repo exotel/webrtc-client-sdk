@@ -1,5 +1,8 @@
 Change Log
 
+## v3.0.13 8 September, 2026
+-[VST-2017] Restored the onRecieveInvite delegate callback on an incoming INVITE. It was dropped in v3.0.0, which left the client SDK with no access to the INVITE headers and broke callSid, sipHeaders and the caller number
+
 ## v3.0.12 14 August, 2026
 -[VST-1782] Configurable incoming ring duration: setRingingDuration, getRingingDuration (default 30 sec); replaces hardcoded ~15 sec interval cap
 -[VST-2016] Expose startRingTone and stopRingTone

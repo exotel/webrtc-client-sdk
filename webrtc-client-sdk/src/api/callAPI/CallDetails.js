@@ -12,6 +12,7 @@ export var CallDetails = {
     callEndReason: '',
     sessionId: '',
     callSid: '',
+    legSid: '',
     sipHeaders: {},
 
     setCallDetails: function (callId, remoteId, remoteDisplayName, callDirection,
@@ -71,6 +72,7 @@ export var CallDetails = {
             callEndReason: this.callEndReason,
             sessionId: this.sessionId,
             callSid: this.callSid,
+            legSid: this.legSid,
             sipHeaders: this.sipHeaders
         }
         return callDetailsObj;
