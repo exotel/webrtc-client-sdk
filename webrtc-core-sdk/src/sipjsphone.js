@@ -805,7 +805,7 @@ class SIPJSPhone {
 						logger.log("sipjsphone: onDisconnect: called", error);
 						let errorEvent = {
 							message: (error && error.message) || "",
-							code: ""
+							code: null
 						};
 						if (error && error.message) {
 							const match = error.message.match(/code:\s*(\d+)/);
