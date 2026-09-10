@@ -87,6 +87,23 @@ class ExDelegationHandler {
             this.exClient.callEventCallback(eventType, this.exClient.callFromNumber, this.exClient.call);
         }
     }
+    onWebSocketDisconnect(error) {
+        logger.log("ExWebClient: onWebSocketDisconnect:", error);
+        // Deliberately NOT gated on unregisterInitiated: registerEventCallback's
+        // "registered" branch also clears that flag, and SIP.js's Registerer.unregister()
+        // fires a spurious "registered"-shaped state change of its own partway through
+        // teardown, before the real disconnect happens - so unregisterInitiated can already
+        // read false here even for a fully deliberate unregister(). expectingIntentionalDisconnect
+        // is untouched by any of that: set right before the actual disconnect() call, and
+        // consumed (cleared) right here, so it can't leak into a later, unrelated real drop.
+        if (this.exClient.expectingIntentionalDisconnect) {
+            this.exClient.expectingIntentionalDisconnect = false;
+            logger.log("ExWebClient: onWebSocketDisconnect: skipping, teardown was intentional (unregister/disconnect)");
+            return;
+        }
+        this.sessionCallback.initializeSession("websocket_disconnected", this.exClient.callFromNumber, error);
+        this.sessionCallback.triggerSessionCallback();
+    }
     playBeepTone() {
         logger.log("delegationHandler: playBeepTone\n");
     }
@@ -208,6 +225,14 @@ class ExotelWebClient {
     autoRetryEnabled = true;
     shouldAutoRetry = false;
     unregisterInitiated = false;
+    // Dedicated, self-consuming flag for onWebSocketDisconnect only. unregisterInitiated
+    // isn't safe for this: registerEventCallback's "registered" branch also clears it, and
+    // SIP.js's Registerer.unregister() fires a spurious "registered"-shaped state change
+    // partway through its own teardown, before the real disconnect ever happens - so by the
+    // time onWebSocketDisconnect runs, unregisterInitiated can already read false even for
+    // a fully deliberate unregister(). This flag is untouched by any of that: set right
+    // before the actual disconnect() call, read-and-cleared only in onWebSocketDisconnect.
+    expectingIntentionalDisconnect = false;
     registrationInProgress = false;
     isReadyToRegister = true;
 
@@ -231,6 +256,7 @@ class ExotelWebClient {
         this.autoRetryEnabled = true;
         this.shouldAutoRetry = false;
         this.unregisterInitiated = false;
+        this.expectingIntentionalDisconnect = false;
         this.registrationInProgress = false;
         this.currentSIPUserName = "";      
         this.isReadyToRegister = true;
@@ -497,7 +523,12 @@ class ExotelWebClient {
             setTimeout(() => {
                 const phone = phonePool[this.userName] || this.webrtcSIPPhone;
                 if (phone) {
-                  phone.sipUnRegisterWebRTC(); 
+                  // Armed right here, immediately before the call that can actually
+                  // trigger the transport disconnect - not at unregister()'s entry - to
+                  // keep the "stuck armed" window (if disconnect() turns out to be a
+                  // no-op because the transport was already down) as narrow as possible.
+                  this.expectingIntentionalDisconnect = true;
+                  phone.sipUnRegisterWebRTC();
                   phone.disconnect?.();
                 }
               }, 500);
@@ -517,7 +548,13 @@ class ExotelWebClient {
         let wsPort = 4442;
         this.isReadyToRegister = false;
         this.registrationInProgress = true;
-        this.shouldAutoRetry = this.autoRetryEnabled;
+        this.shouldAutoRetry = true;
+        // Defensive: if a prior unregister() armed this while the transport was already
+        // disconnected, disconnect() was a no-op and nothing ever consumed the flag via
+        // onWebSocketDisconnect. Starting a fresh register attempt is an unambiguous
+        // "clean slate" point, so clear it here rather than risk it later swallowing an
+        // unrelated real disconnect on this new session.
+        this.expectingIntentionalDisconnect = false;
         this.sipAccntInfo = {
             'userName': '',
             'authUser': '',
