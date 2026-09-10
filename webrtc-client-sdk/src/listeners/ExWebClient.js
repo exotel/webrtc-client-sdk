@@ -77,9 +77,8 @@ class ExDelegationHandler {
         this.sessionCallback.triggerSessionCallback();
     }
     sendWebRTCEventsToFSM(eventType, sipMethod) {
-        logger.log("delegationHandler: sendWebRTCEventsToFSM\n");
-        logger.log("delegationHandler: eventType\n", eventType);
-        logger.log("delegationHandler: sipMethod\n", sipMethod);
+        logger.log("ExWebClient:ExDelegationHandler: sendWebRTCEventsToFSM event " + eventType  + " " + sipMethod);
+      
 
         if (sipMethod == "CONNECTION") {
             this.exClient.registerEventCallback(eventType, this.exClient.userName);
@@ -374,7 +373,6 @@ class ExotelWebClient {
     disableAutoRetry = () => {
         logger.log("ExWebClient: disableAutoRetry: Entry");
         this.autoRetryEnabled = false;
-        this.shouldAutoRetry = false;
     };
 
     initDiagnostics = (saveDiagnosticsCallback, keyValueSetCallback) => {
@@ -440,7 +438,7 @@ class ExotelWebClient {
 
     registerEventCallback = (event, phone, param) => {
         logger.log("ExWebClient: registerEventCallback: Received ---> " +
-            event, [phone, param]);
+            event + " and unregisterInitiated is " + this.unregisterInitiated, [phone, param]);
 
         const lowerCaseEvent = event.toLowerCase();
 
@@ -453,20 +451,24 @@ class ExotelWebClient {
             }
             this.isReadyToRegister = false;
             this.eventListener.onRegistrationStateChanged("registered", phone);
-        } else if (lowerCaseEvent === "unregistered" || lowerCaseEvent === "terminated") {
-            this.registrationInProgress = false;
-            this.unregisterInitiated = false;
-            this.isReadyToRegister = true;
-            this.eventListener.onRegistrationStateChanged("unregistered", phone);
         } else if (lowerCaseEvent === "failed_to_start") {
+            
+            if (this.unregisterInitiated) {
+                this.shouldAutoRetry = false;
+                this.unregisterInitiated = false;
+                this.isReadyToRegister = true;           
+            }
+            this.eventListener.onRegistrationStateChanged("unregistered", phone);
+      
+
+
+        
             // The only signal that ever reaches here for a transport failure; the SDK
             // does not emit "transport_error". Unlike 1x, no unregisterInitiated check
             // is needed here: a deliberate unregister() already sets shouldAutoRetry =
             // false upstream, and the "unregistered" branch above (which this class-based
             // core SDK always fires first on a real disconnect) already clears the flag
             // before this branch runs, so the check could never fire.
-            this.registrationInProgress = false;
-            this.isReadyToRegister = true;
             if (this.shouldAutoRetry) {
                 logger.log("ExWebClient: registerEventCallback: Autoretrying");
                 DoRegisterRL(this.sipAccountInfo, this, AUTO_RETRY_DELAY_MS);
@@ -521,7 +523,6 @@ class ExotelWebClient {
         // shouldAutoRetry = true from autoRetryEnabled, silently re-registering a client
         // that was just told to unregister. The app must call enableAutoRetry() again
         // before its next register if it wants auto-retry back.
-        this.autoRetryEnabled = false;
         this.unregisterInitiated = true;
         if (!this.registrationInProgress) {
             setTimeout(() => {
@@ -552,7 +553,7 @@ class ExotelWebClient {
         let wsPort = 4442;
         this.isReadyToRegister = false;
         this.registrationInProgress = true;
-        this.shouldAutoRetry = true;
+        this.shouldAutoRetry = this.enableAutoRetry;
         // Defensive: if a prior unregister() armed this while the transport was already
         // disconnected, disconnect() was a no-op and nothing ever consumed the flag via
         // onWebSocketDisconnect. Starting a fresh register attempt is an unambiguous
