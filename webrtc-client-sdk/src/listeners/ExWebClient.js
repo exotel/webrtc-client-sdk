@@ -446,7 +446,11 @@ class ExotelWebClient {
 
         if (lowerCaseEvent === "registered") {
             this.registrationInProgress = false;
-            this.unregisterInitiated = false;
+            if (this.unregisterInitiated) {
+                logger.log("ExWebClient:registerEventCallback unregistering due to unregisterInitiated");
+                this.unregisterInitiated = false;
+                this.unregister();
+            }
             this.isReadyToRegister = false;
             this.eventListener.onRegistrationStateChanged("registered", phone);
         } else if (lowerCaseEvent === "unregistered" || lowerCaseEvent === "terminated") {
