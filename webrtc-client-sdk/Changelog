@@ -1,5 +1,8 @@
 Change Log
 
+## v3.0.16 8 September, 2026
+-[VST-1150] Refactor callback handling in webrtc-client-sdk to include error parameter in session callbacks. Update ExWebClient to trigger session callbacks with error information on WebSocket disconnect. Modify SIPJSPhone to improve error message handling during disconnection events.
+
 ## v3.0.15 8 September, 2026
 -[VST-2017] Call events now copy the call details onto callObj, so JSON.stringify(callObj) is no longer "{}". callObj.callDetails() is unchanged
 -[VST-2017] sipHeaders is populated again, custom X-* headers included. It had been silently empty since v3.0.0. NOTE: SIP.js stores header names headerized, so the wire's X-Exotel-CallSid is keyed X-Exotel-Callsid in sipHeaders -- prefer the callSid / legSid fields, whose lookup is case-insensitive

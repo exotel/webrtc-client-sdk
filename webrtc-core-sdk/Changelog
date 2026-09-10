@@ -1,5 +1,8 @@
 Change Log
 
+## v3.0.14 8 September, 2026
+-[VST-1150] Refactor callback handling in webrtc-client-sdk to include error parameter in session callbacks. Update ExWebClient to trigger session callbacks with error information on WebSocket disconnect. Modify SIPJSPhone to improve error message handling during disconnection events.
+
 ## v3.0.13 8 September, 2026
 -[VST-2017] Restored the onRecieveInvite delegate callback on an incoming INVITE. It was dropped in v3.0.0, which left the client SDK with no access to the INVITE headers and broke callSid, sipHeaders and the caller number
 
