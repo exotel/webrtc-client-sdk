@@ -17,6 +17,7 @@ const phonePool = new Map();
 var intervalId;
 var intervalIDMap = new Map();
 const logger = getLogger();   
+const AUTO_RETRY_DELAY_MS = 5000;
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -76,9 +77,8 @@ class ExDelegationHandler {
         this.sessionCallback.triggerSessionCallback();
     }
     sendWebRTCEventsToFSM(eventType, sipMethod) {
-        logger.log("delegationHandler: sendWebRTCEventsToFSM\n");
-        logger.log("delegationHandler: eventType\n", eventType);
-        logger.log("delegationHandler: sipMethod\n", sipMethod);
+        logger.log("ExWebClient:ExDelegationHandler: sendWebRTCEventsToFSM event " + eventType  + " " + sipMethod);
+      
 
         if (sipMethod == "CONNECTION") {
             this.exClient.registerEventCallback(eventType, this.exClient.userName);
@@ -221,6 +221,7 @@ class ExotelWebClient {
     eventListener = null;
     callListener = null;
     callFromNumber = null;
+    autoRetryEnabled = true;
     shouldAutoRetry = false;
     unregisterInitiated = false;
     // Dedicated, self-consuming flag for onWebSocketDisconnect only. unregisterInitiated
@@ -251,6 +252,7 @@ class ExotelWebClient {
         this.eventListener = null;
         this.callListener = null;
         this.callFromNumber = null;
+        this.autoRetryEnabled = true;
         this.shouldAutoRetry = false;
         this.unregisterInitiated = false;
         this.expectingIntentionalDisconnect = false;
@@ -354,6 +356,33 @@ class ExotelWebClient {
         UnRegisterRL(this.sipAccountInfo, this)
     };
 
+    /**
+     * Opts the client back into auto retry on transport failure. Takes effect
+     * from the next initialize() call onward.
+     */
+    enableAutoRetry = () => {
+        logger.log("ExWebClient: enableAutoRetry: Entry");
+        this.autoRetryEnabled = true;
+    };
+
+    /**
+     * Opts the client out of auto retry on transport failure. Same limitation as
+     * unregister(): a retry already in flight (DoRegisterRL's own setTimeout, fired
+     * but not yet at initialize()) cannot be cancelled, only prevented from now on.
+     */
+    disableAutoRetry = () => {
+        logger.log("ExWebClient: disableAutoRetry: Entry");
+        this.autoRetryEnabled = false;
+        // Required in addition to autoRetryEnabled, not instead of it: autoRetryEnabled is
+        // only read once, at the top of the next initialize() call, to set shouldAutoRetry -
+        // it never touches a session that is already armed. Without this line, calling
+        // disableAutoRetry() mid-session (after a register already succeeded) would do
+        // nothing until the NEXT failure after the one following it: the CURRENTLY-armed
+        // session would still fire one more auto-retry on its next transport failure before
+        // the disabled policy ever took effect.
+        this.shouldAutoRetry = false;
+    };
+
     initDiagnostics = (saveDiagnosticsCallback, keyValueSetCallback) => {
         initDiagnosticsDL(saveDiagnosticsCallback, keyValueSetCallback)
     };
@@ -417,13 +446,25 @@ class ExotelWebClient {
 
     registerEventCallback = (event, phone, param) => {
         logger.log("ExWebClient: registerEventCallback: Received ---> " +
-            event, [phone, param]);
+            event + " and unregisterInitiated is " + this.unregisterInitiated, [phone, param]);
 
         const lowerCaseEvent = event.toLowerCase();
 
         if (lowerCaseEvent === "registered") {
+            // Captured before clearing, not read live below. SIP.js's Registerer.unregister()
+            // fires a spurious "registered"-shaped event of its own partway through teardown,
+            // and that spurious event always finds registrationInProgress already false (the
+            // real registration it belongs to finished earlier). Without this snapshot, that
+            // spurious event would be misread as "a deferred unregister() never got scheduled,
+            // replay it now" and call unregister() again - confirmed to cause 3x redundant
+            // unregister()/sipUnRegisterWebRTC() calls per single unregister click (SR2).
+            const wasRegistrationInProgress = this.registrationInProgress;
             this.registrationInProgress = false;
-            this.unregisterInitiated = false;
+            if (wasRegistrationInProgress && this.unregisterInitiated) {
+                logger.log("ExWebClient:registerEventCallback unregistering due to unregisterInitiated");
+                this.unregisterInitiated = false;
+                this.unregister();
+            }
             this.isReadyToRegister = false;
             this.eventListener.onRegistrationStateChanged("registered", phone);
         } else if (lowerCaseEvent === "unregistered" || lowerCaseEvent === "terminated") {
@@ -431,6 +472,49 @@ class ExotelWebClient {
             this.unregisterInitiated = false;
             this.isReadyToRegister = true;
             this.eventListener.onRegistrationStateChanged("unregistered", phone);
+            if (this.shouldAutoRetry) {
+                // Best-effort cleanup only - not the retry trigger. A silent network
+                // outage (the case this branch mainly exists for) can leave disconnect()
+                // unable to complete its close handshake at all (no network path for the
+                // close frame either), so failed_to_start may never fire from this. The
+                // retry below fires unconditionally instead of waiting on it.
+                (phonePool[this.userName] || this.webrtcSIPPhone)?.disconnect?.();
+                logger.log("ExWebClient: registerEventCallback: Autoretrying (unregistered/terminated)");
+                DoRegisterRL(this.sipAccountInfo, this, AUTO_RETRY_DELAY_MS);
+                // Clear immediately so a duplicate firing of this same failure (the
+                // pre-existing duplicate-delegate registration issue - "unregistered"
+                // reliably fires twice per real event) can't schedule a second, parallel
+                // retry. initialize() resets this from autoRetryEnabled on its own next
+                // run (this scheduled retry's own, or a manual one), re-arming it for
+                // whatever failure comes after that - no separate flag needed.
+                this.shouldAutoRetry = false;
+            }
+        } else if (lowerCaseEvent === "failed_to_start") {
+            
+            if (this.unregisterInitiated) {
+                this.shouldAutoRetry = false;
+                this.unregisterInitiated = false;
+                this.isReadyToRegister = true;           
+            }
+            this.eventListener.onRegistrationStateChanged("unregistered", phone);
+      
+
+
+        
+            // The only signal that ever reaches here for a transport failure; the SDK
+            // does not emit "transport_error". Unlike 1x, no unregisterInitiated check
+            // is needed here: a deliberate unregister() already sets shouldAutoRetry =
+            // false upstream, and the "unregistered" branch above (which this class-based
+            // core SDK always fires first on a real disconnect) already clears the flag
+            // before this branch runs, so the check could never fire.
+            if (this.shouldAutoRetry) {
+                logger.log("ExWebClient: registerEventCallback: Autoretrying");
+                DoRegisterRL(this.sipAccountInfo, this, AUTO_RETRY_DELAY_MS);
+                // Same reasoning as the "unregistered"/"terminated" branch above: clear
+                // right after scheduling so a duplicate firing of this failure can't
+                // schedule a second retry. initialize() re-arms it on its next run.
+                this.shouldAutoRetry = false;
+            }
         }
     };
     /**
@@ -475,6 +559,12 @@ class ExotelWebClient {
     unregister = (sipAccountInfo) => {
         logger.log("ExWebClient: unregister: Entry");
         this.shouldAutoRetry = false;
+        // Also clears the persistent policy flag, not just this session's armed state:
+        // a retry already scheduled before this call can't be cancelled (plain setTimeout,
+        // no handle kept), and its eventual initialize() call would otherwise recompute
+        // shouldAutoRetry = true from autoRetryEnabled, silently re-registering a client
+        // that was just told to unregister. The app must call enableAutoRetry() again
+        // before its next register if it wants auto-retry back.
         this.unregisterInitiated = true;
         if (!this.registrationInProgress) {
             setTimeout(() => {
@@ -505,7 +595,7 @@ class ExotelWebClient {
         let wsPort = 4442;
         this.isReadyToRegister = false;
         this.registrationInProgress = true;
-        this.shouldAutoRetry = true;
+        this.shouldAutoRetry = this.autoRetryEnabled;
         // Defensive: if a prior unregister() armed this while the transport was already
         // disconnected, disconnect() was a no-op and nothing ever consumed the flag via
         // onWebSocketDisconnect. Starting a fresh register attempt is an unambiguous

@@ -60,9 +60,8 @@ class WebrtcSIPPhoneEventDelegate {
 	}
 
 	sendWebRTCEventsToFSM(eventType, sipMethod) {
-		logger.log("delegationHandler: sendWebRTCEventsToFSM");
-		logger.log("delegationHandler: eventType", [eventType]);
-		logger.log("delegationHandler: sipMethod", [sipMethod]);
+		logger.log("webrtcSIPPhoneEventDelegate: sendWebRTCEventsToFSM event " + eventType  + " " + sipMethod);
+      
 		this.delegates.forEach(delegate => {
 			if (delegate && typeof delegate.sendWebRTCEventsToFSM === 'function') {
 				delegate.sendWebRTCEventsToFSM(eventType, sipMethod);
