@@ -458,9 +458,8 @@ class ExotelWebClient {
             // spurious event would be misread as "a deferred unregister() never got scheduled,
             // replay it now" and call unregister() again - confirmed to cause 3x redundant
             // unregister()/sipUnRegisterWebRTC() calls per single unregister click (SR2).
-            const wasRegistrationInProgress = this.registrationInProgress;
             this.registrationInProgress = false;
-            if (wasRegistrationInProgress && this.unregisterInitiated) {
+            if (this.unregisterInitiated) {
                 logger.log("ExWebClient:registerEventCallback unregistering due to unregisterInitiated");
                 this.unregisterInitiated = false;
                 this.unregister();
