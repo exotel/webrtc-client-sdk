@@ -1,7 +1,9 @@
 Change Log
 
-## v3.0.16 8 September, 2026
+## v3.0.16 15 September, 2026
 -[VST-1150] Refactor callback handling in webrtc-client-sdk to include error parameter in session callbacks. Update ExWebClient to trigger session callbacks with error information on WebSocket disconnect. Modify SIPJSPhone to improve error message handling during disconnection events.
+-[VST-2187] Added auto-retry for the WebRTC connection: enableAutoRetry()/disableAutoRetry() toggle the policy (enabled by default); on a transport failure, or a silent network drop surfaced as a registration-expiry "unregistered" event, the SDK automatically re-registers after a fixed 5s delay, repeating until it succeeds or auto-retry is disabled
+-[VST-2187] disableAutoRetry() now also stops a retry that is already armed for the current session, not just future ones
 
 ## v3.0.15 8 September, 2026
 -[VST-2017] Call events now copy the call details onto callObj, so JSON.stringify(callObj) is no longer "{}". callObj.callDetails() is unchanged
