@@ -918,10 +918,11 @@ class SIPJSPhone {
 				this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent("disconnected");
 			}
 
-			// PATCH: Surface this as an 'unregistered' terminal state
-			this.registererStateEventListner("Unregistered");
 
 			this.onUserAgentTransportDisconnected();
+			// PATCH: Surface this as an 'unregistered' terminal state
+			//this.registererStateEventListner("Unregistered");
+
 		}
 
 		if (this.webrtcSIPPhoneEventDelegate && this.webrtcSIPPhoneEventDelegate.onCallStatSipJsTransportEvent) {
