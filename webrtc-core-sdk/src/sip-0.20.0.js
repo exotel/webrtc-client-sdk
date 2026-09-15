@@ -9589,6 +9589,17 @@ function defaultMediaStreamFactory() {
         if (navigator.mediaDevices === undefined) {
             return Promise.reject(new Error("Media devices not available in insecure contexts."));
         }
+        if (constraints.audio && navigator.permissions && navigator.permissions.query) {
+            return navigator.permissions.query({ name: 'microphone' }).then(function(ps) {
+                if (ps.state === 'denied') {
+                    return Promise.reject(new Error("Microphone permission denied."));
+                }
+                return navigator.mediaDevices.getUserMedia.call(navigator.mediaDevices,constraints);
+            }).catch(function(e) {
+                if(e&&e.message === 'Microphone permission denied.') throw e;
+                return navigator.mediaDevices.getUserMedia.call(navigator.mediaDevices,constraints);
+            });
+        }
         return navigator.mediaDevices.getUserMedia.call(navigator.mediaDevices, constraints);
     };
 }
