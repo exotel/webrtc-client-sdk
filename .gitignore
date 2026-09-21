@@ -1,5 +1,29 @@
-package-lock.json
 node_modules
-bundle
-dist
+.DS_Store
 .DS_STORE
+
+# SDK build output (webrtc-client-sdk / webrtc-core-sdk)
+/webrtc-client-sdk/dist
+/webrtc-client-sdk/bundle
+/webrtc-core-sdk/dist
+/webrtc-core-sdk/bundle
+
+# Local dev TLS material for the sample apps -- never commit these
+*.pem
+*.key
+
+# Sample-app build output
+/demo-npm/build
+
+# Lockfiles are not tracked in this repo
+package-lock.json
+
+# Local logs and scratch
+*.log
+
+# Local test checklists / scratch CSVs
+VST-*-checklist.csv
+
+# Local SIP credentials -- never commit
+demo-non-npm/phone.local.js
+demo-npm/src/phone.local.json
