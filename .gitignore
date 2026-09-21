@@ -27,3 +27,4 @@ VST-*-checklist.csv
 # Local SIP credentials -- never commit
 demo-non-npm/phone.local.js
 demo-npm/src/phone.local.json
+demo-non-npm/phone2.local.js

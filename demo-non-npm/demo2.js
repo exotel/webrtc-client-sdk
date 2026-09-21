@@ -43,11 +43,11 @@ function registerToggle2() {
 
 function CallListenerCallback2(callObj, eventType, sipInfo) {
     call2 = exWebClient2.getCall();
-    document.getElementById("call_status2").innerHTML = eventType;
+    document.getElementById("call_status2").textContent = eventType;
 }
 
 function RegisterEventCallBack2(state, sipInfo) {
-    document.getElementById("status2").innerHTML = state;
+    document.getElementById("status2").textContent = state;
     exWebClient2.setPreferredCodec("opus");
     
     // Register audio device callbacks after initialization

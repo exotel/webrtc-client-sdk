@@ -43,21 +43,21 @@ function registerToggle() {
 
 function CallListenerCallback(callObj, eventType, sipInfo) {
     call = exWebClient.getCall();
-    document.getElementById("call_status").innerHTML = eventType;
+    document.getElementById("call_status").textContent = eventType;
 }
 
 function CurrentInputDeviceCallback(currentInputDevice) {
     console.log("Current input device: ", currentInputDevice);
-    document.getElementById("current_input_device").innerHTML = currentInputDevice;
+    document.getElementById("current_input_device").textContent = currentInputDevice;
 }
 
 function CurrentOutputDeviceCallback(currentOutputDevice) {
     console.log("Current output device: ", currentOutputDevice);
-    document.getElementById("current_output_device").innerHTML = currentOutputDevice;
+    document.getElementById("current_output_device").textContent = currentOutputDevice;
 }
 
 function RegisterEventCallBack(state, sipInfo) {
-    document.getElementById("status").innerHTML = state;
+    document.getElementById("status").textContent = state;
     //exWebClient.setPreferredCodec("opus")
     exWebClient.registerAudioDeviceChangeCallback(function (deviceId) {
         console.log(`demo:audioInputDeviceCallback device changed to ${deviceId}`);
