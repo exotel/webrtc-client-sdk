@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebPhone - Two Accounts</title>
+    <script type="text/javascript" src="./dist/exotelsdk.js"></script>
+
+    <script type="text/javascript" src="common.js"></script>
+    <!-- Account 1 -->
+    <script type="text/javascript" src="phone.js"></script>
+    <!-- Optional local override, gitignored. Put your real credentials here, not in
+         phone.js. A 404 in the console when it is absent is expected and harmless. -->
+    <script type="text/javascript" src="phone.local.js"></script>
+    <script type="text/javascript" src="demo.js"></script>
+
+    <!-- Account 2 -->
+    <script type="text/javascript" src="phone2.js"></script>
+    <script type="text/javascript" src="demo2.js"></script>
+</head>
+<body>
+    <!-- Account 1 UI -->
+    <h3>Account 1</h3>
+    <b>Register Status: </b><b id="status">unregister</b><br><br>
+    <button id="registerButton" onclick="registerToggle()">START</button><br><br>
+    <b>Call Status:</b><b id="call_status"></b><br><br>
+    <button onclick="acceptCall()">Accept Call</button>
+    <button onclick="rejectCall()">END CALL</button>
+    <button id="muteButton" onclick="toggleMuteButton()">MUTE</button>
+    <button id="holdButton" onclick="toggleHoldButton()">HOLD</button>
+    <button onclick="sendDTMF(1)">DTMF 1</button>
+    <button onclick="sendDTMF(2)">DTMF 2</button><br><br>
+    
+    <!-- Account 1 Call Volume -->
+    <div style="margin:8px 0;">
+        <label>Account 1 Call Volume:
+        <input id="slider-call-acc1" type="range" min="0" max="100" step="1" value="100"
+                oninput="onCallVolumeChange1(this.value)">
+        </label>
+    </div>
+
+    <!-- Dropdown for Input Devices -->
+    <b><label for="inputDevices">Select Input Device:</label></b>
+    <select id="inputDevices"></select>
+    <button id="changeInputButton" onclick="changeAudioInputDevice()">Change Input Device</button>
+    <br><br>
+    <!-- Dropdown for Output Devices -->
+    <b><label for="outputDevices">Select Output Device:</label></b>
+    <select id="outputDevices"></select>
+    <button id="changeOutputButton" onclick="changeAudioOutputDevice()">Change Output Device</button>
+    <br><br>
+    <button onclick="downloadLogs()">Download Logs</button><br><br>
+
+    <hr>
+
+    <!-- Account 2 UI -->
+    <h3>Account 2</h3>
+    <b>Register Status: </b><b id="status2">unregister</b><br><br>
+    <button id="registerButton2" onclick="registerToggle2()">START</button><br><br>
+    <b>Call Status:</b><b id="call_status2"></b><br><br>
+    <button onclick="acceptCall2()">Accept Call</button>
+    <button onclick="rejectCall2()">END CALL</button>
+    <button id="muteButton2" onclick="toggleMuteButton2()">MUTE</button>
+    <button id="holdButton2" onclick="toggleHoldButton2()">HOLD</button>
+    <button onclick="sendDTMF2(1)">DTMF 1</button>
+    <button onclick="sendDTMF2(2)">DTMF 2</button><br><br>
+    
+    <!-- Account 2 Call Volume -->
+    <div style="margin:8px 0;">
+        <label>Account 2 Call Volume:
+        <input id="slider-call-acc2" type="range" min="0" max="100" step="1" value="100"
+                oninput="onCallVolumeChange2(this.value)">
+        </label>
+    </div>
+    
+    <!-- Dropdown for Input Devices -->
+    <b><label for="inputDevices2">Select Input Device:</label></b>
+    <select id="inputDevices2"></select>
+    <button id="changeInputButton2" onclick="changeAudioInputDevice2()">Change Input Device</button>
+    <br><br>
+    <!-- Dropdown for Output Devices -->
+    <b><label for="outputDevices2">Select Output Device:</label></b>
+    <select id="outputDevices2"></select>
+    <button id="changeOutputButton2" onclick="changeAudioOutputDevice2()">Change Output Device</button>
+    <br><br>
+    <button onclick="downloadLogs2()">Download Logs</button><br><br>
+<!-- Global Notification Volume (applies to all accounts) -->
+<div id="global-audio-controls" style="margin:16px 0; padding:12px; border:1px solid #ddd;">
+    <h3 style="margin:0 0 8px;">Global Notification Volume</h3>
+  
+    <div>
+      <label>Ringtone:
+        <input id="slider-ringtone" type="range" min="0" max="100" step="1" value="100"
+               oninput="onGlobalSoundVolumeChange('ringtone', this.value)">
+      </label>
+    </div>
+  
+    <div>
+      <label>Ringbacktone:
+        <input id="slider-ringbacktone" type="range" min="0" max="100" step="1" value="100"
+               oninput="onGlobalSoundVolumeChange('ringbacktone', this.value)">
+      </label>
+    </div>
+  
+    <div>
+      <label>Beep:
+        <input id="slider-beeptone" type="range" min="0" max="100" step="1" value="100"
+               oninput="onGlobalSoundVolumeChange('beeptone', this.value)">
+      </label>
+    </div>
+  
+    <div>
+      <label>DTMF:
+        <input id="slider-dtmftone" type="range" min="0" max="100" step="1" value="100"
+               oninput="onGlobalSoundVolumeChange('dtmftone', this.value)">
+      </label>
+    </div>
+  </div>
+  
+</body>
+</html>
