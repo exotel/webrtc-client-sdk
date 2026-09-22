@@ -1654,7 +1654,7 @@ destroySocketConnection() {
 				if (elem.paused) {
 					elem.load();
 				}
-				elem.setSinkId(deviceId);
+				elem.setSinkId(deviceId).catch((err) => logger.log("sipjsphone:changeAudioOutputDeviceForAdditionalAudioElement: setSinkId rejected (ignored):", err && err.name));
 			}
 		} catch (e) {
 			logger.error("sipjsphone:changeAudioOutputDeviceForAdditionalAudioElement failed to setSink for additonal AudioElements", e);

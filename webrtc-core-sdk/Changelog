@@ -1,5 +1,8 @@
 Change Log
 
+## Unreleased
+- Swallow HTMLMediaElement.setSinkId AbortError on Web Audio-captured tone elements (ringtone/beep/ringback/dtmf) so the rejection is not unhandled
+
 ## v3.0.14 15 September, 2026
 -[VST-1150] Refactor callback handling in webrtc-client-sdk to include error parameter in session callbacks. Update ExWebClient to trigger session callbacks with error information on WebSocket disconnect. Modify SIPJSPhone to improve error message handling during disconnection events.
 -[VST-2187] Stopped firing both "unregistered" and "failed_to_start" for the same WebSocket transport disconnect; only "failed_to_start" fires now, avoiding a duplicate signal to the client SDK's retry logic
