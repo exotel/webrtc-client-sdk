@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://bitbucket.org/Exotel/webrtc-sdk.git"
+    "url": "git+https://github.com/exotel/webrtc-client-sdk.git"
   },
   "keywords": [
     "webrtc"
@@ -17,9 +17,9 @@
   "author": "exotel",
   "license": "ISC",
   "bugs": {
-    "url": "https://bitbucket.org/Exotel/webrtc/issues"
+    "url": "https://github.com/exotel/webrtc-client-sdk/issues"
   },
-  "homepage": "https://bitbucket.org/Exotel/webrtc#readme",
+  "homepage": "https://github.com/exotel/webrtc-client-sdk#readme",
   "devDependencies": {
     "babel-loader": "^8.2.5",
     "circular-dependency-plugin": "^5.2.2",
