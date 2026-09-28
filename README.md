@@ -84,22 +84,6 @@ them. The bundled SDK lives in `demo-non-npm/dist/`; `demo-non-npm/SDK/exotelsdk
 is the same build packaged for distribution. Extract it over `dist/` to refresh the bundle, and
 keep the `.wav` files that ship alongside `exotelsdk.js` — the bundle loads them by name.
 
-## Building and releasing the SDK
-
-```bash
-cd webrtc-client-sdk
-make build          # build against the published core-sdk
-make build-local    # build against the local ../webrtc-core-sdk instead
-make tar            # produce exotelsdk-<version>.tar.gz from dist/
-make publish        # build and npm publish
-```
-
-`dist/exotelsdk.js` is generated along with the `.wav` files. Bump the version in
-`package.json`, add the entry to [Changelog.md](Changelog.md), then tag and publish a release
-here.
-
-> **Ringtone not playing after a build?** Remove the `.wav` files from `dist/` and copy the ones
-> from [`assets/sounds/`](assets/sounds) in their place.
 
 ## Support
 
