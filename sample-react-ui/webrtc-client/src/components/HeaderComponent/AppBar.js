@@ -1091,10 +1091,11 @@ export default function PrimaryPhoneAppBar(myPhoneDetails) {
 
 
 var dataString
-var myapiKey='73939b66be5f60af65dd06394cb8c25ae3f6f662a5827622'
-var myapitoken='b24e0268db4cd021c69f18acd5cab322da20400912d167c5'
-var mysubdomain='api.us3.qaexotel.com'
-var mysid='ccplexopoc1m'
+// Never commit real Exotel credentials. Set these locally (or via REACT_APP_* env at build time).
+var myapiKey = (typeof process !== 'undefined' && process.env && process.env.REACT_APP_EXOTEL_API_KEY) || ''
+var myapitoken = (typeof process !== 'undefined' && process.env && process.env.REACT_APP_EXOTEL_API_TOKEN) || ''
+var mysubdomain = (typeof process !== 'undefined' && process.env && process.env.REACT_APP_EXOTEL_SUBDOMAIN) || 'api.exotel.com'
+var mysid = (typeof process !== 'undefined' && process.env && process.env.REACT_APP_EXOTEL_ACCOUNT_SID) || ''
 var myUrl = 'https://' + mysubdomain + '/v1/Accounts/' + mysid + '/Calls/connect/'
 //var myUrlWithAuth = 'https://' + myapiKey + ':' + myapitoken + '@' + mysubdomain + '/v1/Accounts/' + mysid + '/Calls/connect/'
 
