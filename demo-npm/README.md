@@ -184,7 +184,7 @@ The result arrives on `RegisterEventCallBack`:
 
 | Param | Type | Values |
 | --- | --- | --- |
-| `state` | String | `registered` / `unregistered` / `terminated` / `sent_request` / `websocket_disconnected` |
+| `state` | String | `registered` / `unregistered` / `terminated` / `sent_request` |
 | `phone` | String | Username |
 
 ```js
@@ -193,9 +193,6 @@ function RegisterEventCallBack(state, phone, error) {
     setRegState(true);                 // successful registration
   } else if (state === 'unregistered') {
     setRegState(false);                // successful unregistration
-  } else if (state === 'websocket_disconnected') {
-    console.log('WebSocket disconnected for', phone, error);
-    setRegState(false);
   } else if (state === 'terminated') {
     setRegState(false);                // registration/unregistration failed
   } else if (state === 'sent_request') {
@@ -359,13 +356,15 @@ child tab may notify the user but should not handle the call. When the parent ta
 a `re-register` event reaches the children and one of them can become the new parent.
 
 **Note 1:** parent/child bookkeeping is the customer application's responsibility.
-**Note 2:** if you do not use multi-tab, you do not need to handle these events.
+**Note 2:** if you do not use multi-tab, you can ignore the `incoming` / `connected` /
+`callEnded` / `re-register` states. The other `SessionCallback` states below are sent in
+every setup, so register a `SessionCallback` either way.
 
 ```js
 SessionListener();   // call during initialization
 ```
 
-`SessionCallback(callState, phone)` states:
+`SessionCallback(callState, phone, error)` states:
 
 | State | Meaning |
 | --- | --- |
@@ -376,9 +375,10 @@ SessionListener();   // call during initialization
 | `ice_gathering_state_<state>` | ICE gathering changed (`new`, `gathering`, `complete`) |
 | `ice_connection_state_<state>` | ICE connection changed (`new`, `checking`, `connected`, `disconnected`, `failed`, `closed`) |
 | `media_permission_denied` | User denied microphone/camera permission |
+| `websocket_disconnected` | The SIP WebSocket connection dropped. `error` holds the close code; see [6.20](#620-websocket-disconnect-event) |
 
 ```js
-function SessionCallback(callState, phone) {
+function SessionCallback(callState, phone, error) {
   switch (callState) {
     case 'incoming':
       if (window.sessionStorage.getItem('activeSessionTab') !== 'parent0') {
@@ -395,6 +395,9 @@ function SessionCallback(callState, phone) {
       break;
     case 'media_permission_denied':
       showErrorMessage('Microphone access is required for calls.');
+      break;
+    case 'websocket_disconnected':
+      console.log('WebSocket disconnected', error.code, error.message);
       break;
   }
 }
@@ -626,16 +629,68 @@ const callVolume = exWebClient.getCallAudioOutputVolume();
 
 ### 6.20 WebSocket disconnect event
 
-When the SIP WebSocket transport closes or fails, the SDK reports state
-`"websocket_disconnected"` on `RegisterEventCallBack`.
+When the SIP WebSocket connection drops unexpectedly, the SDK calls `SessionCallback` with
+`callState === "websocket_disconnected"`. It is **not** delivered on `RegisterEventCallBack`.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `callState` | String | `"websocket_disconnected"` |
+| `phone` | String | Same `phone` value as the other `SessionCallback` states |
+| `error` | Object | `{ message, code }`, described below |
 
 ```js
-function RegisterEventCallBack(state, phone, error) {
-  if (state === 'websocket_disconnected') {
-    console.log('SDK websocket disconnected', phone, error);
+function SessionCallback(callState, phone, error) {
+  if (callState === 'websocket_disconnected') {
+    console.log('WebSocket disconnected', error.code, error.message);
+    showReconnectingBanner();   // the SDK retries on its own (see 6.14)
   }
 }
 ```
+
+**When it fires**
+
+- Only when the connection closes unexpectedly: a network drop, a server close or a failed connect.
+- It does **not** fire when your app tears the connection down itself with `UnRegister()` (since 3.0.16).
+- The SDK reconnects on its own. With auto-retry on (the default, see [6.14](#614-auto-retry)), it calls
+  `DoRegister()` again every 5 seconds until registration succeeds. Each attempt is reported on
+  `RegisterEventCallBack`, and each failed attempt can fire this event again.
+- A silent network outage may not close the socket, so this event may never fire. The SDK
+  notices when registration expires and reports `unregistered` on `RegisterEventCallBack`
+  instead. Auto-retry covers both cases.
+- The event is for UI and diagnostics. Use `error.code` to decide whether to let the retries
+  continue, or to call `disableAutoRetry()` and show an error when retrying won't help.
+
+**The `error` object**
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `message` | String | `WebSocket closed <server URL> (code: <n>)`. If no socket could be opened at all, this is the browser's error text instead. |
+| `code` | Number or `null` | The WebSocket close code, read from `message`. `null` when there is no close code (see the last row below). |
+
+**Close codes**
+
+Close codes come from the browser's WebSocket `CloseEvent`, as defined in
+[RFC 6455 §7.4](https://www.rfc-editor.org/rfc/rfc6455#section-7.4). The SDK does not define
+codes of its own. For security reasons, browsers hide the reason a connection could not be
+opened, so most connect-time failures show up as `1006`.
+
+**Transient** means auto-retry will usually recover the connection, so just show a
+"reconnecting" state. **Stop retrying** means the next attempt will fail the same way: call
+`disableAutoRetry()` and show an error.
+
+| Code | Name | Likely cause | Type | Recommended action |
+| --- | --- | --- | --- | --- |
+| `1006` | Abnormal closure | **The most common code.** The connection was lost without a close handshake: a network drop, a Wi-Fi or VPN switch, the device waking from sleep, a proxy or firewall blocking `wss`, a TLS or certificate error, DNS failure, or the server being unreachable. | Transient | Let auto-retry run. If it fails on every attempt from the start, check that the WebSocket host is reachable on port 443 from the user's network. |
+| `1000` | Normal closure | Usually the SDK's own **connect timeout**: if the server does not accept the connection within 5 seconds, the SDK closes the socket with `1000`. Can also be a clean close from the server. | Transient | Let auto-retry run. If it keeps happening, the network is slow or is blocking the WebSocket host. |
+| `1001` | Going away | The server is shutting down or restarting, or the browser is unloading the page. | Transient | Let auto-retry run. |
+| `1005` | No status received | The server closed the connection without sending a code. | Transient | Treat as a drop and let auto-retry run. |
+| `1011` | Internal error | A server-side fault. | Transient | Let auto-retry run. Contact Exotel support if it persists. |
+| `1012` | Service restart | The server is restarting. | Transient | Let auto-retry run. |
+| `1013` | Try again later | The server is temporarily overloaded. | Transient | Let auto-retry run. |
+| `1008` | Policy violation | The server rejected the connection by policy. | Stop retrying | Check the account and SIP configuration with Exotel support. |
+| `1002`, `1003`, `1007`, `1009`, `1010` | Protocol errors | A malformed, unsupported or oversized message, or a failed extension negotiation. These are unexpected between the SDK and Exotel's servers. | Stop retrying | Report to Exotel support with SDK logs. |
+| `1015` | TLS handshake failure | The TLS handshake failed. Most browsers report this as `1006` instead. | Stop retrying | Check for a TLS-intercepting proxy or a certificate problem. |
+| `null` | — | No socket was opened, for example because the WebSocket URL is malformed. `message` holds the browser's error. | Stop retrying | Fix the configuration. |
 
 ### 6.21 Ring tone control
 
