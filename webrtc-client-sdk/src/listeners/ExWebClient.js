@@ -119,14 +119,28 @@ class ExDelegationHandler {
     }
     onCallStatSignalingStateChange(cstate) {
         logger.log("delegationHandler: onCallStatSignalingStateChange\n");
+        this.sessionCallback.initializeSession(
+            "signaling-state-change",
+            this.exClient.callFromNumber,
+            undefined,
+            { state: cstate }
+        );
+        this.sessionCallback.triggerSessionCallback();
     }
     onStatPeerConnectionIceConnectionStateChange(iceConnectionState) {
         logger.log("delegationHandler: onStatPeerConnectionIceConnectionStateChange\n");
         this.sessionCallback.initializeSession(`ice_connection_state_${iceConnectionState}`, this.exClient.callFromNumber);
         this.sessionCallback.triggerSessionCallback();
     }
-    onStatPeerConnectionConnectionStateChange() {
+    onStatPeerConnectionConnectionStateChange(connectionState) {
         logger.log("delegationHandler: onStatPeerConnectionConnectionStateChange\n");
+        this.sessionCallback.initializeSession(
+            "connection-state-change",
+            this.exClient.callFromNumber,
+            undefined,
+            { state: connectionState }
+        );
+        this.sessionCallback.triggerSessionCallback();
     }
     onGetUserMediaSuccessCallstatCallback() {
         logger.log("delegationHandler: onGetUserMediaSuccessCallstatCallback\n");
@@ -156,6 +170,11 @@ class ExDelegationHandler {
     }
     stopCallStat() {
         logger.log("delegationHandler: stopCallStat\n");
+        this.sessionCallback.initializeSession(
+            "stop-call-stat",
+            this.exClient.callFromNumber
+        );
+        this.sessionCallback.triggerSessionCallback();
     }
     onRecieveInvite(incomingSession) {
         logger.log("delegationHandler: onRecieveInvite\n");
@@ -194,6 +213,13 @@ class ExDelegationHandler {
     }
     initGetStats(pc, callid, username) {
         logger.log("delegationHandler: initGetStats\n");
+        this.sessionCallback.initializeSession(
+            "init-get-stats",
+            this.exClient.callFromNumber,
+            undefined,
+            { pc, callId: callid, username }
+        );
+        this.sessionCallback.triggerSessionCallback();
     }
     onRegisterWebRTCSIPEngine(engine) {
         logger.log("delegationHandler: onRegisterWebRTCSIPEngine, engine=\n", engine);
