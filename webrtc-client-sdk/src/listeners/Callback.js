@@ -95,16 +95,18 @@ export class SessionCallback  {
     documentCallback= null;
     phone= '';
     error= undefined;
+    eventData= undefined;
     initializeSessionCallback= function (SessionCallback) {
         this.sessioncallback = SessionCallback;
     };
     intializeDocumentCallback= function (DocumentCallback) {
         this.documentCallback = DocumentCallback;
     };
-    initializeSession= function (state, phone, error) {
+    initializeSession= function (state, phone, error, eventData) {
         this.callState = state;
         this.phone = phone;
         this.error = error;
+        this.eventData = eventData;
     };
     initializeDocument= function (calldocument) {
         this.document = calldocument;
@@ -116,7 +118,7 @@ export class SessionCallback  {
     triggerSessionCallback= function () {
         const sessionCallBackFunc = this.sessioncallback;
         if (sessionCallBackFunc) {
-            return sessionCallBackFunc(this.callState, this.phone, this.error);
+            return sessionCallBackFunc(this.callState, this.phone, this.error, this.eventData);
         } else {
             logger.log("Session callback is null")
             return;
