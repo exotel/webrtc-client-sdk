@@ -631,7 +631,7 @@ export var ameyoWebRTCTroubleshooter = {
     var configuration = {
       iceServers: [
         {
-          urls: "stun:stun.l.google.com:19302",
+          url: "stun:stun.l.google.com:19302",
         },
       ],
     };
@@ -682,7 +682,7 @@ export var ameyoWebRTCTroubleshooter = {
     // If gathering never reaches "complete", leave the UI stuck on waiting.
     setTimeout(finish, 8000);
 
-    var createOfferParams = { offerToReceiveAudio: true };
+    var createOfferParams = { offerToReceiveAudio: 1 };
     try {
       Promise.resolve(pc.createOffer(createOfferParams)).then(function (offer) {
         return pc.setLocalDescription(offer);
