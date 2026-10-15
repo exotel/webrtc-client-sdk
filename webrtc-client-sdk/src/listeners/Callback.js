@@ -88,6 +88,20 @@ export var phoneInstance = {
     }
 };
 
+/**
+ * Delivers call-session events to the consumer callback.
+ *
+ * Signature: (state, phone, error, eventData)
+ *
+ * eventData is only set for call-quality states. Other states pass undefined.
+ * - "signaling-state-change" → { state: string }
+ * - "connection-state-change" → { state: string }
+ * - "init-get-stats" → { pc: RTCPeerConnection, callId: string, username: string }
+ *   pc is a live peer connection. Read stats from it during the call. Do not
+ *   store it in app state, Redux, or logs — that retains the connection after
+ *   the call ends.
+ * - "stop-call-stat" → undefined
+ */
 export class SessionCallback  {
     sessioncallback = null;
     callState= null;
@@ -102,6 +116,12 @@ export class SessionCallback  {
     intializeDocumentCallback= function (DocumentCallback) {
         this.documentCallback = DocumentCallback;
     };
+    /**
+     * @param {string} state
+     * @param {string} phone
+     * @param {*} [error]
+     * @param {object|undefined} [eventData] see SessionCallback class doc
+     */
     initializeSession= function (state, phone, error, eventData) {
         this.callState = state;
         this.phone = phone;
