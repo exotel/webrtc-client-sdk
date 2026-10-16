@@ -626,6 +626,8 @@ export var ameyoWebRTCTroubleshooter = {
 
     this.startCandidatesForTroubleshoot()
 
+    // `url` is ignored by current Chromium, so STUN never started and the
+    // checks stayed on "waiting". `urls` is the supported field.
     var configuration = {
       iceServers: [
         {
@@ -633,39 +635,65 @@ export var ameyoWebRTCTroubleshooter = {
         },
       ],
     };
-    var pc = new RTCPeerConnection(configuration);
+    var pc;
+    try {
+      pc = new RTCPeerConnection(configuration);
+    } catch (e) {
+      logger.log(e);
+      this.proccessCandidatesForTroubleshoot([]);
+      return;
+    }
     var candidates = [];
+    var settled = false;
+    var finish = function () {
+      if (settled) return;
+      settled = true;
+      parent.proccessCandidatesForTroubleshoot(candidates);
+      try {
+        pc.close();
+      } catch (e) {
+        logger.log(e);
+      }
+    };
 
     pc.addEventListener("icecandidate", function (e) {
       if (e.candidate) {
         candidates.push(e.candidate);
+      } else {
+        finish();
       }
     });
 
-    pc.addEventListener("iceconnectionstatechange", function (e) {
+    pc.addEventListener("iceconnectionstatechange", function () {
       logger.log("ice connection state: " + pc.iceConnectionState);
     });
 
     pc.addEventListener("icegatheringstatechange", function (e) {
-      parent.setWSTroubleshootData('connected');
-
       parent.addToTrobuleshootReport(
         "INFO",
         "ice gathering state: " + e.target.iceGatheringState
       );
 
       if (e.target.iceGatheringState == "complete") {
-        parent.proccessCandidatesForTroubleshoot(candidates);
-        if (pc) {
-          pc.close();
-        }
+        finish();
       }
     });
 
+    // If gathering never reaches "complete", leave the UI stuck on waiting.
+    setTimeout(finish, 8000);
+
     var createOfferParams = { offerToReceiveAudio: 1 };
-    pc.createOffer(createOfferParams).then(function (offer) {
-      pc.setLocalDescription(offer).then(parent.noop, parent.noop);
-    }, parent.noop);
+    try {
+      Promise.resolve(pc.createOffer(createOfferParams)).then(function (offer) {
+        return pc.setLocalDescription(offer);
+      }).catch(function (err) {
+        logger.log(err);
+        finish();
+      });
+    } catch (e) {
+      logger.log(e);
+      finish();
+    }
   },
 };
 

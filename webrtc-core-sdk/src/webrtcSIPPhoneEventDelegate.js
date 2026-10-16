@@ -130,10 +130,10 @@ class WebrtcSIPPhoneEventDelegate {
 		});
 	}
 
-	onStatPeerConnectionConnectionStateChange() {
+	onStatPeerConnectionConnectionStateChange(connectionState) {
 		this.delegates.forEach(delegate => {
 			if (delegate && typeof delegate.onStatPeerConnectionConnectionStateChange === 'function') {
-				delegate.onStatPeerConnectionConnectionStateChange();
+				delegate.onStatPeerConnectionConnectionStateChange(connectionState);
 			}
 		});
 	}

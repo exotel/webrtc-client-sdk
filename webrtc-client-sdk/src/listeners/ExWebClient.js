@@ -119,14 +119,28 @@ class ExDelegationHandler {
     }
     onCallStatSignalingStateChange(cstate) {
         logger.log("delegationHandler: onCallStatSignalingStateChange\n");
+        this.sessionCallback.initializeSession(
+            "signaling-state-change",
+            this.exClient.callFromNumber,
+            undefined,
+            { state: cstate }
+        );
+        this.sessionCallback.triggerSessionCallback();
     }
     onStatPeerConnectionIceConnectionStateChange(iceConnectionState) {
         logger.log("delegationHandler: onStatPeerConnectionIceConnectionStateChange\n");
         this.sessionCallback.initializeSession(`ice_connection_state_${iceConnectionState}`, this.exClient.callFromNumber);
         this.sessionCallback.triggerSessionCallback();
     }
-    onStatPeerConnectionConnectionStateChange() {
+    onStatPeerConnectionConnectionStateChange(connectionState) {
         logger.log("delegationHandler: onStatPeerConnectionConnectionStateChange\n");
+        this.sessionCallback.initializeSession(
+            "connection-state-change",
+            this.exClient.callFromNumber,
+            undefined,
+            { state: connectionState }
+        );
+        this.sessionCallback.triggerSessionCallback();
     }
     onGetUserMediaSuccessCallstatCallback() {
         logger.log("delegationHandler: onGetUserMediaSuccessCallstatCallback\n");
@@ -156,6 +170,13 @@ class ExDelegationHandler {
     }
     stopCallStat() {
         logger.log("delegationHandler: stopCallStat\n");
+        this.sessionCallback.initializeSession(
+            "stop-call-stat",
+            this.exClient.callFromNumber,
+            undefined,
+            undefined
+        );
+        this.sessionCallback.triggerSessionCallback();
     }
     onRecieveInvite(incomingSession) {
         logger.log("delegationHandler: onRecieveInvite\n");
@@ -192,8 +213,20 @@ class ExDelegationHandler {
     onSettingLocalDesc() {
         logger.log("delegationHandler: onSettingLocalDesc\n");
     }
-    initGetStats(pc, callid, username) {
+    /**
+     * @param {RTCPeerConnection} pc live reference; do not persist (see SessionCallback)
+     * @param {string} callId
+     * @param {string} username
+     */
+    initGetStats(pc, callId, username) {
         logger.log("delegationHandler: initGetStats\n");
+        this.sessionCallback.initializeSession(
+            "init-get-stats",
+            this.exClient.callFromNumber,
+            undefined,
+            { pc, callId, username }
+        );
+        this.sessionCallback.triggerSessionCallback();
     }
     onRegisterWebRTCSIPEngine(engine) {
         logger.log("delegationHandler: onRegisterWebRTCSIPEngine, engine=\n", engine);
@@ -354,6 +387,37 @@ class ExotelWebClient {
     UnRegister = () => {
         logger.log("ExWebClient: UnRegister: Entry")
         UnRegisterRL(this.sipAccountInfo, this)
+    };
+
+    /**
+     * Drops a REGISTER that DoRegister scheduled but has not sent yet.
+     * Used when SoftPhone turns OFF before that delay elapses.
+     */
+    cancelPendingRegister = () => {
+        if (this.pendingRegisterTimer) {
+            clearTimeout(this.pendingRegisterTimer);
+            this.pendingRegisterTimer = null;
+        }
+    };
+
+    /**
+     * Drops a delayed UNREGISTER that has not been handed to the phone yet.
+     * Resolves unregisterHandoff so a waiting REGISTER can proceed.
+     */
+    cancelPendingUnregister = () => {
+        if (this.pendingUnregisterTimer) {
+            clearTimeout(this.pendingUnregisterTimer);
+            this.pendingUnregisterTimer = null;
+        }
+        this.finishUnregisterHandoff();
+    };
+
+    finishUnregisterHandoff = () => {
+        const handoff = this.unregisterHandoff;
+        this.unregisterHandoff = null;
+        if (typeof handoff === "function") {
+            handoff();
+        }
     };
 
     /**
@@ -565,8 +629,10 @@ class ExotelWebClient {
         // that was just told to unregister. The app must call enableAutoRetry() again
         // before its next register if it wants auto-retry back.
         this.unregisterInitiated = true;
+        this.cancelPendingRegister();
         if (!this.registrationInProgress) {
-            setTimeout(() => {
+            this.pendingUnregisterTimer = setTimeout(() => {
+                this.pendingUnregisterTimer = null;
                 const phone = phonePool[this.userName] || this.webrtcSIPPhone;
                 if (phone) {
                   // Armed right here, immediately before the call that can actually
@@ -577,7 +643,10 @@ class ExotelWebClient {
                   phone.sipUnRegisterWebRTC();
                   phone.disconnect?.();
                 }
+                this.finishUnregisterHandoff();
               }, 500);
+        } else {
+            this.finishUnregisterHandoff();
         }
       };
       

@@ -16,7 +16,11 @@ export function DoRegister(sipAccountInfo, exWebClient, delay = 500) {
      * CHANGE IS REQUIRED - in the initialize function provision is to be given to pass Callback functions as arguments
      */
     try {
-        setTimeout(function () {
+        if (exWebClient.pendingRegisterTimer) {
+            clearTimeout(exWebClient.pendingRegisterTimer);
+        }
+        exWebClient.pendingRegisterTimer = setTimeout(function () {
+            exWebClient.pendingRegisterTimer = null;
             exWebClient.initialize(userContext,
                 sipAccountInfo.domain, //hostname
                 sipAccountInfo.userName, //subscriberName
