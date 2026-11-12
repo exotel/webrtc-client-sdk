@@ -253,7 +253,7 @@ function App() {
     return (
 
       <Grid container spacing={2}>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <Item>
             <Stack spacing={2}>
               <Item>
@@ -309,18 +309,18 @@ function App() {
   function diagnostics() {
     return (
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Stack spacing={2}>
             <Item>
               <Grid container spacing={2}>
-                <Grid item xs={4}>
+                <Grid size={4}>
                   <textarea style={{ width: 400, height: 100, resize: 'none' }} ref={diagnosticsRef} value={diagnosticsValue} onChange={diagnosticsChanged}></textarea>
                   <br></br>
                   {(configUpdated && !diagState) ? <Button variant="outlined" onClick={diagnosticsInitHandler}>Init Diagnostics</Button> : null}
                   {(diagState) ? <Button variant="outlined" onClick={diagnosticsEndHandler}>End Diagnostics</Button> : null}
                 </Grid>
                 {(diagState) ?
-                  <Grid item xs={8}>
+                  <Grid size={8}>
                     Troubleshooting Logs
                     <br></br>
                     <textarea style={{ width: 800, height: 200, resize: 'none' }} ref={diagnosticsLogsRef} value={diagnosticsLogsData} onChange={diagnosticsLogsChanged}></textarea>
@@ -332,20 +332,20 @@ function App() {
             {(diagState) ?
               <Item>
 
-                <Grid item xs={16} container spacing={2}>
-                  <Grid item xs={4}>
+                <Grid size={12} container spacing={2}>
+                  <Grid size={4}>
                     {(diagState && !diagSpeakerTestState) ? <Button variant="outlined" onClick={startSpeakerTest}>Start Speaker Test</Button> : null}
                     {(diagState && diagSpeakerTestState) ? <Button variant="outlined" onClick={stopSpeakerTestSuccess}>Stop Speaker Test Success</Button> : null}
                     {(diagState && diagSpeakerTestState) ? <Button variant="outlined" onClick={stopSpeakerTestFailure}>Stop Speaker Test Failure</Button> : null}
                     {(diagState && diagSpeakerTestState) ? <Button variant="outlined" onClick={stopSpeakerTest}>Stop Speaker Test</Button> : null}
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid size={4}>
                     {(diagState && !diagMicTestState) ? <Button variant="outlined" onClick={startMicTest}>Start Mic Test</Button> : null}
                     {(diagState && diagMicTestState) ? <Button variant="outlined" onClick={stopMicTestSuccess}>Stop Mic Test Success</Button> : null}
                     {(diagState && diagMicTestState) ? <Button variant="outlined" onClick={stopMicTestFailure}>Stop Mic Test Failure</Button> : null}
                     {(diagState && diagMicTestState) ? <Button variant="outlined" onClick={stopMicTest}>Stop Mic Test</Button> : null}
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid size={4}>
                     {(diagState && !diagNWTestState) ? <Button variant="outlined" onClick={startNwTest}>Start NW Test</Button> : null}
                     {(diagState && diagNWTestState) ? <Button variant="outlined" onClick={stopNwTest}>Stop NW Test</Button> : null}
                   </Grid>
@@ -353,21 +353,21 @@ function App() {
 
                 <br></br>
 
-                <Grid item xs={16} container spacing={2}>
+                <Grid size={12} container spacing={2}>
 
-                  <Grid item xs={4}>
+                  <Grid size={4}>
                     {(diagState && diagSpeakerTestState) ? <textarea style={{ width: 400, height: 50, resize: 'none' }} ref={diagnosticsSpeakerRef} value={diagnosticsSpeakerValue} onChange={diagnosticsSpeakerChanged}></textarea> : null}
                   </Grid>
 
-                  <Grid item xs={4}>
+                  <Grid size={4}>
                     {(diagState && diagMicTestState) ?
                       (<textarea style={{ width: 400, height: 50, resize: 'none' }} ref={diagnosticsMicRef} value={diagnosticsMicValue} onChange={diagnosticsMicChanged}></textarea>)
                       : null}
                   </Grid>
 
-                  <Grid item xs={4}>
+                  <Grid size={4}>
                     {(diagState && diagNWTestState) ?
-                      <Grid item xs={4}>
+                      <Grid size={4}>
                         <Stack spacing={2}>
                           <Item>WSS<br></br><textarea style={{ width: 400, height: 50, resize: 'none' }} ref={diagnosticsWssRef} value={diagnosticsWssValue} onChange={diagnosticsWssChanged}></textarea></Item>
                           <Item>UserReg<br></br><textarea style={{ width: 400, height: 50, resize: 'none' }} ref={diagnosticsRegRef} value={diagnosticsRegValue} onChange={diagnosticsRegChanged}></textarea></Item>
