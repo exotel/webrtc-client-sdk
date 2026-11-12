@@ -1,5 +1,10 @@
 Changelog
 
+## v3.1.0 12 November, 2026
+-[VST-2335] Upgraded uuid from 9 to 14 (dev dependency). No API change; v4() is unchanged
+-[VST-2338] Upgraded webpack-cli from 4 to 7 and webpack to ^5.101 (dev dependencies). Building the SDK now requires Node >= 20.9
+-[VST-2314][VST-2315][VST-2319][VST-2337] demo-npm sample app: removed @mui/icons-material, upgraded @mui/material 5 to 9 (Grid moved to the size API), @testing-library/react 13 to 16 (added @testing-library/dom), web-vitals 2 to 6 (on* APIs, INP replaces FID)
+
 ## v3.0.16 15 September, 2026
 -[VST-1150] Refactor callback handling in webrtc-client-sdk to include error parameter in session callbacks. Update ExWebClient to trigger session callbacks with error information on WebSocket disconnect. Modify SIPJSPhone to improve error message handling during disconnection events.
 -[VST-2187] Added auto-retry for the WebRTC connection: enableAutoRetry()/disableAutoRetry() toggle the policy (enabled by default); on a transport failure, or a silent network drop surfaced as a registration-expiry "unregistered" event, the SDK automatically re-registers after a fixed 5s delay, repeating until it succeeds or auto-retry is disabled
