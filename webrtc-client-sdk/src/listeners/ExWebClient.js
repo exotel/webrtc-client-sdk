@@ -10,7 +10,7 @@ import { closeDiagnostics as closeDiagnosticsDL, initDiagnostics as initDiagnost
 import { Callback, RegisterCallback, SessionCallback } from '../listeners/Callback';
 import { webrtcTroubleshooterEventBus } from "./Callback";
 
-import { WebrtcSIPPhone, getLogger } from "@exotel-npm-dev/webrtc-core-sdk";
+import { WebrtcSIPPhone, getLogger, EventShipper, EVENT_TYPES } from "@exotel-npm-dev/webrtc-core-sdk";
 import { CallDetails } from "../api/callAPI/CallDetails";
 import LogManager from '../api/LogManager.js';
 const phonePool = new Map();
@@ -61,6 +61,119 @@ function fetchPublicIP(sipAccountInfo) {
             resolve();
         }, 1000);
     });
+}
+
+// dump call stats in logs . 
+function dumpStats(pc, eventShipper = null, session = null) {
+    if(pc && pc.connectionState !== 'closed') {
+        pc.getStats().then((stats) => {
+            let allowedReportTypeFields = {
+                'inbound-rtp':{
+                    preprocessor : (report) => {
+                        if (report['jitterBufferEmittedCount'] > 0) {
+                            report.currentJitterBufferDelay = report['jitterBufferDelay'] / report['jitterBufferEmittedCount'];
+                        } else {
+                            report.currentJitterBufferDelay = 0;
+                        }
+                        return report;
+                    },
+                    params:['bytesReceived','jitter','packetsLost','packetsReceived','jitterBufferDelay','jitterBufferEmittedCount','currentJitterBufferDelay']
+                },
+                'outbound-rtp':{params:['bytesSent','packetsSent']},
+                'candidate-pair':{params : ['currentRoundTripTime']},
+                'media-playout':{
+                    preprocessor : (report) => {     
+                        if (report['totalSamplesCount'] > 0) {
+                            report.currentPlayoutDelay = report['totalPlayoutDelay'] / report['totalSamplesCount'];
+                        } else {
+                            report.currentPlayoutDelay = 0;
+                        }
+                        return report;
+                    },
+                    params : ['totalPlayoutDelay','totalSamplesCount','currentPlayoutDelay']
+                }
+            };
+
+            let statsJson = {
+                timestamp: Date.now(),
+                reports: []
+            };
+
+            // Variables for metrics tracking
+            let rtt = null;
+            let jitter = null;
+            let packetsLost = null;
+            let packetsReceived = null;
+
+            stats.forEach((report) => {
+                if(allowedReportTypeFields.hasOwnProperty(report.type)) {
+                    let reportmeta = allowedReportTypeFields[report.type];
+                    if(reportmeta.hasOwnProperty("preprocessor")) {
+                        report = reportmeta.preprocessor(report);
+                    }
+                    let fields = allowedReportTypeFields[report.type]['params'];
+                    let stat = {
+                        type: report.type,
+                        timestamp: report.timestamp
+                    };
+                    fields.forEach((field) => {
+                        stat[field] = report[field];
+                    });
+                    console.log("callstat : " +  report.type + " : " + JSON.stringify(stat));
+                    statsJson.reports.push(stat);
+
+                    // Extract metrics for tracking
+                    if (report.type === 'candidate-pair' && report.currentRoundTripTime) {
+                        rtt = report.currentRoundTripTime;
+                    }
+                    if (report.type === 'inbound-rtp') {
+                        if (report.jitter !== undefined) jitter = report.jitter;
+                        if (report.packetsLost !== undefined) packetsLost = report.packetsLost;
+                        if (report.packetsReceived !== undefined) packetsReceived = report.packetsReceived;
+                    }
+                }
+            });
+            
+            // Add peer connection states (iceConnectionState and dtlsState)
+            if (pc.iceConnectionState !== undefined) {
+                let connectionState = {
+                    type: 'peer-connection-state',
+                    timestamp: Date.now(),
+                    iceConnectionState: pc.iceConnectionState,
+                    dtlsState: pc.dtlsState || null
+                };
+                console.log("callstat : peer-connection-state : " + JSON.stringify(connectionState));
+                statsJson.reports.push(connectionState);
+
+                // Track WebRTC connection state
+                if (eventShipper && eventShipper.isInitialized) {
+                    eventShipper.eventCollector.trackWebRTCConnection({
+                        ice_connection_state: pc.iceConnectionState,
+                        dtls_state: pc.dtlsState || null
+                    }, session); // Pass session for call info extraction
+                }
+            }
+
+            // Track RTP stats
+            if (eventShipper && eventShipper.isInitialized && (rtt !== null || jitter !== null)) {
+                let packetLossPercentage = null;
+                if (packetsLost !== null && packetsReceived !== null && (packetsLost + packetsReceived) > 0) {
+                    packetLossPercentage = (packetsLost / (packetsReceived + packetsLost)) * 100;
+                }
+
+                eventShipper.eventCollector.trackRTPStats({
+                    rtt: rtt,
+                    jitter: jitter,
+                    packetLossPercentage: packetLossPercentage,
+                    callId: CallDetails.callId,
+                    callSid: CallDetails.callSid
+                }, session); // Pass session for call info extraction
+            }
+        }).catch((error) => {
+            // Silently handle errors if peer connection is closed
+            logger.log("dumpStats: Error getting stats:", error);
+        });
+    }
 }
 
 class ExDelegationHandler {
@@ -159,8 +272,19 @@ class ExDelegationHandler {
     setWebRTCFSMMapper(stack) {
         logger.log("delegationHandler: setWebRTCFSMMapper : Initialisation complete \n");
     }
-    onCallStatSipJsTransportEvent() {
-        logger.log("delegationHandler: onCallStatSipJsTransportEvent\n");
+    onCallStatSipJsTransportEvent(ev) {
+        logger.log("delegationHandler: onCallStatSipJsTransportEvent\n", ev);
+        
+        // Track WebSocket events
+        if (this.exClient.eventShipper && this.exClient.eventShipper.isInitialized) {
+            if (ev === 'connected' || ev === 'Connected') {
+                this.exClient.eventShipper.eventCollector.trackWebSocket('connected');
+            } else if (ev === 'disconnected' || ev === 'Disconnected' || ev === 'error') {
+                this.exClient.eventShipper.eventCollector.trackWebSocket('failure', {
+                    reason: ev
+                });
+            }
+        }
     }
     onCallStatSipSendCallback() {
         logger.log("delegationHandler: onCallStatSipSendCallback\n");
@@ -189,6 +313,16 @@ class ExDelegationHandler {
         CallDetails.callSid = message.getHeader('X-Exotel-CallSid') || '';
         CallDetails.callId = message.getHeader('Call-ID') || '';
         CallDetails.legSid = message.getHeader('X-Exotel-LegSid') || '';
+
+        // Store call info in EventShipper immediately when we receive the invite
+        // This ensures call_id/call_sid are available even before i_new_call fires
+        if (this.exClient.eventShipper && this.exClient.eventShipper.isInitialized) {
+            this.exClient.eventShipper.setCurrentCallInfo({
+                call_id: CallDetails.callId,
+                call_sid: CallDetails.callSid,
+                leg_sid: CallDetails.legSid
+            });
+        }
         const result = {};
         for (let key in obj) {
             if (obj.hasOwnProperty(key)) {
@@ -227,6 +361,25 @@ class ExDelegationHandler {
             { pc, callId, username }
         );
         this.sessionCallback.triggerSessionCallback();
+
+        // Metrics collection for EventShipper (separate from the app-facing stats callback above)
+        if (this.exClient && pc) {
+            // Clear any existing interval before starting a new one
+            if (this.exClient.dumpStatInterval) {
+                clearInterval(this.exClient.dumpStatInterval);
+                this.exClient.dumpStatInterval = null;
+            }
+            // Store peer connection reference
+            this.exClient.currentPeerConnection = pc;
+            // Note: session is not directly available here, but EventShipper has stored call info from call start
+            this.exClient.dumpStatInterval = setInterval(() => {
+                // Use stored peer connection and check if it's still valid
+                if (this.exClient.currentPeerConnection && this.exClient.currentPeerConnection.connectionState !== 'closed') {
+                    // Pass current session if available, otherwise EventShipper will use stored call info
+                    dumpStats(this.exClient.currentPeerConnection, this.exClient.eventShipper, this.exClient.currentSession);
+                }
+            }, 2000);
+        }
     }
     onRegisterWebRTCSIPEngine(engine) {
         logger.log("delegationHandler: onRegisterWebRTCSIPEngine, engine=\n", engine);
@@ -276,6 +429,13 @@ class ExotelWebClient {
     sessionCallback = null;
     logger = getLogger();
     static clientSDKLoggerCallback = null;
+    dumpStatInterval = null;
+    currentPeerConnection = null;
+    currentSession = null;  // Store current SIP session for call info extraction
+    eventShipper = null;
+    registrationStartTime = null;
+    callStartTime = null;
+    performanceMetricsInterval = null;
         
         
     constructor() {
@@ -316,6 +476,12 @@ class ExotelWebClient {
         }
         this.currentSIPUserName = userName;
         phonePool.set(userName, null); 
+
+        // Initialize EventShipper for metrics collection
+        if (!this.eventShipper) {
+            this.eventShipper = new EventShipper();
+            await this.eventShipper.init(sipAccountInfo_);
+        } 
 
         if (!this.eventListener) {
             this.eventListener = new ExotelVoiceClientListener(this.registerCallback);
@@ -371,6 +537,9 @@ class ExotelWebClient {
             this.call = new Call(this.webrtcSIPPhone);
         }
 
+        // Start performance metrics collection
+        this.startPerformanceMetricsCollection();
+
         return true;
     };
 
@@ -380,6 +549,8 @@ class ExotelWebClient {
             logger.warn("ExWebClient: DoRegister: SDK is not ready to register");
             return false;
         }
+        // Track registration start time
+        this.registrationStartTime = performance.now();
         DoRegisterRL(this.sipAccountInfo, this);
         return true;
     };
@@ -530,6 +701,14 @@ class ExotelWebClient {
             }
             this.isReadyToRegister = false;
             this.eventListener.onRegistrationStateChanged("registered", phone);
+            
+            // Track registration success
+            if (this.eventShipper && this.eventShipper.isInitialized) {
+                const duration = this.registrationStartTime ? 
+                    Math.round(performance.now() - this.registrationStartTime) : undefined;
+                this.eventShipper.eventCollector.trackRegistration('success', { duration });
+                this.registrationStartTime = null;
+            }
         } else if (lowerCaseEvent === "unregistered" || lowerCaseEvent === "terminated") {
             this.registrationInProgress = false;
             this.unregisterInitiated = false;
@@ -551,6 +730,17 @@ class ExotelWebClient {
                 // run (this scheduled retry's own, or a manual one), re-arming it for
                 // whatever failure comes after that - no separate flag needed.
                 this.shouldAutoRetry = false;
+            }
+
+            // Track registration failure
+            if (this.eventShipper && this.eventShipper.isInitialized) {
+                const duration = this.registrationStartTime ?
+                    Math.round(performance.now() - this.registrationStartTime) : undefined;
+                this.eventShipper.eventCollector.trackRegistration('failure', {
+                    reason: param || 'Unknown',
+                    duration
+                });
+                this.registrationStartTime = null;
             }
         } else if (lowerCaseEvent === "failed_to_start") {
             
@@ -595,13 +785,122 @@ class ExotelWebClient {
             if (!this.call) {
                 this.call = new Call(param); // param is the session
             }
+            this.currentSession = param; // Store session for call info extraction
+            this.callStartTime = performance.now();
             this.callListener.onIncomingCall(param, phone);
+            
+            // Extract call_id and call_sid from session and CallDetails
+            if (this.eventShipper && this.eventShipper.isInitialized && param) {
+                // Try to extract from session first
+                const callInfo = this.eventShipper.extractCallInfoFromSession(param);
+                
+                // Use CallDetails if available (populated by onRecieveInvite), otherwise use extracted info
+                // Also check stored call info from EventShipper (populated by onRecieveInvite)
+                const storedCallInfo = this.eventShipper.getCurrentCallInfo();
+                const callId = CallDetails.callId || callInfo.call_id || storedCallInfo.call_id || null;
+                const callSid = CallDetails.callSid || callInfo.call_sid || storedCallInfo.call_sid || null;
+                const legSid = CallDetails.legSid || callInfo.leg_sid || storedCallInfo.leg_sid || null;
+                
+                // Log for debugging
+                if (!callId || !callSid) {
+                    console.log('ExWebClient: call_start - CallDetails:', {
+                        callId: CallDetails.callId,
+                        callSid: CallDetails.callSid,
+                        legSid: CallDetails.legSid
+                    });
+                    console.log('ExWebClient: call_start - Extracted from session:', callInfo);
+                    console.log('ExWebClient: call_start - Stored in EventShipper:', storedCallInfo);
+                    console.log('ExWebClient: call_start - Session structure:', {
+                        hasIncomingInviteRequest: !!param.incomingInviteRequest,
+                        hasRequest: !!param.request,
+                        hasInviteRequest: !!param.inviteRequest,
+                        sessionKeys: Object.keys(param || {})
+                    });
+                }
+                
+                // Store in EventShipper for use in RTP stats and WebRTC connection state (only if we have values)
+                if (callId || callSid || legSid) {
+                    this.eventShipper.setCurrentCallInfo({ call_id: callId, call_sid: callSid, leg_sid: legSid });
+                }
+                
+                // Track call start (only pass non-empty values)
+                const callStartData = {};
+                if (callId) callStartData.call_id = callId;
+                if (callSid) callStartData.call_sid = callSid;
+                if (legSid) callStartData.leg_sid = legSid;
+                
+                this.eventShipper.eventCollector.trackCall('start', callStartData, param); // Pass session for additional extraction
+            }
         } else if (event === "ringing" || event === "accept_reject") {
             this.callListener.onRinging(param, phone);
         } else if (event === "connected") {
             this.callListener.onCallEstablished(param, phone);
+            
+            // Track call connected
+            if (this.eventShipper && this.eventShipper.isInitialized && this.callStartTime) {
+                // Re-extract call info from session (headers might be available now for outgoing calls)
+                if (this.currentSession) {
+                    const callInfo = this.eventShipper.extractCallInfoFromSession(this.currentSession);
+                    // Update stored call info if we found new values
+                    if (callInfo.call_id || callInfo.call_sid) {
+                        const currentCallInfo = this.eventShipper.getCurrentCallInfo();
+                        this.eventShipper.setCurrentCallInfo({
+                            call_id: callInfo.call_id || currentCallInfo.call_id || CallDetails.callId || '',
+                            call_sid: callInfo.call_sid || currentCallInfo.call_sid || CallDetails.callSid || '',
+                            leg_sid: callInfo.leg_sid || currentCallInfo.leg_sid || CallDetails.legSid || ''
+                        });
+                    }
+                }
+                
+                const callSetupTime = Math.round(performance.now() - this.callStartTime);
+                const callAnswerDelay = callSetupTime; // Simplified, can be calculated more accurately
+                const currentCallInfo = this.eventShipper.getCurrentCallInfo();
+                
+                // Build call connected data (only include non-empty call info)
+                const callConnectedData = {
+                    call_setup_time: callSetupTime,
+                    call_answer_delay: callAnswerDelay
+                };
+                const finalCallId = currentCallInfo.call_id || CallDetails.callId;
+                const finalCallSid = currentCallInfo.call_sid || CallDetails.callSid;
+                const finalLegSid = currentCallInfo.leg_sid || CallDetails.legSid;
+                
+                if (finalCallId) callConnectedData.call_id = finalCallId;
+                if (finalCallSid) callConnectedData.call_sid = finalCallSid;
+                if (finalLegSid) callConnectedData.leg_sid = finalLegSid;
+                
+                this.eventShipper.eventCollector.trackCall('connected', callConnectedData, this.currentSession); // Pass session for call info extraction
+            }
         } else if (event === "terminated") {
             this.callListener.onCallEnded(param, phone);
+            
+            // Track call ended
+            if (this.eventShipper && this.eventShipper.isInitialized) {
+                const currentCallInfo = this.eventShipper.getCurrentCallInfo();
+                const callEndedData = {
+                    call_failure_reason: CallDetails.callEndReason || param || 'Unknown'
+                };
+                
+                // Include call info if available
+                const finalCallId = currentCallInfo.call_id || CallDetails.callId;
+                const finalCallSid = currentCallInfo.call_sid || CallDetails.callSid;
+                const finalLegSid = currentCallInfo.leg_sid || CallDetails.legSid;
+                
+                if (finalCallId) callEndedData.call_id = finalCallId;
+                if (finalCallSid) callEndedData.call_sid = finalCallSid;
+                if (finalLegSid) callEndedData.leg_sid = finalLegSid;
+                
+                this.eventShipper.eventCollector.trackCall('ended', callEndedData, this.currentSession); // Pass session for call info extraction
+            }
+            
+            // Clear any existing interval
+            if(this.dumpStatInterval) {
+                clearInterval(this.dumpStatInterval);
+                this.dumpStatInterval = null;
+            }
+            this.currentPeerConnection = null;
+            this.currentSession = null; // Clear session reference
+            this.callStartTime = null;
         }
     };
 
@@ -630,6 +929,15 @@ class ExotelWebClient {
         // before its next register if it wants auto-retry back.
         this.unregisterInitiated = true;
         this.cancelPendingRegister();
+
+        // Stop performance metrics collection
+        this.stopPerformanceMetricsCollection();
+
+        // Stop event dispatcher
+        if (this.eventShipper) {
+            this.eventShipper.stopDispatcher();
+        }
+
         if (!this.registrationInProgress) {
             this.pendingUnregisterTimer = setTimeout(() => {
                 this.pendingUnregisterTimer = null;
@@ -907,6 +1215,47 @@ class ExotelWebClient {
             return;
         }
         this.webrtcSIPPhone.stopRingTone();
+    }
+
+    /**
+     * Start performance metrics collection
+     */
+    startPerformanceMetricsCollection() {
+        if (this.performanceMetricsInterval) {
+            return; // Already started
+        }
+
+        this.performanceMetricsInterval = setInterval(() => {
+            if (this.eventShipper && this.eventShipper.isInitialized) {
+                // Collect memory usage
+                let memoryUsage = null;
+                if (performance.memory && performance.memory.usedJSHeapSize) {
+                    memoryUsage = performance.memory.usedJSHeapSize;
+                }
+
+                // Estimate CPU usage (simplified - using performance timing)
+                let cpuUsage = null;
+                // Note: Actual CPU usage per tab is difficult to measure in browser
+                // This is a placeholder for future implementation
+
+                if (memoryUsage !== null || cpuUsage !== null) {
+                    this.eventShipper.eventCollector.trackPerformance({
+                        memory_usage: memoryUsage,
+                        cpu_usage: cpuUsage
+                    });
+                }
+            }
+        }, 30000); // Every 30 seconds
+    }
+
+    /**
+     * Stop performance metrics collection
+     */
+    stopPerformanceMetricsCollection() {
+        if (this.performanceMetricsInterval) {
+            clearInterval(this.performanceMetricsInterval);
+            this.performanceMetricsInterval = null;
+        }
     }
 
 }
