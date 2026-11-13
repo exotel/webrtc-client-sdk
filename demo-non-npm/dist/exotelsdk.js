@@ -1,6 +1,6 @@
 /*!
  * 
- * WebRTC CLient SIP version 3.1.0
+ * WebRTC CLient SIP version 3.0.18
  *
  */
 (function webpackUniversalModuleDefinition(root, factory) {

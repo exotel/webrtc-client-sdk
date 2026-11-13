@@ -1,6 +1,6 @@
 Changelog
 
-## v3.1.0 12 November, 2026
+## v3.0.18 13 November, 2026
 -[VST-2335] Upgraded uuid from 9 to 14 (dev dependency). No API change; v4() is unchanged
 -[VST-2338] Upgraded webpack-cli from 4 to 7 and webpack to ^5.101 (dev dependencies). Building the SDK now requires Node >= 20.9
 -[VST-2314][VST-2315][VST-2319][VST-2337] demo-npm sample app: removed @mui/icons-material, upgraded @mui/material 5 to 9 (Grid moved to the size API), @testing-library/react 13 to 16 (added @testing-library/dom), web-vitals 2 to 6 (on* APIs, INP replaces FID)

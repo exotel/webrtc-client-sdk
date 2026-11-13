@@ -80,7 +80,7 @@ and account creation.
 ### 4.2 Add the SDK to your project
 
 1. Download the SDK tarball from [releases](https://github.com/exotel/webrtc-client-sdk/releases),
-   or use `SDK/exotelsdk-3.1.0.tar.gz` from this repo.
+   or use `SDK/exotelsdk-3.0.18.tar.gz` from this repo.
 2. Extract it and place the `dist` folder in your app.
 3. Load it before your own scripts:
 
