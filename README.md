@@ -80,7 +80,7 @@ http-server -S -C cert.pem -K key.pem -p 8080 -c-1
 ```
 
 The generated `key.pem` / `cert.pem` are local dev material and are gitignored — never commit
-them. The bundled SDK lives in `demo-non-npm/dist/`; `demo-non-npm/SDK/exotelsdk-3.0.16.tar.gz`
+them. The bundled SDK lives in `demo-non-npm/dist/`; `demo-non-npm/SDK/exotelsdk-3.0.18.tar.gz`
 is the same build packaged for distribution. Extract it over `dist/` to refresh the bundle, and
 keep the `.wav` files that ship alongside `exotelsdk.js` — the bundle loads them by name.
 
